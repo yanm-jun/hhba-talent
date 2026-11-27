@@ -149,11 +149,26 @@ function events(env,request,input,waitUntil){
    });
    const queueProgress=kind=>publisher.queue(kind);
    const stopProgress=()=>publisher.stop();
+   let lastQueuedRowCount=0;
+   // Persist candidates first, then independently enqueue known JD work. A
+   // second research batch or broken browser transport cannot hold those jobs
+   // hostage. Queue entries contain digests only, not resume or JD content.
+   const enqueueEarlyVerification=async(checkpoint,{force=false}={})=>{
+    if(!input.background||!input.taskKey||!v4JobWorkQueueEnabled(env)||!Array.isArray(checkpoint?.rows)||!checkpoint.rows.length||!force&&checkpoint.rows.length<=lastQueuedRowCount)return null;
+    const queue=await reconcileV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0,checkpoint);
+    let awakened=true;
+    if(queue.work>0&&checkpoint.phase==='research'&&input.backgroundTicket&&stagedV4WorkflowsEnabled(env)){
+     awakened=await stageWorkflowSignal(env,input.backgroundTicket,{lane:'verification'});
+     if(!awakened)console.warn('HHBA_V4_EARLY_VERIFICATION_WAKE_DEFERRED');
+    }
+    if(queue.available&&queue.remaining===0&&awakened)lastQueuedRowCount=Math.max(lastQueuedRowCount,checkpoint.rows.length);
+    return queue;
+   };
    const stageCompleteOrHandoff=async checkpoint=>{
     if(input.backgroundLane&&input.backgroundTicket&&stagedV4WorkflowsEnabled(env)){
      const next=v4CheckpointLane(checkpoint,{independentJobs:v4JobExecutorEnabled(env)});
      if(next!==input.backgroundLane){
-      if(await stageWorkflowSignal(env,input.backgroundTicket,{lane:next})){send('complete',{status:'HANDOFF'});return;}
+      if(await stageWorkflowSignal(env,input.backgroundTicket,{lane:next})){send('complete',{status:'HANDOFF',next_lane:next});return;}
       // If the new independent consumer cannot be awakened, the owning
       // Workflow continues in proven-safe single-driver mode instead.
       send('complete',{status:'CONTINUE',fallback:true});return;
@@ -236,7 +251,9 @@ function events(env,request,input,waitUntil){
    if(input.lease)leaseHeartbeat=startMatchPhaseHeartbeat({
      renew:()=>{budget?.observe('lease');return input.lease.renew();},
      getCheckpoint:()=>input.taskKey&&!leaseAbort.signal.aborted&&(!budget||budget.canPublish())?{checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null),progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime()}:null,
-     persist:async state=>{if(!leaseAbort.signal.aborted){budget?.observe('checkpoint');await saveMatchTask(env,input.taskKey,{...state,generation:input.generation||0});}},
+     persist:async state=>{if(!leaseAbort.signal.aborted){budget?.observe('checkpoint');await saveMatchTask(env,input.taskKey,{...state,generation:input.generation||0});
+        if(!leaseAbort.signal.aborted&&state.checkpoint?.rows?.length>lastQueuedRowCount)await enqueueEarlyVerification(state.checkpoint).catch(()=>console.warn('HHBA_V4_EARLY_VERIFICATION_QUEUE_DEFERRED'));
+       }},
      onError:e=>leaseAbort.abort(e),
      onSaveError:e=>{if(e?.code==='AI_AGENT_CANCELLED')leaseAbort.abort(e);else console.warn('HHBA_V4_PERIODIC_PROGRESS_SAVE_FAILED');}
     });
@@ -335,7 +352,7 @@ function events(env,request,input,waitUntil){
         await input.lease.renew();
         await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:snapshotProgress(),checkpoint_captured_at:captureTime()});
         if(input.background&&v4JobWorkQueueEnabled(env)){
-         try{const state=await reconcileV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0,result.checkpoint);
+         try{const state=await enqueueEarlyVerification(result.checkpoint,{force:true});
           console.info('HHBA_V4_JOB_QUEUE_SYNC',JSON.stringify({pendingOrDone:state.work,changed:state.createdOrUpdated,remaining:state.remaining}));
          }catch{console.warn('HHBA_V4_JOB_QUEUE_SYNC_DEFERRED');}
         }
@@ -417,7 +434,9 @@ function events(env,request,input,waitUntil){
       metricError=code==='AI_PROVIDER_UPSTREAM_ERROR'&&/^(?:HTTP_5[0-9]{2}|SSE_FAILED)$/.test(upstreamKind)?'AI_PROVIDER_'+upstreamKind:code;
      const retryable=!isV4TerminalTaskFailure(code)&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
       if(retryable)runtimeState='recovering';
-      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&!taskStopped){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null),generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable,...(e?.upstreamKind==='SSE_FAILED'?{upstream_kind:'SSE_FAILED'}:{})}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
+      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&!taskStopped){try{await guard();await input.lease.renew();const latestCheckpoint=stampTransport(input.recoveryState?.()||input.checkpoint||null);
+       await saveMatchTask(env,input.taskKey,{checkpoint:latestCheckpoint,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable,...(e?.upstreamKind==='SSE_FAILED'?{upstream_kind:'SSE_FAILED'}:{})}});
+       await enqueueEarlyVerification(latestCheckpoint,{force:true}).catch(()=>console.warn('HHBA_V4_RECOVERED_JOB_QUEUE_DEFERRED'));}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(!taskStopped&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,upstream_kind:metricError!==code?upstreamKind:null,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
       if(!retryable)await finishWorkflowStages();
@@ -546,7 +565,7 @@ async function backgroundStep(env,request,waitUntil){
     }
     await input.lease.release();input.lease=null;
     const signaled=await stageWorkflowSignal(env,ticket,{lane:next});
-    return new Response('event: complete\ndata: '+JSON.stringify(signaled?{status:'HANDOFF'}:{status:'CONTINUE',fallback:true})+'\n\n',{headers:{'Content-Type':'text/event-stream','Cache-Control':'no-store'}});
+    return new Response('event: complete\ndata: '+JSON.stringify(signaled?{status:'HANDOFF',next_lane:next}:{status:'CONTINUE',fallback:true})+'\n\n',{headers:{'Content-Type':'text/event-stream','Cache-Control':'no-store'}});
    }
   }
   return events(env,request,input,waitUntil);
