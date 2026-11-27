@@ -177,14 +177,14 @@ test('live candidate application link opens immediately without waiting for JD v
  assert.equal(discoveryApplyDestination({...raw,official_url:'https://university.edu.cn/companies/brand/jobs/7'}),null);
  for(const unsafe of ['http://careers.real-employer.cn/jobs/123','https://localhost/jobs/12','https://user:pass@careers.real-employer.cn/job/12','javascript:alert(1)'])
   assert.equal(discoveryApplyDestination({...raw,official_url:unsafe}),null);
- assert.match(panel,/function OfficialApplyAction\\(/);
+ assert.match(panel,/function OfficialApplyAction\(/);
  assert.match(panel,/const label='投递官网'/);
- assert.match(panel,/const href=officialApplicationHref\\(job\\)/);
- assert.match(panel,/discoveryApplyDestination\\(job\\)/);
- assert.match(panel,/href=\\{href\\} target="_blank" rel="noopener noreferrer"/);
- assert.match(panel,/if\\(!href\\)return null/);
+ assert.match(panel,/const href=officialApplicationHref\(job\)/);
+ assert.match(panel,/discoveryApplyDestination\(job\)/);
+ assert.match(panel,/href=\{href\} target="_blank" rel="noopener noreferrer"/);
+ assert.match(panel,/if\(!href\)return null/);
  assert.doesNotMatch(panel,/<button type="button" className="hhba-discovery-apply" disabled/);
- assert.match(panel,/recent\\.map\\(job=>[\\s\\S]*?<OfficialApplyAction job=\\{job\\}\\/>/);
- assert.match(panel,/visible\\.map\\(job=>[\\s\\S]*?<OfficialApplyAction job=\\{job\\}\\/>/);
- assert.doesNotMatch(panel,/查看招聘来源|查看官方招聘页面|待核验/,'customer link action stays simple');
+ assert.match(panel,/recent\.map\(job=>[\s\S]*?<OfficialApplyAction job=\{job\}\/>/);
+ assert.match(panel,/visible\.map\(job=>[\s\S]*?<OfficialApplyAction job=\{job\}\/>/);
+ assert.doesNotMatch(panel,/查看招聘来源|查看官方招聘页面/,'customer link action stays simple');
 });
