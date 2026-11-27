@@ -104,7 +104,10 @@ test('queue remains disabled unless Cloudflare explicitly enables the migration-
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/await saveMatchTask\(env,input\.taskKey,\{checkpoint:result\.checkpoint/);
  assert.match(route,/if\(input\.background&&v4JobWorkQueueEnabled\(env\)\)/);
- assert.match(route,/await reconcileV4JobWork\(env\.HHBA_PNVS_AUTH_DB,input\.taskKey,input\.generation\|\|0,result\.checkpoint\)/);
+ assert.match(route,/await enqueueEarlyVerification\(result\.checkpoint,\{force:true\}\)/);
+ assert.match(route,/await enqueueEarlyVerification\(state\.checkpoint\)/);
+ assert.match(route,/await reconcileV4JobWork\(env\.HHBA_PNVS_AUTH_DB,input\.taskKey,input\.generation\|\|0,checkpoint\)/);
+ assert.match(route,/stageWorkflowSignal\(env,input\.backgroundTicket,\{lane:'verification'\}\)/);
 });
 
 test('report queue cannot launch 500 long reports before global AI ranking confirms the top fifty',async()=>{
