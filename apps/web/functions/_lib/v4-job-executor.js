@@ -87,11 +87,17 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    const version=lane==='reporting'?reportWorkRevision(source,activeScore):candidateRevision(source);
    if(!version||await revKey(version)!==claim.revision)return {status:'STALE'};
   }
-  if(previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.complete&&previous.job&&exactSeed){
+  // Legacy saved per-job checkpoints predate the original-source seed.
+  // After the authoritative checkpoint validated this job revision, these
+  // encrypted continuations are still safe to reuse (no duplicate AI calls).
+  const vettedPrevious=previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.generation===generation&&
+   previous.lane===lane&&previous.revision===claim.revision&&previous.job_key===claim.job_key&&
+   previous.source_url===url;
+  if(vettedPrevious&&previous.complete&&previous.job){
    done=true;await finishV4JobWork(db,claim,{completed:true});
    return {status:'DONE',lane,cached:true};
   }
-  let child=exactSeed?previous.checkpoint:null;
+  let child=(exactSeed||vettedPrevious)?previous.checkpoint:null;
   if(!child)child=oneJobCheckpoint(checkpoint,url,source,lane);
   const budget=v4ManagedResourceBudget({background:true,recovering:!!previous});
   const scoped=budget.env(env),provider=v4JobProvider(scoped);
