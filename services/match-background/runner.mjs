@@ -100,7 +100,11 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
    state=await step.do('resume-research-phase-'+phase,{retries:{limit:5,delay:'15 seconds',backoff:'exponential'},timeout:'30 minutes'},async()=>{
     try{
      const primary=requestPhase(fetcher,ticket,{diagnostic:true,recovery,lane:currentLane,stagedFallback:stagedOrigin&&!currentLane});
-     if(!jobsEnabled)return await primary;
+     // A staged discovery worker must not await expensive JD invocations.
+     // Verification has its own durable Workflow, awakened as soon as the
+     // first encrypted candidate checkpoint is queued. Legacy single-driver
+     // mode still fans out work here for backward compatibility.
+     if(!jobsEnabled||currentLane==='discovery')return await primary;
      // Keep the primary discovery phase moving. Large parallel Pages/model
      // bursts risk exhausting a Cloudflare Free invocation and delaying the
      // workflow even when its own research step has already finished. Spread
