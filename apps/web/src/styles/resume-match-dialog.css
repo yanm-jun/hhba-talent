@@ -457,6 +457,10 @@
 .hhba-discovery-item small,.hhba-refined-job-head small{display:flex;align-items:center;gap:4px;color:#8291a1;font-size:11px}
 .hhba-source-confirmed,.hhba-source-pending{font-size:11px;white-space:nowrap;color:#247452}
 .hhba-source-pending{color:#7f8d9c}
+.hhba-discovery-apply{display:inline-flex;align-items:center;justify-content:center;gap:4px;flex:0 0 auto;min-width:83px;padding:8px 10px;border:1px solid #cdddef;border-radius:8px;background:#edf5ff;color:#235d9c;font-size:12px;font-weight:600;line-height:1.35;text-decoration:none;white-space:nowrap;cursor:pointer;transition:background .16s,border-color .16s}
+.hhba-discovery-apply:hover:not(:disabled){background:#e2efff;border-color:#97b9df}
+.hhba-discovery-apply:focus-visible{outline:2px solid #2d70b7;outline-offset:2px}
+.hhba-discovery-apply:disabled{background:#f6f8fa;border-color:#e5eaf0;color:#a0acb9;cursor:default;opacity:1}
 .hhba-refined-stage .hhba-refined-details{border-top:1px solid #e6ebf0;padding:13px 0}
 .hhba-refined-stage .hhba-refined-details>summary{font-size:12px;color:#43617e}
 .hhba-refined-details details{margin-top:8px}
