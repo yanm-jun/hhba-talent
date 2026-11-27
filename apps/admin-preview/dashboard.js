@@ -91,7 +91,7 @@ function renderDailyOperations(report){
  status.textContent=rows.length+' 天 · '+(report.collectorStartedAt?'运营事件起始于 '+report.collectorStartedAt.slice(0,10):'运营事件采集时间尚未核实');
 }
 function updateGrowth(){
- renderAiUsage();renderV4Operations();renderV4JobOperations();renderV4SearchSpeed();
+ renderAiUsage();renderV4Operations();renderV4JobOperations();renderV4MinuteOps();renderV4SearchSpeed();
  showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
  setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
@@ -412,6 +412,22 @@ function renderV4JobOperations(){
  add('状态异常','失效 '+fmt.format(t.stale)+' · 执行失败 '+fmt.format(t.failed)+' · 单次平均 '+(t.averageMs===null?'—':(t.averageMs/1000).toFixed(1)+' 秒'));
  for(const x of data.stages||[])add(x.lane==='verification'?'JD 核验独立执行':'报告独立执行','成功 '+fmt.format(x.done)+' · 重试 '+fmt.format(x.retries)+' · 继续 '+fmt.format(x.continued));
  for(const x of data.errors||[])add((x.lane==='verification'?'JD 核验':'报告生成')+' · '+x.code,fmt.format(x.count)+' 次');
+}
+function renderV4MinuteOps(){
+ const data=growth?.v4MinuteOps,state=byId('v4-minute-ops-state'),root=byId('v4-minute-ops-details');
+ if(!state||!root)return;
+ root.replaceChildren();
+ if(data?.quality!=='collected'){
+  state.textContent=data?.quality==='no_records'?'没有真实的逐分钟成果；不以零代替未知。':'逐分钟统计暂不可用（可能尚未执行数据库迁移）';
+  return;
+ }
+ state.textContent='真实 UTC 分钟观测；主流程与独立核验分列，不能直接相加成去重岗位。Token 用量见「AI Token 消耗」，人民币费用需账单核对。';
+ for(const item of (data.rows||[]).slice(0,32)){
+  const line=document.createElement('div'),label=document.createElement('span'),value=document.createElement('strong');
+  label.textContent=item.minute_utc+' · '+(item.source==='independent'?'独立 JD/报告核验':'搜索与主流程');
+  value.textContent='候选 '+fmt.format(Number(item.candidates)||0)+' · JD '+fmt.format(Number(item.jds)||0)+' · 评分 '+fmt.format(Number(item.scores)||0)+' · 报告 '+fmt.format(Number(item.reports)||0);
+  line.append(label,value);root.append(line);
+ }
 }
 function renderV4SearchSpeed(){
  const data=growth?.v4SearchSpeed,root=byId('v4-search-speed-milestones'),state=byId('v4-search-speed-state');
