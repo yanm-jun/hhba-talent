@@ -36,7 +36,8 @@ test('staged handoff always happens after encrypted checkpoint save and task lea
  assert.match(route,/await publishProgress\(\);await releaseTask\(\);\s*await stageCompleteOrHandoff\(result\.checkpoint\)/);
  assert.match(route,/if\(input\.backgroundLane&&!input\.cachedResult\)/);
  assert.match(route,/if\(next!==input\.backgroundLane\)/);
- assert.equal((route.match(/v4CheckpointLane\\((?:input\\.)?checkpoint,\\{independentJobs:v4JobExecutorEnabled\\(env\\)\\}\\)/g)||[]).length,2,'phase handoff and phase admission use the same independent queue-aware ownership');
+ assert.equal(route.split('v4CheckpointLane(checkpoint,{independentJobs:v4JobExecutorEnabled(env)})').length-1,1);
+ assert.equal(route.split('v4CheckpointLane(input.checkpoint,{independentJobs:v4JobExecutorEnabled(env)})').length-1,1);
 });
 
 test('fallback driver retains authorized task cleanup without adding an AI provider call',()=>{
