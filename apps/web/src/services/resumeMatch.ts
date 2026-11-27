@@ -329,7 +329,8 @@ export function matchExecutionFromServer(value:unknown):MatchExecution|null{
     ![x.worker_seen_at,x.last_result_at,x.phase_started_at].every(n=>Number.isSafeInteger(n)&&Number(n)>=0))return null;
  return x as MatchExecution;
 }
-type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;execution?:MatchExecution;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;failure?:{error:string;retryable?:boolean}|null};
+type CompletedJobCursor={ms:number;lane:''|'verification'|'reporting';key:string};
+type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;execution?:MatchExecution;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;completed_jobs?:{cursor:CompletedJobCursor;jobs:MatchedJob[];more:boolean};failure?:{error:string;retryable?:boolean}|null};
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
 // token, signed continuation or model output is written to localStorage.
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
@@ -476,6 +477,7 @@ export async function submitExtractedResumeText(
  if(MATCH_V4_PREVIEW){try{task=opts.research_task_id?{id:opts.research_task_id,touch(){},clear(){}}:await matchTaskReference(cleaned,opts,resumeId)}catch{}}
  const liveCandidates=createLiveCandidateReception(onResearchJobs);
  let lastDeliveryStamp='';
+ let completedCursor:CompletedJobCursor|null=null;
  let reconnectDelay=1000;
  const reconnect=async()=>{
   if(requestSignal.aborted)throw requestSignal.reason;
@@ -488,10 +490,11 @@ export async function submitExtractedResumeText(
   for(;;){
   if(requestSignal.aborted)throw requestSignal.reason;
   try{
-  const response=await fetch(EFFECTIVE_API+'/resume',{
+  const response:Response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id,research_generation:opts.research_generation??0}:{}),...(opts.managed_task?{task_managed:true}:{}),
+    ...(opts.managed_task?{job_delta:true,job_cursor:completedCursor,progress_stamp:lastDeliveryStamp}:{}),
     options:{country:'CN',remote_only:false,
      role_hint:opts.role_hint,
      exclude_urls:opts.exclude_urls
@@ -499,9 +502,9 @@ export async function submitExtractedResumeText(
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。',true);});
-  const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
+  const isStream:boolean=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。',response.status===429||response.status>=500);
-  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,jobs=>{liveCandidates.snapshot(jobs);},event=>{liveCandidates.receive(event);},onExecution):
+  const data:(Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string}=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,jobs=>{liveCandidates.snapshot(jobs);},event=>{liveCandidates.receive(event);},onExecution):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string};
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
@@ -532,10 +535,25 @@ export async function submitExtractedResumeText(
      }
     }
    }
+   const completed:PendingManagedMatch['completed_jobs']=data.completed_jobs;
+   let deliveredJobs=0;
+   if(opts.managed_task&&Array.isArray(completed?.jobs)&&completed?.cursor){
+    const c:CompletedJobCursor=completed.cursor;
+    if(Number.isSafeInteger(c.ms)&&c.ms>=0&&['','verification','reporting'].includes(c.lane)&&
+      typeof c.key==='string'&&(c.key===''||/^[a-f0-9]{64}$/.test(c.key))){
+     if(completed.jobs.length){
+      deliveredJobs=completed.jobs.length;
+      addedCandidates+=liveCandidates.snapshot(completed.jobs);
+      onPartial?.(verifiedMatchReports(liveCandidates.jobs()));
+      console.info('HHBA_V4_INDEPENDENT_DELTAS_APPLIED',{jobs:deliveredJobs,added_candidates:addedCandidates});
+     }
+     completedCursor={ms:c.ms,lane:c.lane,key:c.key};
+    }
+   }
    if(data.status==='FAILED')throw new MatchError(502,errorMap[data.failure?.error||'']||errorMap.AI_BACKGROUND_EXECUTION_FAILED,false);
    if(data.failure?.retryable)onActivity?.({stage:'waiting',message:(data.failure.error==='AI_EDGE_DAILY_LIMIT'?'Cloudflare 当日额度暂时不足，将在额度允许后继续。':data.failure.error==='AI_PROVIDER_RATE_LIMITED'?'AI 接口暂时限流，等待恢复。':data.failure.error==='AI_TASK_IN_PROGRESS'?'原任务仍在执行或释放任务锁。':data.failure.error==='AI_BACKGROUND_WORKFLOW_ROLLOVER'?'正在接续下一段后台工作。':'后台暂时等待或正在恢复。')+' 已保存的研究成果会保留，无需重新开始。'});
    else if(!data.progress)onActivity?.({stage:'preparing',message:'后台任务已登记，正在等待实际执行状态。'});
-   await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},data.failure?.retryable?15000:addedCandidates>0?2000:3000);requestSignal.addEventListener('abort',stop,{once:true});});
+   await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},data.failure?.retryable?15000:completed?.more?1000:addedCandidates>0||deliveredJobs>0?2000:3000);requestSignal.addEventListener('abort',stop,{once:true});});
    continue;
   }
   if(data.status==='CONTINUE'){

@@ -13,6 +13,7 @@ import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSig
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {v4JobWorkQueueEnabled,reconcileV4JobWork,clearV4JobWork} from '../../_lib/v4-job-work-queue.js';
 import {v4JobExecutorEnabled,runIndependentV4Job,mergeIndependentV4Jobs,pendingIndependentV4Work} from '../../_lib/v4-job-executor.js';
+import {completedV4JobDeltas,v4CompactProgress} from '../../_lib/v4-independent-job-delivery.js';
 import {stampV4JobLocator} from '../../_lib/v4-job-locator.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
@@ -480,6 +481,18 @@ async function backgroundJobStep(env,request){
   if(observed)await recordV4JobOps(env.HHBA_METRICS_DB,observed);
  }
 }
+// Only the already authenticated and generation-fenced managed match request
+// can fetch independent completions. This never triggers a provider request.
+async function pendingManagedView(env,input,generation,body,progress,failure){
+ let deltas=null,view=progress;
+ if(body?.job_delta===true&&input.managed&&v4JobExecutorEnabled(env)){
+  try{
+   deltas=await completedV4JobDeltas(env,input.taskKey,generation,body.job_cursor);
+   view=v4CompactProgress(progress,body.progress_stamp);
+  }catch{console.warn('HHBA_V4_JOB_DELTA_READ_DEFERRED');}
+ }
+ return reply({status:'PENDING',progress:view||null,failure:failure||null,...(deltas?{completed_jobs:deltas}:{})});
+}
 async function backgroundStep(env,request,waitUntil){
  if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);
  if(!matchEnabled(env,request))return fail('MATCH_NOT_ENABLED',503);
@@ -620,14 +633,14 @@ export async function onRequest(context){
     let scheduled;
     if(view?.generation===generation&&view.status==='PENDING'){
      scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask,{diagnostic:true});
-     if(scheduled===true||scheduled?.status==='RECOVERING')return reply({status:'PENDING',progress:view.progress||null,failure:scheduled?.status==='RECOVERING'?(view.failure?.retryable?view.failure:{error:scheduled.error,retryable:true}):view.failure||null});
+     if(scheduled===true||scheduled?.status==='RECOVERING')return pendingManagedView(env,input,generation,body,view.progress,scheduled?.status==='RECOVERING'?(view.failure?.retryable?view.failure:{error:scheduled.error,retryable:true}):view.failure||null);
     }
     const saved=await readMatchTask(env,input.taskKey);
     if(saved?.generation===generation&&saved?.result?.status==='COMPLETE'){input.generation=generation;input.cachedResult=saved.result;return events(env,request,input,waitUntil);}
     if(saved?.generation===generation&&terminalV4SavedFailure(saved.failure))return reply({status:'FAILED',progress:saved.progress||null,failure:saved.failure});
     if(scheduled===undefined)scheduled=await tryScheduleBackgroundMatch(env,request,session,input.sessionTask,{diagnostic:true});
     if(scheduled==='FAILED'||scheduled?.status==='FAILED')return reply({status:'FAILED',progress:view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,failure:{error:saved?.failure?.error||scheduled?.error||'AI_BACKGROUND_EXECUTION_FAILED',retryable:false}});
-    if(scheduled)return reply({status:'PENDING',progress:view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,failure:scheduled?.status==='RECOVERING'?(saved?.generation===generation&&saved.failure?.retryable?saved.failure:{error:scheduled.error,retryable:true}):saved?.generation===generation?(retryableV4SavedFailure(saved.failure)?{...saved.failure,retryable:true}:saved.failure||null):null});
+    if(scheduled)return pendingManagedView(env,input,generation,body,view?.generation===generation?view.progress||null:saved?.generation===generation?saved.progress||null:null,scheduled?.status==='RECOVERING'?(saved?.generation===generation&&saved.failure?.retryable?saved.failure:{error:scheduled.error,retryable:true}):saved?.generation===generation?(retryableV4SavedFailure(saved.failure)?{...saved.failure,retryable:true}:saved.failure||null):null);
     // Fallback continues the same persisted task under its exclusive lease.
    }
    input.lease=await leaseMatchTask(db,input.taskKey);

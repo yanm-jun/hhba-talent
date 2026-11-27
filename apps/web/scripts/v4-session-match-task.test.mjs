@@ -155,7 +155,7 @@ test('recovery diagnostics cannot be mistaken for terminal failures in the route
  assert.match(route,/error:scheduled\.error,retryable:true/);
  assert.match(route,/isV4RetryableTaskFailure\(code\)/);
  assert.match(route,/if\(committedResult\)/);
- assert.match(client,/data\.failure\?\.retryable\?15000:addedCandidates>0\?2000:3000/);
+ assert.match(client,/data\.failure\?\.retryable\?15000:completed\?\.more\?1000:addedCandidates>0\|\|deliveredJobs>0\?2000:3000/);
 });
 
 test('profile reuse key isolates session, account, exact resume revision, intent and model; expires without renewal',async()=>{
@@ -318,7 +318,8 @@ test('route restores discovery supplements under existing leases and persists be
  assert.match(route,/await saveMatchTask\(env,input\.taskKey,recovered\.saved\)/);
  assert.match(route,/const saved=await recoverSavedDiscovery\(env,input,durable\)/);
  assert.match(route,/const saved=await recoverSavedDiscovery\(env,input,durable,view\)/);
- assert.match(route,/progress:view\.progress\|\|null/);
+ assert.match(route,/pendingManagedView\(env,input,generation,body,view\.progress/);
+ assert.match(route,/v4CompactProgress\(progress,body\.progress_stamp\)/);
  assert.doesNotMatch(route,/return reply\(\{[^}]*discovery_recovery/);
 });
 
