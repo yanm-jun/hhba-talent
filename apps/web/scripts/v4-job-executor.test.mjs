@@ -8,7 +8,7 @@ import {independentJobKey,v4JobExecutorEnabled,mergeIndependentV4Jobs,runIndepen
 const schema=readFileSync(new URL('../d1/20261126_v4_job_work_queue.sql',import.meta.url),'utf8');
 const taskKey='b'.repeat(64),url='https://careers.real.test/job/22';
 const candidate=()=>({company:'真实雇主',title:'区域督导',location:'上海',requirements:'销售运营经验',employer_proof_url:url});
-const scored=()=>({research_candidate_url:url,official_url:url,company:'真实雇主',title:'区域督导',location:'上海',curated_suitable:true,source_type:'站外官方招聘',match_score:86,jd_source_status:'VERIFIED_JD',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',evidence_excerpt:'销售运营经验'});
+const scored=()=>({research_candidate_url:url,official_url:url,company:'真实雇主',title:'区域督导',location:'上海',curated_suitable:true,source_type:'站外官方招聘',match_score:86,jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',evidence_excerpt:'销售运营经验'});
 function fixture(){
  const sqlite=new DatabaseSync(':memory:');sqlite.exec(schema);
  const db={prepare(sql){return {bind(...args){return {async all(){return {results:sqlite.prepare(sql).all(...args)}},async first(){return sqlite.prepare(sql).get(...args)},async run(){const r=sqlite.prepare(sql).run(...args);return {success:true,meta:{changes:Number(r.changes)}}}}}}},async batch(statements){return Promise.all(statements.map(s=>s.run()))}};
