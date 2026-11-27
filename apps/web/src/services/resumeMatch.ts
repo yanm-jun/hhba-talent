@@ -490,7 +490,7 @@ export async function submitExtractedResumeText(
   for(;;){
   if(requestSignal.aborted)throw requestSignal.reason;
   try{
-  const response=await fetch(EFFECTIVE_API+'/resume',{
+  const response:Response=await fetch(EFFECTIVE_API+'/resume',{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
    body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id,research_generation:opts.research_generation??0}:{}),...(opts.managed_task?{task_managed:true}:{}),
@@ -502,9 +502,9 @@ export async function submitExtractedResumeText(
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。',true);});
-  const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
+  const isStream:boolean=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。',response.status===429||response.status>=500);
-  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,jobs=>{liveCandidates.snapshot(jobs);},event=>{liveCandidates.receive(event);},onExecution):
+  const data:(Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string}=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,jobs=>{liveCandidates.snapshot(jobs);},event=>{liveCandidates.receive(event);},onExecution):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string};
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
@@ -535,10 +535,10 @@ export async function submitExtractedResumeText(
      }
     }
    }
-   const completed=data.completed_jobs;
+   const completed:PendingManagedMatch['completed_jobs']=data.completed_jobs;
    let deliveredJobs=0;
    if(opts.managed_task&&Array.isArray(completed?.jobs)&&completed?.cursor){
-    const c=completed.cursor;
+    const c:CompletedJobCursor=completed.cursor;
     if(Number.isSafeInteger(c.ms)&&c.ms>=0&&['','verification','reporting'].includes(c.lane)&&
       typeof c.key==='string'&&(c.key===''||/^[a-f0-9]{64}$/.test(c.key))){
      if(completed.jobs.length){
