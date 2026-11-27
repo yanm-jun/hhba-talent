@@ -395,3 +395,12 @@ test('incomplete second-round response retries the original ticket and preserves
  assert.equal(calls[2].recovery,'AI_BACKGROUND_RESPONSE_INCOMPLETE');
  assert.deepEqual(sleeps,['15 seconds']);
 });
+
+
+test('misconfigured staged verifier fails closed instead of taking discovery master lease',async()=>{
+ let mainCalls=0,jobCalls=0;
+ const step={async waitForEvent(){return {payload:{done:false}};},async do(){throw Error('no execution should occur');}};
+ const result=await driveBackgroundMatch(step,ticket,async url=>{if(url.endsWith('/background-step'))mainCalls++;else jobCalls++;return event('complete',{status:'COMPLETE'});},{lane:'verification',jobsEnabled:false});
+ assert.deepEqual(result,{status:'FAILED',error:'AI_JOB_EXECUTOR_DISABLED'});
+ assert.equal(mainCalls,0);assert.equal(jobCalls,0);
+});
