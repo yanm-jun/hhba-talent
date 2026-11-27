@@ -47,6 +47,7 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
   }
   if(value?.status==='COMPLETE')return terminal('COMPLETE');
   if(value?.status==='HANDOFF')return terminal('HANDOFF');
+   if(value?.status==='CONTINUE'&&value?.waiting_for_jobs===true)return terminal('WAIT_JOBS');
    if(value?.status==='CONTINUE')return value?.fallback===true&&diagnostic?{status:'CONTINUE',fallback:true}:terminal('CONTINUE');
  }
  throw retry('AI_BACKGROUND_RESPONSE_INCOMPLETE');
@@ -108,6 +109,14 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
    const error=retryCode(e);console.warn('HHBA_MATCH_WORKFLOW_INTERRUPTED',JSON.stringify({phase,error}));throw retry(error);
   }
   const result=typeof state==='string'?{status:state}:state;
+  if(result?.status==='WAIT_JOBS'){
+    // Independent job invocations were already dispatched during this
+    // phase. Sleep durably rather than hot-looping on the same R2 checkpoint.
+    // There is no cap on jobs or total research rounds.
+    streak=0;recovery=undefined;
+    await step.sleep('wait-independent-jobs-'+phase,'30 seconds');
+    continue;
+   }
   if(result?.status==='CONTINUE'){
     if(result.fallback===true)currentLane=null;
     streak=0;recovery=undefined;continue;
