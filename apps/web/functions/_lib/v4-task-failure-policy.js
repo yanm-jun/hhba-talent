@@ -17,3 +17,11 @@ export function normalizeV4RecoveryView(view,generation){
 }
 // A host-resource failure asks for a smaller *invocation*, never less research.
 export const v4RecoveredResourcePhase=code=>code==='AI_EDGE_RESOURCE_EXHAUSTED'||code==='AI_PHASE_RESOURCE_YIELD';
+
+// Keep relay transport remediation scoped to one encrypted task generation.
+// Only a specific SSE failure warrants JSON failover; ordinary HTTP 5xx and
+// network failures retain the configured transport until evidence says otherwise.
+export const v4RecoveredTransportMode=(checkpoint,failure)=>
+ checkpoint?.transport_mode==='json'||failure?.upstream_kind==='SSE_FAILED'?'json':'sse';
+export const v4StampTransport=(checkpoint,mode)=>
+ mode==='json'&&checkpoint?{...checkpoint,transport_mode:'json'}:checkpoint;
