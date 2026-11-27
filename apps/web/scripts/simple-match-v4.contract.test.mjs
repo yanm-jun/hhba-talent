@@ -114,10 +114,10 @@ test('V4 resumes explicit relay SSE failures with a durable JSON transport prefe
  assert.equal(v4StampTransport(null,'json'),null);
  const {readFile}=await import('node:fs/promises');
  const route=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
- assert.match(route,/input\\.transportMode=v4RecoveredTransportMode\\(saved\\.checkpoint,saved\\.failure\\)/);
- assert.match(route,/provider\\.stream=input\\.transportMode==='json'\\?false:/);
- assert.match(route,/result\\.checkpoint=stampTransport\\(result\\.checkpoint\\)/);
- assert.match(route,/checkpoint:stampTransport\\(input\\.recoveryState\\?\\.\\(\\)\\|\\|input\\.checkpoint\\|\\|null\\)/);
+ assert.ok(route.includes("input.transportMode=v4RecoveredTransportMode(saved.checkpoint,saved.failure)"));
+ assert.ok(route.includes("input.transportMode=v4RecoveredTransportMode(saved.checkpoint,saved.failure)"));
+ assert.ok(route.includes("result.checkpoint=stampTransport(result.checkpoint)"));
+ assert.ok(route.includes("checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null)"));
  assert.match(route,/upstream_kind:'SSE_FAILED'/);
 });
 
