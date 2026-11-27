@@ -66,13 +66,13 @@ export function v4ParseJson(response){
 }
 // Native Responses SSE support is opt-in until the configured relay has
 // demonstrated a complete stream. Never forward model reasoning or CV text.
-export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onDiscoveryJob,onDiscoverySource,timing}={}){
+export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onDiscoveryJob,onDiscoverySource,timing,streamIdleMs=180000,onStreamIdle}={}){
  const observer=typeof onDiscoveryJob==='function'||typeof onDiscoverySource==='function'?createV4DiscoveryJobObserver((job,meta)=>{timing?.observe('first_candidate');onDiscoveryJob?.(job,meta);},(url,meta)=>{timing?.observe('first_source');onDiscoverySource?.(url,meta);},(url,meta)=>onDiscoverySource?.(url,meta)):null;
  if(!(response.headers.get('content-type')||'').includes('text/event-stream')){
   const data=await response.json();if(!signal?.aborted)observer?.response(data);timing?.observe('terminal');return data;
  }
  if(!response.body)throw fault('AI_PROVIDER_RESPONSE_INVALID');
- const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='',complete=null;
+ const reader=response.body.getReader(),decoder=new TextDecoder();let buffer='',complete=null,streamTimedOut=false;
  function parse(frame){
   const raw=frame.split(/\r?\n/).filter(line=>line.startsWith('data:')).map(line=>line.slice(5).trimStart()).join('\n');
   if(!raw||raw==='[DONE]')return;
@@ -91,7 +91,18 @@ export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onD
  try{
   for(;;){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
-   const chunk=await reader.read();if(chunk.done)break;
+   // Active research may stream indefinitely; only silence on the actual
+   // transport triggers recovery. This is not a reasoning or search cap.
+   let idleTimer;
+   const chunk=await Promise.race([
+    reader.read(),
+    new Promise((_,reject)=>{idleTimer=setTimeout(()=>{
+     streamTimedOut=true;
+     try{onStreamIdle?.()}catch{}
+     reject(fault('AI_PROVIDER_TIMEOUT'));
+    },streamIdleMs);})
+   ]).finally(()=>clearTimeout(idleTimer));
+   if(chunk.done)break;
    timing?.observe('first_chunk');
    buffer+=decoder.decode(chunk.value,{stream:true});
    // CRLF may itself be split across network chunks.
@@ -100,7 +111,11 @@ export async function v4ReadProviderResponse(response,{signal,onEvent=()=>{},onD
    if(complete)break;
   }
   if(!complete){buffer+=decoder.decode();if(buffer.trim())parse(buffer);}
- }finally{await reader.cancel().catch(()=>{});reader.releaseLock();}
+  }finally{
+   // Never wait indefinitely for cleanup of an upstream that already stalled.
+   if(streamTimedOut){void reader.cancel().catch(()=>{});try{reader.releaseLock()}catch{}}
+   else{await reader.cancel().catch(()=>{});reader.releaseLock();}
+  }
  if(!complete)throw fault('AI_PROVIDER_RESPONSE_INVALID');
  if(!signal?.aborted)observer?.response(complete);
  return complete;
@@ -142,7 +157,9 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscovery
  if(!provider)throw fault('AI_PROVIDER_NOT_CONFIGURED');
 
  const started=Date.now();
- let response;
+  const transportAbort=new AbortController();
+  const transportSignal=signal?AbortSignal.any([signal,transportAbort.signal]):transportAbort.signal;
+  let response;
  try{
   // Let the provider and the hosting runtime govern request duration. HHBA
   // adds no separate per-model-call wall-clock deadline to long job research.
@@ -151,7 +168,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscovery
    headers:{authorization:'Bearer '+provider.key,'content-type':'application/json',
     accept:provider.stream?'text/event-stream':'application/json','x-openai-actor-authorization':'local-image-extension'},
    body:JSON.stringify({...(provider.reasoningEffort?{reasoning:{effort:provider.reasoningEffort}}:{}),...payload,model:provider.model,store:false,stream:provider.stream===true}),
-   ...(signal?{signal}:{} )
+   signal:transportSignal
   });
  }catch(e){
   if(e?.code==='AI_PHASE_RESOURCE_YIELD')throw e;
@@ -185,7 +202,7 @@ async function v4CallOpenAI(fetcher,provider,payload,{signal,onEvent,onDiscovery
   throw fault('AI_PROVIDER_REQUEST_REJECTED');
  }
  let data;
- try{data=await v4ReadProviderResponse(response,{signal,onEvent,onDiscoveryJob,onDiscoverySource,timing})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
+ try{data=await v4ReadProviderResponse(response,{signal,onEvent,onDiscoveryJob,onDiscoverySource,timing,onStreamIdle:()=>transportAbort.abort()})}catch(e){throw fault(e?.code||'AI_PROVIDER_RESPONSE_INVALID')}
  if(!Array.isArray(data?.output)||!['completed','incomplete'].includes(data.status))
   throw fault('AI_PROVIDER_RESPONSE_INVALID');
  logV4Usage(provider,data.usage,Date.now()-started,data.status);
@@ -1334,6 +1351,13 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     else if(researchToolResult?.type==='text_page'&&researchToolResult.collection==='resume')researchToolResult=resumePageRef(researchToolResult.offset,researchContextBudget);
     else if(typeof researchToolResult?.text==='string'&&researchToolResult.text.length>researchContextBudget){researchToolResult={type:'read_page',ok:false,url:researchToolResult.url,error:'CONTEXT_PAGE_TOO_LARGE',suggested_mode:researchToolResult.mode,offset:researchToolResult.offset};}
     note('AI_CONTEXT_REPAGED');recoveryHint='接口报告上下文容量不足，已缩小单次传输页；完整候选和原始研究状态仍保留，可按页读取。';continue;
+   }
+   // A partially streamed research round is already in the encrypted checkpoint.
+   // Recover automatically rather than discarding evidence on upstream silence.
+   if(curated&&stepMode&&code==='AI_PROVIDER_TIMEOUT'&&(streamSources.size||streamRows.size||earlyRows.size)){
+    note('AI_IDLE_STREAM_CHECKPOINT_HANDOFF');
+    onActivity('searching','联网连接长时间没有新数据，已保存本轮发现，正在接续研究。');
+    return continuation('research');
    }
    if(curated&&isV4RetryableProviderError(code))throw e;
    if(['AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED'].includes(code)&&providerRecovery!==code){

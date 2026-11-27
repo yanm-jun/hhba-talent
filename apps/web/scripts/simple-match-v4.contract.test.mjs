@@ -2,7 +2,7 @@ import test from 'node:test';
 import './v4-shared-capabilities.test.mjs';
 import assert from 'node:assert/strict';
 import {v4Provider,v4Call,v4ParseJson,v4GroundProfile,v4ToolSources,v4Sources,
- v4Match} from '../functions/_lib/simple-match-v4.js';
+ v4Match,v4ReadProviderResponse} from '../functions/_lib/simple-match-v4.js';
 import {v4PublicJobUrl,v4ReadEmployerJob} from '../functions/_lib/v4-open-job-evidence.js';
 import {onRequest} from '../functions/api/match-v4/[[path]].js';
 
@@ -34,6 +34,47 @@ test('V4 holds model requests server-side, refuses redirects, sets store=false',
  await assert.rejects(()=>v4Call(async()=>new Response(null,{status:302}),
   provider,{input:'synthetic'}),/AI_PROVIDER_REDIRECT_BLOCKED/);
 });
+test('V4 detects silent provider SSE, preserving earlier live events for checkpoint recovery',async()=>{
+ let eventCount=0,idleCount=0,cancelled=false;
+ const payload='data: '+JSON.stringify({type:'response.web_search_call.searching'})+'\n\n';
+ const body=new ReadableStream({
+  start(controller){controller.enqueue(new TextEncoder().encode(payload));},
+  cancel(){cancelled=true;}
+ });
+ const response=new Response(body,{headers:{'content-type':'text/event-stream'}});
+ await assert.rejects(
+  v4ReadProviderResponse(response,{
+   streamIdleMs:40,onEvent:()=>eventCount++,onStreamIdle:()=>idleCount++
+  }),
+  error=>error?.code==='AI_PROVIDER_TIMEOUT'
+ );
+ assert.equal(eventCount,1);
+ assert.equal(idleCount,1);
+ // The reader must be cancelled (or cancellation queued), not block forever.
+ await Promise.resolve();
+ assert.equal(cancelled,true);
+});
+
+test('V4 active streamed research can exceed the idle window across multiple chunks',async()=>{
+ const emit=(type,response)=>'data: '+JSON.stringify({type,...(response?{response}:{})})+'\n\n';
+ const events=[
+  emit('response.web_search_call.searching'),
+  emit('response.web_search_call.completed'),
+  emit('response.completed',{status:'completed',output:[]})
+ ];
+ const body=new ReadableStream({
+  async start(controller){
+   for(const event of events){controller.enqueue(new TextEncoder().encode(event));await new Promise(r=>setTimeout(r,45));}
+   try{controller.close()}catch{}
+  }
+ });
+ const response=new Response(body,{headers:{'content-type':'text/event-stream'}});
+ let timedOut=false;
+ const completed=await v4ReadProviderResponse(response,{streamIdleMs:80,onStreamIdle:()=>{timedOut=true;}});
+ assert.equal(completed.status,'completed');
+ assert.equal(timedOut,false);
+});
+
 test('V4 can parse JSON and extract only resume-quoted profile facts',()=>{
  const d=model({profile:{roles:['区域运营','渠道管理'],
   education:'博士',education_evidence:'博士毕业',
@@ -213,10 +254,14 @@ test('V4 has no per-model-call timeout and respects explicit cancellation',async
  const controller=new AbortController();let options;
  const fetcher=async(u,opts)=>{options=opts;return model({ok:true})};
  await v4Call(fetcher,provider,{input:'test'},{signal:controller.signal});
- assert.equal(options.signal,controller.signal);
+ assert.ok(options.signal instanceof AbortSignal);
+ assert.equal(options.signal.aborted,false);
+ controller.abort();
+ assert.equal(options.signal.aborted,true,'caller cancellation reaches the composed transport signal');
  const direct=async(u,opts)=>{options=opts;return model({ok:true})};
  await v4Call(direct,provider,{input:'test'});
- assert.equal(options.signal,undefined);
+ assert.ok(options.signal instanceof AbortSignal);
+ assert.equal(options.signal.aborted,false,'transport owns its recovery signal without a wall-clock deadline');
 });
 test('V4 frontend never rejects more than ten posts or cancels at the legacy five-minute deadline',async()=>{
  const {readFile}=await import('node:fs/promises');
