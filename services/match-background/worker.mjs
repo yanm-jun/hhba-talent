@@ -5,7 +5,7 @@ const hex64=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
 export class MatchBackgroundWorkflow extends WorkflowEntrypoint{
  async run(event,step){
   if(!hex64(event.payload?.ticket))return {status:'INVALID_TICKET'};
-  return driveBackgroundMatch(step,event.payload.ticket,fetch,{lane:event.payload?.lane});
+  return driveBackgroundMatch(step,event.payload.ticket,fetch,{lane:event.payload?.lane,jobsEnabled:event.payload?.jobsEnabled===true});
  }
 }
 // Only the Pages service binding may reach this Worker. Deployment must
@@ -45,7 +45,7 @@ export default {async scheduled(event,env){
  // registered. Pages may fall back to the same leased checkpoint driver.
  if(!env.MATCH_REGISTRY||!env.MATCH_WORKFLOW)return Response.json({ok:false},{status:503});
  if(body.mode==='staged'){
-   try{const status=await startStageWorkflows(env.MATCH_WORKFLOW,env.MATCH_REGISTRY,body.instance,body.ticket,{register:registerWatchdogInstance,schedule:async (workflow,id,ticket,opts)=>{
+   try{const status=await startStageWorkflows(env.MATCH_WORKFLOW,env.MATCH_REGISTRY,body.instance,body.ticket,{register:registerWatchdogInstance,jobsEnabled:body.job_executor===true,schedule:async (workflow,id,ticket,opts)=>{
      const result=await scheduleWorkflowInstance(workflow,id,ticket,opts);
      if(result?.status==='RECOVERING')await restartRecoveredWorkflowOnAuthorizedStart(env.MATCH_REGISTRY,workflow,id);
      return result;
@@ -54,7 +54,7 @@ export default {async scheduled(event,env){
   }
   try{await registerWatchdogInstance(env.MATCH_REGISTRY,body.instance);}
  catch{console.warn('HHBA_MATCH_WATCHDOG_REGISTER_FAILED');return Response.json({ok:false},{status:503});}
- const active=await scheduleWorkflowInstance(env.MATCH_WORKFLOW,body.instance,body.ticket,{diagnostic:true});
+ const active=await scheduleWorkflowInstance(env.MATCH_WORKFLOW,body.instance,body.ticket,{diagnostic:true,jobsEnabled:body.job_executor===true});
  if(active?.status==='RECOVERING'){
   await restartRecoveredWorkflowOnAuthorizedStart(env.MATCH_REGISTRY,env.MATCH_WORKFLOW,body.instance);
   return Response.json({ok:true,recovering:true,error:active.error});
