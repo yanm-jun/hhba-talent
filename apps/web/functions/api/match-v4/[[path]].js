@@ -240,7 +240,7 @@ function events(env,request,input,waitUntil){
       await finishWorkflowStages();sendFinal(cached);
       succeeded=true;return;
      }
-     let recoveryState=()=>null;
+     let recoveryState=()=>null,mergedIndependentJobs=0;
      input.recoveryState=()=>recoveryState();
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
@@ -270,7 +270,7 @@ function events(env,request,input,waitUntil){
       // Merge only revision-verified, independently completed job results.
       if(input.background&&input.taskKey&&input.checkpoint&&v4JobExecutorEnabled(env)){
        try{const merged=await mergeIndependentV4Jobs(env,input.taskKey,input.generation||0,input.checkpoint);
-        if(merged.count){input.checkpoint=merged.checkpoint;console.info('HHBA_V4_INDEPENDENT_JOB_MERGED',JSON.stringify({count:merged.count}));}
+        if(merged.count){input.checkpoint=merged.checkpoint;mergedIndependentJobs=merged.count;console.info('HHBA_V4_INDEPENDENT_JOB_MERGED',JSON.stringify({count:merged.count}));}
         researchEnv.__v4IndependentPending=await pendingIndependentV4Work(env,input.taskKey,input.generation||0);
        }catch{console.warn('HHBA_V4_INDEPENDENT_JOB_MERGE_DEFERRED');}
       }
@@ -291,21 +291,28 @@ function events(env,request,input,waitUntil){
       if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
      if(result.status==='CONTINUE'){
-      metricOutcome='CONTINUE';
+      metricOutcome=result.waitingIndependentJobs?'WAIT_JOBS':'CONTINUE';
       console.info('HHBA_V4_STAGE',JSON.stringify({trace,phase:result.checkpoint.phase,round:result.checkpoint.round,candidates:result.checkpoint.rows?.length,processed:result.checkpoint.next,scored:result.checkpoint.scored,diagnostics:result.checkpoint.diagnostics}));
       if(input.taskKey){
-       await input.lease.renew();
-       await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:snapshotProgress(),checkpoint_captured_at:captureTime()});
-       // The encrypted checkpoint is committed first. If optional queue sync
-       // fails, the authoritative research state and normal continuation
-       // remain intact; the next phase can retry idempotently.
-       if(input.background&&v4JobWorkQueueEnabled(env)){
-        try{const state=await reconcileV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0,result.checkpoint);
-         console.info('HHBA_V4_JOB_QUEUE_SYNC',JSON.stringify({pendingOrDone:state.work,changed:state.createdOrUpdated,remaining:state.remaining}));
-        }catch{console.warn('HHBA_V4_JOB_QUEUE_SYNC_DEFERRED');}
+       // When independent jobs are already processing this exact saved
+       // checkpoint, do not repeatedly re-encrypt and reconcile identical
+       // hundreds-of-job state just to tell Workflow to wait. If new job
+       // evidence was merged, persist it before releasing the D1 lease.
+       if(!result.waitingIndependentJobs||mergedIndependentJobs>0){
+        await input.lease.renew();
+        await saveMatchTask(env,input.taskKey,{checkpoint:result.checkpoint,generation:input.generation||0,progress:snapshotProgress(),checkpoint_captured_at:captureTime()});
+        if(input.background&&v4JobWorkQueueEnabled(env)){
+         try{const state=await reconcileV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0,result.checkpoint);
+          console.info('HHBA_V4_JOB_QUEUE_SYNC',JSON.stringify({pendingOrDone:state.work,changed:state.createdOrUpdated,remaining:state.remaining}));
+         }catch{console.warn('HHBA_V4_JOB_QUEUE_SYNC_DEFERRED');}
+        }
        }
        await publishProgress();await releaseTask();
-       await stageCompleteOrHandoff(result.checkpoint);
+       if(result.waitingIndependentJobs){
+        // The Workflow performs a durable timer-based wait; this signal
+        // cannot be mistaken for completed JD research or a finished task.
+        send('complete',{status:'CONTINUE',waiting_for_jobs:true});
+       }else await stageCompleteOrHandoff(result.checkpoint);
        succeeded=true;return;
       }
       // Store derived research state only when a private encrypted checkpoint
