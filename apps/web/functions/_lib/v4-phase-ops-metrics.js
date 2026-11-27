@@ -2,7 +2,7 @@
 // applicant-identifying enters this table: no task IDs, URLs, private text,
 // search terms, session data or provider output.
 const lanes=new Set(['discovery','verification','reporting','mixed']);
-const outcomes=new Set(['CONTINUE','COMPLETE','RESOURCE_YIELD','RETRYABLE_FAILURE','TERMINAL_FAILURE','CACHED']);
+const outcomes=new Set(['CONTINUE','WAIT_JOBS','COMPLETE','RESOURCE_YIELD','RETRYABLE_FAILURE','TERMINAL_FAILURE','CACHED']);
 const stage=v=>lanes.has(v)?v:'mixed';
 const code=v=>typeof v==='string'&&/^[A-Z][A-Z0-9_]{2,72}$/.test(v)?v:'-';
 const millis=v=>Number.isFinite(v)&&v>=0?Math.min(Math.floor(v),86400000):0;
@@ -11,7 +11,7 @@ export function v4PhaseMetricSample({started,finished=Date.now(),lane,outcome,er
  const counts={candidate:0,jd:0,score:0,report:0};
  for(const e of events)if(e&&Object.hasOwn(counts,e.kind))counts[e.kind]++;
  const seen={candidate:sample(first.result_candidate),jd:sample(first.result_jd),report:sample(first.result_report)};
- const success=['CONTINUE','COMPLETE','RESOURCE_YIELD','CACHED'].includes(outcome);
+ const success=['CONTINUE','WAIT_JOBS','COMPLETE','RESOURCE_YIELD','CACHED'].includes(outcome);
  const observed=resources?.mode==='classified';
  const number=x=>observed&&Number.isSafeInteger(Number(x))&&Number(x)>=0?Number(x):0;
  const resourceCounts={resource_samples:observed?1:0,
@@ -49,7 +49,7 @@ export async function readV4PhaseOps(db,since,until){
    const recovery=sum(records,'recovered_attempts'),resolved=sum(records,'recovered_successes');
    const time=sum(records,'elapsed_ms_total');
    const sampleMean=(total,count)=>count?Math.round(total/count):null;
-   return {attempts,continued:sum(records.filter(r=>r.outcome==='CONTINUE'),'executions'),completed:sum(records.filter(r=>r.outcome==='COMPLETE'),'executions'),
+   return {attempts,continued:sum(records.filter(r=>r.outcome==='CONTINUE'),'executions'),waitingJobs:sum(records.filter(r=>r.outcome==='WAIT_JOBS'),'executions'),completed:sum(records.filter(r=>r.outcome==='COMPLETE'),'executions'),
     yields:sum(records.filter(r=>r.outcome==='RESOURCE_YIELD'),'executions'),retryableFailures:retries,terminalFailures:terminal,
     failureRate:attempts?Math.round((retries+terminal)*10000/attempts)/100:null,
     recoveredAttempts:recovery,recoveredSuccesses:resolved,recoveryCompletionRate:recovery?Math.round(resolved*10000/recovery)/100:null,
