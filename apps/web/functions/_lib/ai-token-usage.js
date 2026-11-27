@@ -2,9 +2,9 @@ import {metricDb,isoDay} from './metric-utils.js';
 export const STAGE_EFFORT=Object.freeze({format:'medium',identity:'medium',jd_extract:'medium',jd_coverage:'medium',jd_search:'medium',jd_reference:'medium',profile:'medium',discovery:'medium',score:'medium',rank:'medium',report:'medium',resume_ocr:'medium',resume_optimization:'medium',resume_reassess:'medium',probe:null,other:'medium'});
 export function usageStage(stage){return Object.hasOwn(STAGE_EFFORT,stage)?stage:'other'}
 export function stageEffort(provider,stage){
- // Normal GPT-6 business calls use medium, even if an old global high override remains.
- // Capability probes and other models preserve their explicit configuration.
- return (/^gpt-6(?:\.|-)/i.test(provider.model||'')?STAGE_EFFORT[usageStage(stage)]:null)||provider.reasoningEffort||null;
+ // Only caller configuration may choose effort. A stage must not silently downgrade
+ // more demanding JD research, ranking, or recovery to a fixed medium setting.
+ return provider?.reasoningEffort||null;
 }
 const integer=v=>Number.isSafeInteger(v)&&v>=0?v:null;
 export function usageCounts(usage){
