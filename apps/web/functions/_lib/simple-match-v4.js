@@ -748,7 +748,11 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // still working. Dispatch verification against those real snapshots without
  // waiting for the response, and replenish independently when capacity allows.
  // Keep the older direct/compatibility pipeline unchanged.
- if(fullResearch&&parallelResearch&&!pipelineChild&&deferDiscoverySnapshots&&resourceBudget&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&(!checkpoint.priorState||checkpoint.pipelineActive)){
+ // When per-job D1 workers are enabled, discovery must NEVER launch a second
+ // in-process live JD verifier. The two paths would read/score the same job
+ // concurrently while sharing one Pages invocation CPU and checkpoint budget.
+ // The independent queue already persists every candidate for JD/score work.
+ if(fullResearch&&parallelResearch&&!pipelineChild&&!independentExecutor&&deferDiscoverySnapshots&&resourceBudget&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&(!checkpoint.priorState||checkpoint.pipelineActive)){
   const search=structuredClone(checkpoint);
   const eligible=pendingVerification(checkpoint).length;
   if(eligible)search.discoveryWidth=Math.min(search.discoveryWidth||initialDiscoveryWidth,Math.max(1,5-Math.min(2,eligible)));
