@@ -63,9 +63,14 @@ test('independent JD preserves a transport-specific SSE failure across a durable
  assert.equal(v4IndependentJobTransport(null,sseError,false),'configured','do not switch an already JSON-only provider');
  assert.equal(v4IndependentJobTransport(null,{code:'AI_PROVIDER_UPSTREAM_ERROR',upstreamKind:'HTTP_503'},true),'configured','a 503 must not be mistaken for SSE transport rejection');
  assert.equal(v4IndependentJobTransport(null,{code:'AI_PROVIDER_NETWORK_ERROR'},true),'configured');
+ assert.equal(v4IndependentJobTransport(null,{code:'AI_PROVIDER_NETWORK_ERROR'},true,1),'configured','one network failure is not proof of broken SSE');
+ assert.equal(v4IndependentJobTransport(null,{code:'AI_PROVIDER_NETWORK_ERROR'},true,2),'json','second interrupted SSE should switch transport on next durable step');
+ assert.equal(v4IndependentJobTransport({transport_mode:'json'},null,true,3),'json','the sidecar must retain network failover');
+ assert.equal(v4IndependentJobTransport(null,{code:'AI_PROVIDER_NETWORK_ERROR'},false,3),'configured','already-JSON requests cannot flip a nonexistent SSE connection');
+ assert.equal(v4IndependentJobTransport(null,{code:'AI_PROVIDER_UPSTREAM_ERROR',upstreamKind:'HTTP_503'},true,3),'configured','ordinary provider 503 remains a service error');
  const route=readFileSync(new URL('../functions/_lib/v4-job-executor.js',import.meta.url),'utf8');
  assert.match(route,/provider\.stream=false;/,'provider transport must obey persisted per-job fallback');
  assert.match(route,/transport_mode:'json'/,'SSE fallback must be serialized into encrypted job sidecar');
- assert.match(route,/transportMode=v4IndependentJobTransport\(vettedPrevious\?previous:null,e,provider\.stream\)/);
+ assert.match(route,/transportMode=v4IndependentJobTransport\(vettedPrevious\?previous:null,e,provider\.stream,claim\.attempts\)/);
  assert.match(route,/await saveMatchTask\(env,resultKey,/,'job checkpoint remains persisted for same candidate and revision');
 });
