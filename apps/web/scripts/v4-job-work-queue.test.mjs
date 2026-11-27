@@ -47,6 +47,28 @@ test('D1 job claims are atomic, generation fenced and expire for safe automatic 
  assert.equal(await claimV4JobWork(db,taskKey,0,'verification',{now:16500}),null);
  assert.equal(local.prepare("SELECT state FROM hhba_v4_job_work_queue WHERE lane='verification'").get().state,'COMPLETED');
 });
+test('Cloudflare resource safety: atomic job lease admission waits instead of overloading second research round',async()=>{
+ const {db,local}=fixture();
+ const urls=Array.from({length:5},(_,i)=>url+'/admission-'+i);
+ const cp={phase:'research',rows:urls.map(u=>[u,{...source(),employer_proof_url:u}]),processedEarlier:[],processedEvidence:[],matches:[]};
+ await reconcileV4JobWork(db,taskKey,0,cp,{now:1000});
+ const one=await claimV4JobWork(db,taskKey,0,'verification',{now:1100,owner:'worker-1'});
+ const two=await claimV4JobWork(db,taskKey,0,'verification',{now:1101,owner:'worker-2'});
+ assert.ok(one&&two);
+ assert.equal(await claimV4JobWork(db,taskKey,0,'verification',{now:1102,owner:'worker-3'}),null,
+  'extra job request is cheap and deferred while two unrelated jobs run');
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE state='LEASED'").get().n,2);
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE state='PENDING'").get().n,3,
+  'no research records are discarded because of temporary Cloudflare pressure');
+ assert.equal(await finishV4JobWork(db,one,{now:1150,completed:true}),true);
+ const three=await claimV4JobWork(db,taskKey,0,'verification',{now:1151,owner:'worker-3'});
+ assert.ok(three,'a released slot admits the next waiting job without a new search');
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE state='LEASED'").get().n,2);
+ // Expired leases no longer count against active concurrency.
+ const afterExpiry=await claimV4JobWork(db,taskKey,0,'verification',{now:310000,owner:'worker-after-expiry'});
+ assert.ok(afterExpiry,'expired jobs are eligible for safe recovery without an artificial task cap');
+});
+
 test('later source revisions invalidate an old lease without falsely carrying over a score',async()=>{
  const {db,local}=fixture(),original={phase:'verification',rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[]};
  await reconcileV4JobWork(db,taskKey,0,original,{now:1000});
