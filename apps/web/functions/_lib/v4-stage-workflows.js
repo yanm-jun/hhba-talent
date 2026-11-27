@@ -8,6 +8,11 @@ export const STAGE_LANES=Object.freeze(['discovery','verification','reporting'])
 export const isV4StageLane=v=>STAGE_LANES.includes(v);
 export const stagedV4WorkflowsEnabled=env=>env?.HHBA_V4_STAGE_WORKFLOWS==='1'&&typeof env?.HHBA_MATCH_BACKGROUND?.fetch==='function';
 export function v4CheckpointLane(cp,{independentJobs=false}={}){
+ // With separately leased JD/report workers, the discovery Workflow owns the
+ // ONLY master task lease through research, verification and reporting. The
+ // job-only workflows are awakened from persisted queue rows, not by handing
+ // them the master checkpoint (they cannot wake the master back).
+ if(independentJobs)return 'discovery';
  if(cp?.phase==='verification')return 'verification';
  if(cp?.phase==='reporting')return 'reporting';
  // Independently leased JD/score/report workers consume the job queue without
