@@ -14,7 +14,7 @@ import {v4ManagedResourceBudget} from './v4-phase-budget.js';
 const keyOk=x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x);
 export async function pendingIndependentV4Work(env,taskKey,generation){
  if(!v4JobExecutorEnabled(env)||!keyOk(taskKey))return 0;
- const result=await env.HHBA_PNVS_AUTH_DB.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE task_key=? AND generation=? AND state IN ('PENDING','LEASED') AND attempts<3").bind(taskKey,generation).first();
+ const result=await env.HHBA_PNVS_AUTH_DB.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE task_key=? AND generation=? AND state IN ('PENDING','LEASED')").bind(taskKey,generation).first();
  return Math.max(0,Number(result?.n)||0);
 }
 
