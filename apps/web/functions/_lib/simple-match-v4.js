@@ -13,7 +13,7 @@ import {findMainlandCity} from './mainland-job-location.js';
 import {v4AcceptResearchDigest,V4_DIGEST_GUIDE,v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4NextStallRead,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls,v4ResearchEvidenceProgress,v4MayContinueBrowserRead} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
 import {groundJdResearch,mergeJdResearch,mergeJobEvidence,nextVerificationBatch} from './v4-jd-research.js';
-import {initialDiscoveryWidth,nextDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
+import {initialDiscoveryWidth,nextDiscoveryWidth,admittedDiscoveryWidth,discoveryLaneContext,runDiscoveryWave,combineDiscovery,runReadyWork} from './v4-parallel-discovery.js';
 import {candidateRevision,candidateResearchMemory,pendingVerification,verificationSnapshot,mergePipelineCheckpoint,pipelineWidths,pipelineVerificationWindow,discoveryReadAhead,createLiveVerificationCoordinator,createLiveReportQueue} from './v4-research-pipeline.js';
 import {makeBatchScorer} from './v4-batch-scoring.js';
 import {createV4DiscoveryJobObserver} from './v4-stream-job-parser.js';
@@ -715,7 +715,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  if(fullResearch&&parallelResearch&&!pipelineChild&&deferDiscoverySnapshots&&resourceBudget&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&(!checkpoint.priorState||checkpoint.pipelineActive)){
   const search=structuredClone(checkpoint);
   const eligible=pendingVerification(checkpoint).length;
-  if(eligible)search.discoveryWidth=Math.min(search.discoveryWidth||initialDiscoveryWidth,2);
+  if(eligible)search.discoveryWidth=Math.min(search.discoveryWidth||initialDiscoveryWidth,Math.max(1,5-Math.min(2,eligible)));
   const common={signal,officialOnly:true,curated:true,env,excludeUrls,stepMode:true,allowContinue,parallelResearch,pipelineChild:true,resourceBudget};
   let searchRecovery=()=>search,searchDone=false;
   const publishMerged=next=>{
@@ -1236,7 +1236,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      allow:j=>acceptedLiveUrl(j.url)}):undefined;
    const canParallel=parallelResearch&&curated&&!activeResumePage&&!researchToolResult&&(fullResearch||concreteCount()<CANDIDATE_TARGET)&&(!priorState||checkpoint?.pipelineActive&&!backfillSignature);
    if(canParallel){
-    const width=resourceBudget?Math.min(3,discoveryWidth):discoveryWidth;
+    const width=admittedDiscoveryWidth(discoveryWidth,resourceBudget,{maxConnections:checkpoint?.pipelineActive?5:6,inFlight:0,reserve:6});
     onActivity('searching','主研究 Agent 与 '+(width-1)+' 个辅助 Agent 正在并行搜索企业官方岗位。');
     const lane=async lane=>{
      const laneResponse=await v4Call(fetcher,provider,{
@@ -1296,7 +1296,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      let wave;
       try{wave=await runDiscoveryWave(()=>v4Call(fetcher,provider,coordinatorPayload,{signal,onEvent:providerActivity,stage:'discovery',onDiscoveryJob:candidateEvents(0),onDiscoverySource:acceptStreamSource}),lane,width,signal,stageReady);}
       finally{await readAhead?.close();}
-    discoveryWidth=nextDiscoveryWidth(width,wave.codes,adaptiveResearch?{maxConnections:checkpoint?.pipelineActive?4:6,elapsed:wave.elapsed,previousElapsed:checkpoint?.discoveryElapsed}:{});
+    discoveryWidth=nextDiscoveryWidth(width,wave.codes,adaptiveResearch?{maxConnections:checkpoint?.pipelineActive?5:6,elapsed:wave.elapsed,previousElapsed:checkpoint?.discoveryElapsed}:{});
     if(adaptiveResearch)discoveryElapsed=wave.elapsed;
     for(const code of wave.codes)note('PARALLEL_'+code);
     independent=wave.independent.filter(x=>x.status==='fulfilled').map(x=>x.value);
