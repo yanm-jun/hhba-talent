@@ -7,7 +7,7 @@ export async function stageWorkflowId(instance,lane){
  return Array.from(new Uint8Array(digest),x=>x.toString(16).padStart(2,'0')).join('');
 }
 
-export async function startStageWorkflows(workflow,registry,base,ticket,{register,schedule}={}){
+export async function startStageWorkflows(workflow,registry,base,ticket,{register,schedule,jobsEnabled=false}={}){
  if(!workflow||!registry||typeof register!=='function'||typeof schedule!=='function')return {ok:false};
  // Active legacy Workflow (including recoverable error states) retains the
  // entire generation; a rollout never starts competing paid work.
@@ -18,7 +18,7 @@ export async function startStageWorkflows(workflow,registry,base,ticket,{registe
  for(const lane of ['verification','reporting','discovery']){
   const id=await stageWorkflowId(base,lane);
   await register(registry,id);
-  const state=await schedule(workflow,id,ticket,{diagnostic:true,lane});
+  const state=await schedule(workflow,id,ticket,{diagnostic:true,lane,jobsEnabled});
   if(state!==true&&state?.status!=='RECOVERING')throw Error('AI_BACKGROUND_STAGE_SCHEDULE_UNAVAILABLE');
  }
  return {ok:true,mode:'staged'};
