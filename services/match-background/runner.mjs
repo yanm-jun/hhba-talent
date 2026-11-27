@@ -60,7 +60,7 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
    return terminal('FAILED',code);
   }
   if(value?.status==='COMPLETE')return terminal('COMPLETE');
-  if(value?.status==='HANDOFF')return terminal('HANDOFF');
+  if(value?.status==='HANDOFF')return diagnostic&&validStageLane(value.next_lane)?{status:'HANDOFF',next_lane:value.next_lane}:terminal('HANDOFF');
    if(value?.status==='CONTINUE'&&value?.waiting_for_jobs===true)return terminal('WAIT_JOBS');
    if(value?.status==='CONTINUE')return value?.fallback===true&&diagnostic?{status:'CONTINUE',fallback:true}:terminal('CONTINUE');
   }
@@ -138,6 +138,13 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
     streak=0;recovery=undefined;continue;
    }
    if(result?.status==='HANDOFF'){
+    if(currentLane==='verification'&&jobsEnabled&&result.next_lane==='discovery'){
+     // Verification is allowed to research already queued JDs before the
+     // discovery stage finishes. Never take over its main checkpoint lease.
+     // The two revision-fenced job calls above are independent and persisted.
+     await step.sleep('early-verification-'+phase,'30 seconds');
+     streak=0;recovery=undefined;continue;
+    }
     if(!currentLane){streak=0;continue;}
     const wake=await step.waitForEvent('next-'+currentLane+'-'+phase,{type:'wake_'+currentLane,timeout:'24 hours'});
     if(wake?.done||wake?.payload?.done)return {status:'COMPLETE'};
