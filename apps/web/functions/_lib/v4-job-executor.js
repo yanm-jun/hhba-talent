@@ -156,19 +156,25 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   const current=byKey.get(record.job_key);
   if(!current||(record.lane==='reporting'?current.reportRevision:current.revision)!==record.revision)continue;
   if(record.lane==='verification'&&done.has(current.url)&&revisions.get(current.url)===candidateRevision(current.job))continue;
+  // The encrypted locator is an optimization hint, not authorization:
+  // re-check the actual candidate URL against the D1 claim before merging.
+  if(await workKey(taskKey,current.url)!==record.job_key)continue;
   const resultKey=await independentJobKey(taskKey,generation,record.lane,record.job_key,record.revision);
   const saved=await read(env,resultKey);
   if(saved?.kind!=='V4_INDEPENDENT_JOB_V1'||!saved.complete||saved.generation!==generation||saved.revision!==record.revision||saved.source_url!==current.url||!saved.job)continue;
   if(record.lane==='reporting'&&!doneReport(saved.job))continue;
+  const available=(next||checkpoint);
+  const existingMatches=(available.phase==='research'?available.priorState?.matches:available.matches)||[];
+  const present=existingMatches.findIndex(x=>itemUrl(x)===current.url);
+  if(record.lane==='verification'&&present>=0&&suitableScore(existingMatches[present]))continue;
+  if(record.lane==='reporting'&&present<0)continue;
+  if(record.lane==='reporting'&&doneReport(existingMatches[present]))continue;
   // Most resume phases have no new independent evidence. Clone the large
   // checkpoint only after a revision-fenced, not-yet-applied result exists.
   if(!next)next=structuredClone(checkpoint);
   const parent=next.phase==='research'?(next.priorState||(next.priorState={matches:[],read:0,scored:0,archived:0,scoreFailures:0,reportFailures:0})):next;
   const matches=parent.matches||(parent.matches=[]);
   const idx=matches.findIndex(x=>itemUrl(x)===current.url);
-  if(record.lane==='verification'&&idx>=0&&suitableScore(matches[idx]))continue;
-  if(record.lane==='reporting'&&idx<0)continue;
-  if(record.lane==='reporting'&&doneReport(matches[idx]))continue;
   const row=structuredClone(saved.job);
   if(idx<0)matches.push(row);else matches[idx]={...matches[idx],...row};
   if(record.lane==='verification'){
