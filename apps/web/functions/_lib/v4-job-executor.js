@@ -5,7 +5,7 @@ import {sha256Hex} from './real-auth.js';
 import {candidateRevision} from './v4-research-pipeline.js';
 import {eligibleCuratedScore,qualifiedReport} from './v4-curated-reports.js';
 import {claimV4JobWork,renewV4JobWork,finishV4JobWork,v4JobWorkQueueEnabled,reportWorkRevision} from './v4-job-work-queue.js';
-import {readMatchTask,saveMatchTask} from './v4-match-checkpoint-storage.js';
+import {readMatchTask,saveMatchTask,readMatchProgress} from './v4-match-checkpoint-storage.js';
 import {loadBackgroundMatch} from './v4-background-match.js';
 import {assertSessionTaskActive} from './v4-session-match-task.js';
 import {v4JobProvider,v4Match} from './simple-match-v4.js';
@@ -61,7 +61,16 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
  const {session,task,taskKey}=await loadBackgroundMatch(env,ticket);
  const generation=task.generation,db=env.HHBA_PNVS_AUTH_DB;
  const claim=await claimV4JobWork(db,taskKey,generation,lane,{leaseMs:300000});
- if(!claim)return {status:'EMPTY'};
+ if(!claim){
+  // This lane has no more claimable work *right now*. Do not mistake a
+  // temporarily empty queue for job completion while discovery is still
+  // producing candidates. The separately encrypted progress record is a
+  // cheap, authorized completion signal and avoids decoding a 500-job
+  // checkpoint on each idle Workflow pass.
+  const progress=await readMatchProgress(env,taskKey).catch(()=>null);
+  if(progress?.generation===generation&&progress.status==='COMPLETE')return {status:'FINISHED'};
+  return {status:'EMPTY'};
+ }
  let heartbeat=null,leaseLost=false,done=false,retryError=null;
  try{
   // Reuse an encrypted one-job continuation, fenced to this exact D1
