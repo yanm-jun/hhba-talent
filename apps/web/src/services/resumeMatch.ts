@@ -330,7 +330,7 @@ export function matchExecutionFromServer(value:unknown):MatchExecution|null{
  return x as MatchExecution;
 }
 type CompletedJobCursor={ms:number;lane:''|'verification'|'reporting';key:string};
-type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;execution?:MatchExecution;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;completed_jobs?:{cursor:CompletedJobCursor;jobs:MatchedJob[];more:boolean};failure?:{error:string;retryable?:boolean}|null};
+type PendingManagedMatch={status:'PENDING'|'FAILED'|'CHECK_DRIVER';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;execution?:MatchExecution;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;completed_jobs?:{cursor:CompletedJobCursor;jobs:MatchedJob[];more:boolean};failure?:{error:string;retryable?:boolean}|null};
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
 // token, signed continuation or model output is written to localStorage.
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
@@ -504,7 +504,7 @@ export async function submitExtractedResumeText(
     ...(continuation?{continuation}:{})};
   const response:Response=await fetch(EFFECTIVE_API+route,{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
-   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'application/json, text/event-stream'},
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':readOnly?'application/json':'text/event-stream'},
    body:JSON.stringify(requestBody)
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
