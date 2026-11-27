@@ -570,3 +570,23 @@ test('background lock contention is read-only and reports a bounded lease wait',
  assert.match(route,/lease_state:state\.state,retry_after_seconds:state\.retry_after_seconds/);
  assert.match(route,/if\(!input\.lease\)return leaseBusy/);
 });
+
+
+test('Free-tier resource recovery prioritizes original search while independent JD keeps its lease',async()=>{
+ const {deferV4RecoveryHousekeeping}=await import('../functions/_lib/v4-phase-budget.js');
+ const input={background:true,resourceRecovery:true,independentExecutor:true,
+  checkpoint:{phase:'research',round:6,rows:[['https://careers.employer.cn/jobs/123',{company:'真实企业'}]]}};
+ assert.equal(deferV4RecoveryHousekeeping(input),true,'skip ONLY optional full-pool housekeeping in a recovery invocation');
+ assert.equal(deferV4RecoveryHousekeeping({...input,resourceRecovery:false}),false,'normal phases must reconcile all completed JD evidence');
+ assert.equal(deferV4RecoveryHousekeeping({...input,checkpoint:{phase:'verification',rows:input.checkpoint.rows}}),false,'verification must still merge JD results');
+ assert.equal(deferV4RecoveryHousekeeping({...input,checkpoint:{phase:'reporting',rows:input.checkpoint.rows}}),false,'reporting must still merge ranked results');
+ assert.equal(deferV4RecoveryHousekeeping({...input,independentExecutor:false}),false,'single-worker tasks cannot skip housekeeping');
+ assert.equal(deferV4RecoveryHousekeeping({...input,checkpoint:{phase:'research',rows:[]}}),false);
+ assert.equal(deferV4RecoveryHousekeeping({...input,background:false}),false);
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const decision=route.indexOf('const deferRecoveryHousekeeping=deferV4RecoveryHousekeeping(');
+ const merge=route.indexOf('const merged=await mergeIndependentV4Jobs(',decision);
+ const search=route.indexOf('const result=await v4Match(',decision);
+ assert.ok(decision>0&&merge>decision&&search>merge,'post-1102 search must defer expensive full-pool merge only');
+ assert.match(route,/&&!deferRecoveryHousekeeping\)\{/);
+});
