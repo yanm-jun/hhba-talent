@@ -60,6 +60,30 @@ test('enabled independent JD queue avoids a second in-process verifier inside di
   'regression must not silently re-enable the duplicate in-process research/verification pipeline');
 });
 
+test('pending independent JD/score queue yields a waitable checkpoint without extra model calls',async()=>{
+ const runEnv={HHBA_MATCH_V4_READY:'1',HHBA_V4_JOB_QUEUE_ENABLED:'1',HHBA_V4_JOB_EXECUTOR_ENABLED:'1',__v4IndependentPending:12};
+ for(const phase of ['verification','reporting']){
+  const checkpoint={phase,profile,round:2,rows:[[job(1).url,job(1)]],matches:[],
+   next:0,processedEarlier:[],diagnostics:{SAVED_CANDIDATE:1}};
+  let calls=0;const stages=[];
+  const result=await v4Match(async()=>{calls++;throw Error('must not repeat paid AI work while queue is leased')},
+   {key:'synthetic',baseUrl:'https://provider.invalid/v1',model:'test'},
+   resume,'全国',{env:runEnv,checkpoint,curated:true,officialOnly:true,
+    stepMode:true,parallelResearch:true,onActivity:(stage)=>stages.push(stage)});
+  assert.equal(result.status,'CONTINUE');
+  assert.equal(result.waitingIndependentJobs,true);
+  assert.equal(result.checkpoint,checkpoint,'the previous evidence stays the single authoritative checkpoint');
+  assert.equal(result.checkpoint.rows[0][0],job(1).url);
+  assert.equal(calls,0);
+  assert.equal(stages.length,1);
+ }
+ const {v4PhaseMetricSample}=await import('../functions/_lib/v4-phase-ops-metrics.js');
+ const metric=v4PhaseMetricSample({started:100,finished:250,lane:'verification',outcome:'WAIT_JOBS',recovering:true});
+ assert.equal(metric.outcome,'WAIT_JOBS');
+ assert.equal(metric.error_code,'-');
+ assert.equal(metric.recovered_successes,1);
+});
+
 test('discovery capacity grows with available hosting headroom instead of fixed three lanes',()=>{
  const roomy={remainingResearch:()=>36,availableFor:()=>32};
  const tight={remainingResearch:()=>9,availableFor:()=>2};
