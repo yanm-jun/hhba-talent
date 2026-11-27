@@ -28,7 +28,7 @@ import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSess
 import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
 import {isV4TerminalTaskFailure,terminalV4SavedFailure,retryableV4SavedFailure,normalizeV4RecoveryRecord,normalizeV4RecoveryView,v4RecoveredResourcePhase,v4RecoveredTransportMode,v4StampTransport} from '../../_lib/v4-task-failure-policy.js';
 
-import {v4ManagedResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
+import {v4ManagedResourceBudget,phaseModelReplay,PHASE_YIELD,deferV4RecoveryHousekeeping} from '../../_lib/v4-phase-budget.js';
 import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
 import {createV4DeliveryTelemetry} from '../../_lib/v4-live-delivery-telemetry.js';
 import {createV4SearchSpeedTracker,recordV4SearchSpeed} from '../../_lib/v4-search-speed.js';
@@ -310,7 +310,18 @@ function events(env,request,input,waitUntil){
       // reconciliation on *every* phase (including idle WAIT_JOBS) until all
       // expected jobs have been enqueued. Never equate an empty partial batch
       // with completed JD research.
-      if(input.background&&input.taskKey&&input.checkpoint&&v4JobExecutorEnabled(env)){
+      // After a platform 1102, spend the next hosting invocation on the
+      // unfinished discovery call itself. Re-merging every independently
+      // completed JD and scanning/reconciling the entire D1 queue before
+      // research starts can exhaust Free-tier CPU again in under one second.
+      // JD workers keep their own revision-fenced leases and can continue
+      // without any main-checkpoint merge; the next healthy phase merges them.
+      // This skips no candidate, provider research round, or completed result.
+      const deferRecoveryHousekeeping=deferV4RecoveryHousekeeping({
+       background:input.background,resourceRecovery:input.resourceRecovery,
+       checkpoint:input.checkpoint,independentExecutor:v4JobExecutorEnabled(env)});
+      if(deferRecoveryHousekeeping)console.info('HHBA_V4_RESOURCE_RECOVERY_DISCOVERY_PRIORITY');
+      if(input.background&&input.taskKey&&input.checkpoint&&v4JobExecutorEnabled(env)&&!deferRecoveryHousekeeping){
        try{
         const merged=await mergeIndependentV4Jobs(env,input.taskKey,input.generation||0,input.checkpoint);
         if(merged.count){input.checkpoint=merged.checkpoint;mergedIndependentJobs=merged.count;console.info('HHBA_V4_INDEPENDENT_JOB_MERGED',JSON.stringify({count:merged.count}));}

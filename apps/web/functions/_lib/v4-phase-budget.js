@@ -133,3 +133,15 @@ export function phaseModelReplay(entries=[]){
   const cost=pressure?Math.max(old,observed,initialCost):Math.max(observed,old*0.5+observed*0.5);
   return {cost,width:pressure?1:Math.max(1,width),pressure:!!pressure};
  }
+
+
+/**
+ * Free-tier CPU recovery fast path. During research after a verified host
+ * resource failure, the independently leased JD queue already owns its work.
+ * Defer optional full-pool merge/reconciliation for THIS invocation only,
+ * not total research, job count, or model depth. Next successful phase merges.
+ */
+export function deferV4RecoveryHousekeeping({background=false,resourceRecovery=false,checkpoint,independentExecutor=false}={}){
+ return !!(background&&resourceRecovery&&independentExecutor&&
+  checkpoint?.phase==='research'&&Array.isArray(checkpoint.rows)&&checkpoint.rows.length>0);
+}
