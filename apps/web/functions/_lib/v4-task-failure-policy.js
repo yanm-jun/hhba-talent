@@ -26,7 +26,11 @@ export const v4RecoveredTransportMode=(checkpoint,failure,recoveryHint)=>
  // Legacy in-flight tasks predating upstream-kind diagnostics only have the
  // durable retry error. A matching Workflow recovery hint confirms another
  // attempt of the same failed stage, so try the alternate transport once.
- recoveryHint==='AI_PROVIDER_UPSTREAM_ERROR'&&failure?.error==='AI_PROVIDER_UPSTREAM_ERROR'
+ (recoveryHint==='AI_PROVIDER_UPSTREAM_ERROR'&&failure?.error==='AI_PROVIDER_UPSTREAM_ERROR')||
+ // A completed Pages response lost its SSE terminal marker. Switch only
+ // this task generation to the provider's non-SSE transport for the next
+ // attempt; keep the same saved research checkpoint and model capability.
+ recoveryHint==='AI_BACKGROUND_RESPONSE_INCOMPLETE'||recoveryHint==='AI_BACKGROUND_TRANSPORT_INTERRUPTED'
  ?'json':'sse';
 export const v4StampTransport=(checkpoint,mode)=>
  mode==='json'&&checkpoint?{...checkpoint,transport_mode:'json'}:checkpoint;
