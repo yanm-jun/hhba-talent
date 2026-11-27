@@ -75,6 +75,34 @@ test('V4 active streamed research can exceed the idle window across multiple chu
  assert.equal(timedOut,false);
 });
 
+test('V4 reports real AI request lifecycle without changing the request',async()=>{
+ const states=[],tracked={...provider,onCallState:(state,stage)=>states.push([state,stage])};
+ await v4Call(async()=>model({ok:true}),tracked,{input:'synthetic'},{stage:'discovery'});
+ assert.deepEqual(states,[['start','discovery'],['end','discovery']]);
+ states.length=0;
+ await assert.rejects(()=>v4Call(async()=>new Response(null,{status:503}),tracked,{input:'synthetic'},{stage:'discovery'}),/AI_PROVIDER_UPSTREAM_ERROR/);
+ assert.deepEqual(states,[['start','discovery'],['end','discovery']]);
+});
+
+test('V4 backend heartbeat reaches frontend without inventing new candidate counts',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const api=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const service=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
+ const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
+ const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ const panel=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ assert.match(api,/worker_seen_at:lastWorkerSeenAt,last_result_at:lastEvidenceAt/);
+ assert.match(api,/send\('heartbeat',\{stage:phase,elapsed_ms:.*execution:execution\(\)/);
+ assert.match(api,/if\(input.background\)queueProgress\('routine'\)/);
+ assert.match(service,/onExecution\?\.\(matchExecutionFromServer\(data\.progress\?\.execution\)\)/);
+ assert.match(service,/if\(event==='heartbeat'\)/);
+ assert.match(page,/execution=\{execution\}/);
+ assert.match(dialog,/execution=\{execution\}/);
+ assert.match(panel,/workerAge>90/);
+ assert.match(panel,/最近新增研究成果/);
+ assert.doesNotMatch(panel,/execution\?\.state==='processing'\?'已发现/);
+});
+
 test('V4 can parse JSON and extract only resume-quoted profile facts',()=>{
  const d=model({profile:{roles:['区域运营','渠道管理'],
   education:'博士',education_evidence:'博士毕业',
