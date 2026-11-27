@@ -587,7 +587,7 @@ export async function submitExtractedResumeText(
   if(data.research_report)onResearch?.(data.research_report);
   if(data.research_leads)liveCandidates.snapshot(data.research_leads,{final:true});
   return data as MatchResponse;
-  }catch(error){if(!MATCH_V4_PREVIEW||!task||!(error instanceof MatchError)||!error.retryable||requestSignal.aborted)throw error;await reconnect();}
+  }catch(error){if(!MATCH_V4_PREVIEW||!task||!(error instanceof MatchError)||!error.retryable||requestSignal.aborted)throw error;progressOnly=false;checkDriverAt=0;await reconnect();}
   }
  }catch(error){
   if(requestSignal.aborted)throw requestSignal.reason;
