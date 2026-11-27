@@ -679,10 +679,19 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // The deployed curated V4 route exposes the full model-neutral research protocol.
  // Legacy direct consumers without the V4 activation flag retain their compatibility behavior.
  const fullResearch=curated&&env.HHBA_MATCH_V4_READY==='1';
+ const independentExecutor=fullResearch&&env.HHBA_V4_JOB_EXECUTOR_ENABLED==='1'&&env.HHBA_V4_JOB_QUEUE_ENABLED==='1';
+ // Do not duplicate paid JD/score/report model work while separately leased
+ // Pages job invocations are producing revision-bound results. If their worker
+ // retries have exhausted, the ordinary V4 coordinator resumes as fallback.
+ if(independentExecutor&&!pipelineChild&&checkpoint&&['verification','reporting'].includes(checkpoint.phase)&&env.__v4IndependentPending>0){
+  onActivity(checkpoint.phase==='reporting'?'writing':'reading','已发现岗位正在独立核验和生成报告；本轮研究成果已保存，等待合并独立完成的证据。');
+  return {status:'CONTINUE',checkpoint};
+ }
+
  // Give existing candidates a fresh hosting invocation even when discovery
  // would consume all shared capacity. Alternate with unrestricted discovery.
  // The verification snapshot is task-local and retains the whole candidate pool.
- if(fullResearch&&parallelResearch&&!pipelineChild&&deferDiscoverySnapshots&&resourceBudget&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&checkpoint.liveDeliveryTurn!=='search'){
+ if(fullResearch&&parallelResearch&&!pipelineChild&&!independentExecutor&&deferDiscoverySnapshots&&resourceBudget&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&checkpoint.liveDeliveryTurn!=='search'){
   const pending=pendingVerification(checkpoint);
   const prior=checkpoint.priorState?.matches||[];
   const reportPending=prior.filter(eligibleCuratedScore).some(j=>!qualifiedReport(j)&&(!j.report_status||j.report_status==='RETRY_PENDING'))&&prior.filter(qualifiedReport).length<FINAL_TARGET;
@@ -770,7 +779,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // Run one existing verification phase alongside the next discovery phase.
  // Use a separate snapshot and merge only completed branches; failures do not
  // invalidate paid work completed by the other branch.
- if(curated&&parallelResearch&&!pipelineChild&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&(!checkpoint.priorState||checkpoint.pipelineActive)){
+ if(curated&&parallelResearch&&!pipelineChild&&!independentExecutor&&checkpoint?.phase==='research'&&!checkpoint.backfillSignature&&(!checkpoint.priorState||checkpoint.pipelineActive)){
   const eligible=pendingVerification(checkpoint);
   if(eligible.length){
    const plan=pipelineWidths(checkpoint,eligible.length);
