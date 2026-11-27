@@ -47,11 +47,11 @@ function JobTitle({job}:{job:MatchedJob}){
 function OfficialApplyAction({job}:{job:MatchedJob}){
  const href=officialApplicationHref(job);
  const label='投递官网';
- // Keep the one action visually stable as the existing job gains verified
- // evidence. Do not fabricate an employer destination for unverified leads.
- return href?
-  <a className="hhba-discovery-apply" href={href} target="_blank" rel="noopener noreferrer" aria-label={label+' · '+job.company+' · '+(job.title_zh||job.title)}>{label}<ArrowUpRight size={13} aria-hidden="true"/></a>:
-  <button type="button" className="hhba-discovery-apply" disabled aria-label={label}>{label}</button>;
+ // Unverified leads still appear in the live search list, but there is no
+ // customer-facing "投递官网" action until a real employer destination is proven.
+ // Never render a disabled promise of a link or substitute a guessed domain.
+ if(!href)return null;
+ return <a className="hhba-discovery-apply" href={href} target="_blank" rel="noopener noreferrer" aria-label={label+' · '+job.company+' · '+(job.title_zh||job.title)}>{label}<ArrowUpRight size={13} aria-hidden="true"/></a>;
 }
 function OfficialLink({job}:{job:MatchedJob}){
  const href=officialApplicationHref(job);
