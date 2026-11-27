@@ -711,7 +711,10 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  // retries have exhausted, the ordinary V4 coordinator resumes as fallback.
  if(independentExecutor&&!pipelineChild&&checkpoint&&['verification','reporting'].includes(checkpoint.phase)&&env.__v4IndependentPending>0){
   onActivity(checkpoint.phase==='reporting'?'writing':'reading','已发现岗位正在独立核验和生成报告；本轮研究成果已保存，等待合并独立完成的证据。');
-  return {status:'CONTINUE',checkpoint};
+  // Signal a durable Workflow sleep instead of endlessly re-running the
+  // unchanged encrypted checkpoint while leased jobs are still in flight.
+  // This is an idle-state hint, not a cap on AI calls or job count.
+  return {status:'CONTINUE',checkpoint,waitingIndependentJobs:true};
  }
 
  // Give existing candidates a fresh hosting invocation even when discovery

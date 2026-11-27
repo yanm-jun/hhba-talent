@@ -33,13 +33,27 @@ test('stage wake uses only private service binding and deterministic opaque inst
 test('staged handoff always happens after encrypted checkpoint save and task lease release',()=>{
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/await saveMatchTask\(env,input\.taskKey,\{checkpoint:result\.checkpoint/);
- assert.match(route,/await publishProgress\(\);await releaseTask\(\);\s*await stageCompleteOrHandoff\(result\.checkpoint\)/);
+ assert.match(route,/await publishProgress\(\);await releaseTask\(\);\s*if\(result\.waitingIndependentJobs\)/);
+ assert.ok(route.includes("}else await stageCompleteOrHandoff(result.checkpoint)"),
+  'normal saved continuation still releases its lease and signals the next stage');
+ assert.ok(route.includes("if(!result.waitingIndependentJobs||mergedIndependentJobs>0)"),
+  'the authoritative checkpoint is persisted on every real advance and merged JD result');
  assert.match(route,/if\(input\.backgroundLane&&!input\.cachedResult\)/);
  assert.match(route,/if\(next!==input\.backgroundLane\)/);
  assert.equal(route.split('v4CheckpointLane(checkpoint,{independentJobs:v4JobExecutorEnabled(env)})').length-1,1);
  assert.equal(route.split('v4CheckpointLane(input.checkpoint,{independentJobs:v4JobExecutorEnabled(env)})').length-1,1);
 });
 
+test('independent job wait does not re-save unchanged private checkpoints or fake completion',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const runner=readFileSync(new URL('../../../services/match-background/runner.mjs',import.meta.url),'utf8');
+ assert.ok(route.includes("if(!result.waitingIndependentJobs||mergedIndependentJobs>0)"),
+  'new independent evidence is saved while an unchanged checkpoint is not re-encrypted every idle tick');
+ assert.ok(route.includes("send('complete',{status:'CONTINUE',waiting_for_jobs:true})"),
+  'pending JD progress must never be reported as finished');
+ assert.ok(runner.includes("value?.waiting_for_jobs===true"));
+ assert.ok(runner.includes("step.sleep('wait-independent-jobs-'+phase,'30 seconds')"));
+});
 test('fallback driver retains authorized task cleanup without adding an AI provider call',()=>{
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const runner=readFileSync(new URL('../../../services/match-background/runner.mjs',import.meta.url),'utf8');
