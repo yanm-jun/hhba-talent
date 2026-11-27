@@ -330,7 +330,7 @@ export function matchExecutionFromServer(value:unknown):MatchExecution|null{
  return x as MatchExecution;
 }
 type CompletedJobCursor={ms:number;lane:''|'verification'|'reporting';key:string};
-type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;execution?:MatchExecution;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;completed_jobs?:{cursor:CompletedJobCursor;jobs:MatchedJob[];more:boolean};failure?:{error:string;retryable?:boolean}|null};
+type PendingManagedMatch={status:'PENDING'|'FAILED'|'CHECK_DRIVER';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;execution?:MatchExecution;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;completed_jobs?:{cursor:CompletedJobCursor;jobs:MatchedJob[];more:boolean};failure?:{error:string;retryable?:boolean}|null};
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
 // token, signed continuation or model output is written to localStorage.
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
@@ -478,6 +478,9 @@ export async function submitExtractedResumeText(
  const liveCandidates=createLiveCandidateReception(onResearchJobs);
  let lastDeliveryStamp='';
  let completedCursor:CompletedJobCursor|null=null;
+ // First registration/recovery stays on /resume. Routine reads use the
+ // authenticated CV-free endpoint with periodic original-driver checks.
+ let progressOnly=false,checkDriverAt=0;
  let reconnectDelay=1000;
  const reconnect=async()=>{
   if(requestSignal.aborted)throw requestSignal.reason;
@@ -490,22 +493,34 @@ export async function submitExtractedResumeText(
   for(;;){
   if(requestSignal.aborted)throw requestSignal.reason;
   try{
-  const response:Response=await fetch(EFFECTIVE_API+'/resume',{
+  const readOnly:boolean=!!(opts.managed_task&&task&&progressOnly&&Date.now()<checkDriverAt);
+  const route=readOnly?'/progress':'/resume';
+  const requestBody=readOnly?
+   {task_id:task?.id,generation:opts.research_generation??0,job_delta:true,
+    job_cursor:completedCursor,progress_stamp:lastDeliveryStamp}:
+   {resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id,research_generation:opts.research_generation??0}:{}),
+    ...(opts.managed_task?{task_managed:true,job_delta:true,job_cursor:completedCursor,progress_stamp:lastDeliveryStamp}:{}),
+    options:{country:'CN',remote_only:false,role_hint:opts.role_hint,exclude_urls:opts.exclude_urls},
+    ...(continuation?{continuation}:{})};
+  const response:Response=await fetch(EFFECTIVE_API+route,{
    method:'POST',credentials:'same-origin',cache:'no-store',signal:requestSignal,
-   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':'text/event-stream'},
-   body:JSON.stringify({resume_id:resumeId||null,text:cleaned,consent:true,...(task?{task_id:task.id,research_generation:opts.research_generation??0}:{}),...(opts.managed_task?{task_managed:true}:{}),
-    ...(opts.managed_task?{job_delta:true,job_cursor:completedCursor,progress_stamp:lastDeliveryStamp}:{}),
-    options:{country:'CN',remote_only:false,
-     role_hint:opts.role_hint,
-     exclude_urls:opts.exclude_urls
-    },...(continuation?{continuation}:{})})
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'Accept':readOnly?'application/json':'text/event-stream'},
+   body:JSON.stringify(requestBody)
   }).catch(e=>{if(requestSignal.aborted)throw requestSignal.reason;
    if((e as Error)?.name==='AbortError')throw e;
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。',true);});
+  if(readOnly&&!response.ok){
+   // Read-only endpoint unavailable: reuse the established driver rather
+   // than fail or launch a fresh search.
+   progressOnly=false;checkDriverAt=0;continue;
+  }
   const isStream:boolean=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。',response.status===429||response.status>=500);
   const data:(Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string}=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,jobs=>{liveCandidates.snapshot(jobs);},event=>{liveCandidates.receive(event);},onExecution):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string};
+  if(readOnly&&data.status==='CHECK_DRIVER'){
+   progressOnly=false;checkDriverAt=0;continue;
+  }
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
    if(code==='AI_TASK_IN_PROGRESS')throw new MatchError(409,'上次任务正在处理当前阶段，正在等待原任务恢复。',true);
@@ -551,6 +566,10 @@ export async function submitExtractedResumeText(
     }
    }
    if(data.status==='FAILED')throw new MatchError(502,errorMap[data.failure?.error||'']||errorMap.AI_BACKGROUND_EXECUTION_FAILED,false);
+   if(opts.managed_task&&task&&data.progress){
+    progressOnly=true;
+    if(!readOnly)checkDriverAt=Date.now()+30000;
+   }else progressOnly=false;
    if(data.failure?.retryable)onActivity?.({stage:'waiting',message:(data.failure.error==='AI_EDGE_DAILY_LIMIT'?'Cloudflare 当日额度暂时不足，将在额度允许后继续。':data.failure.error==='AI_PROVIDER_RATE_LIMITED'?'AI 接口暂时限流，等待恢复。':data.failure.error==='AI_TASK_IN_PROGRESS'?'原任务仍在执行或释放任务锁。':data.failure.error==='AI_BACKGROUND_WORKFLOW_ROLLOVER'?'正在接续下一段后台工作。':'后台暂时等待或正在恢复。')+' 已保存的研究成果会保留，无需重新开始。'});
    else if(!data.progress)onActivity?.({stage:'preparing',message:'后台任务已登记，正在等待实际执行状态。'});
    await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},data.failure?.retryable?15000:completed?.more?1000:addedCandidates>0||deliveredJobs>0?2000:3000);requestSignal.addEventListener('abort',stop,{once:true});});
@@ -568,7 +587,7 @@ export async function submitExtractedResumeText(
   if(data.research_report)onResearch?.(data.research_report);
   if(data.research_leads)liveCandidates.snapshot(data.research_leads,{final:true});
   return data as MatchResponse;
-  }catch(error){if(!MATCH_V4_PREVIEW||!task||!(error instanceof MatchError)||!error.retryable||requestSignal.aborted)throw error;await reconnect();}
+  }catch(error){if(!MATCH_V4_PREVIEW||!task||!(error instanceof MatchError)||!error.retryable||requestSignal.aborted)throw error;progressOnly=false;checkDriverAt=0;await reconnect();}
   }
  }catch(error){
   if(requestSignal.aborted)throw requestSignal.reason;

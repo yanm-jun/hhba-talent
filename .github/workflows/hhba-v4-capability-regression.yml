@@ -18,6 +18,7 @@ on:
       - 'apps/web/scripts/v4-job-executor.test.mjs'
       - 'apps/web/scripts/v4-job-locator.test.mjs'
       - 'apps/web/scripts/v4-independent-job-delivery.test.mjs'
+      - 'apps/web/scripts/v4-readonly-progress.test.mjs'
       - 'apps/web/src/services/resumeMatch.ts'
       - 'apps/web/scripts/v4-job-ops-metrics.test.mjs'
       - 'apps/web/d1/20261127_v4_job_ops_daily.sql'
@@ -38,6 +39,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test apps/web/scripts/ai-token-usage.test.mjs apps/web/scripts/v4-search-expansion.test.mjs apps/web/scripts/v4-parallel-discovery.test.mjs apps/web/scripts/simple-match-v4.contract.test.mjs apps/web/scripts/v4-session-match-task.test.mjs apps/web/scripts/v4-stage-workflows.test.mjs apps/web/scripts/v4-job-work-queue.test.mjs apps/web/scripts/v4-job-executor.test.mjs apps/web/scripts/v4-job-locator.test.mjs apps/web/scripts/v4-independent-job-delivery.test.mjs apps/web/scripts/v4-job-ops-metrics.test.mjs apps/web/scripts/v4-search-speed.test.mjs services/match-background/runner.test.mjs
+      - run: node --test apps/web/scripts/ai-token-usage.test.mjs apps/web/scripts/v4-search-expansion.test.mjs apps/web/scripts/v4-parallel-discovery.test.mjs apps/web/scripts/simple-match-v4.contract.test.mjs apps/web/scripts/v4-session-match-task.test.mjs apps/web/scripts/v4-stage-workflows.test.mjs apps/web/scripts/v4-job-work-queue.test.mjs apps/web/scripts/v4-job-executor.test.mjs apps/web/scripts/v4-job-locator.test.mjs apps/web/scripts/v4-independent-job-delivery.test.mjs apps/web/scripts/v4-readonly-progress.test.mjs apps/web/scripts/v4-job-ops-metrics.test.mjs apps/web/scripts/v4-search-speed.test.mjs services/match-background/runner.test.mjs
       - working-directory: apps/web
         run: npm ci --ignore-scripts && npm run build

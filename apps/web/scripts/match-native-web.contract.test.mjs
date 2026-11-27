@@ -91,7 +91,8 @@ test('frontend fetches one native SSE stream and maps stages without restarting 
  const {readFile}=await import('node:fs/promises');
  const svc=await readFile(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
  const page=await readFile(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
- assert.match(svc,/'Accept':'text\/event-stream'/);
+ assert.match(svc,/'Accept':readOnly\?'application\/json':'text\/event-stream'/,
+  'original research remains SSE while lightweight progress is JSON');
  assert.match(svc,/consumeNativeMatchStream/);
  assert.match(svc,/event==='complete'/);
  assert.match(svc,/event==='failure'/);
