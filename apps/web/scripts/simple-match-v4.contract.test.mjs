@@ -92,7 +92,7 @@ test('V4 backend heartbeat reaches frontend without inventing new candidate coun
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const panel=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  assert.match(api,/worker_seen_at:lastWorkerSeenAt,last_result_at:lastEvidenceAt/);
- assert.match(api,/send\('heartbeat',\{stage:phase,elapsed_ms:.*execution:execution\(\)/);
+ assert.match(api,/send\('heartbeat',\{stage:phase,elapsed_ms:.*execution:workerSnapshot\(\)/);
  assert.match(api,/if\(input.background\)queueProgress\('routine'\)/);
  assert.match(service,/onExecution\?\.\(matchExecutionFromServer\(data\.progress\?\.execution\)\)/);
  assert.match(service,/if\(event==='heartbeat'\)/);
