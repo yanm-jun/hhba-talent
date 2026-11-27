@@ -9,8 +9,9 @@ export function v4MinuteSamples(events,{source='phase',finished=Date.now()}={}){
  const grouped=new Map();
  for(const e of events){
   if(!e||!kinds.has(e.kind))continue;
-  const at=validTime(e.at)?e.at:finished;
-  if(!validTime(at))continue;
+  // No timestamp -> no trustworthy minute. Never guess when it happened.
+  if(!validTime(e.at))continue;
+  const at=e.at;
   const minute=new Date(Math.floor(at/60000)*60000).toISOString().slice(0,16)+'Z';
   const key=minute+':'+source+':'+e.kind;
   grouped.set(key,{minute_utc:minute,source,kind:e.kind,events:(grouped.get(key)?.events||0)+1});
