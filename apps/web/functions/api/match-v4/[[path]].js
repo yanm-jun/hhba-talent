@@ -22,7 +22,7 @@ import {claimAiCheckpoint,leaseMatchTask} from '../../_lib/ai-checkpoint-claim.j
 import {issueCheckpoint,verifyCheckpoint} from '../../_lib/resume-rewrite-checkpoint.js';
 import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSessionTask,researchTaskKey} from '../../_lib/v4-session-match-task.js';
 import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
-import {isV4TerminalTaskFailure,terminalV4SavedFailure,retryableV4SavedFailure,normalizeV4RecoveryRecord,normalizeV4RecoveryView,v4RecoveredResourcePhase} from '../../_lib/v4-task-failure-policy.js';
+import {isV4TerminalTaskFailure,terminalV4SavedFailure,retryableV4SavedFailure,normalizeV4RecoveryRecord,normalizeV4RecoveryView,v4RecoveredResourcePhase,v4RecoveredTransportMode,v4StampTransport} from '../../_lib/v4-task-failure-policy.js';
 
 import {v4ManagedResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
 import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
@@ -89,8 +89,7 @@ function events(env,request,input,waitUntil){
    // A live worker heartbeat is separate from actual research progress.
    // Transport fallback is task-scoped, persisted alongside encrypted research
    // state. It never changes the model's search breadth or reasoning policy.
-   const stampTransport=checkpoint=>input.background&&input.transportMode==='json'&&checkpoint?
-    {...checkpoint,transport_mode:'json'}:checkpoint;
+   const stampTransport=checkpoint=>v4StampTransport(checkpoint,input.background?input.transportMode:null);
    const workerSnapshot=()=>({state:runtimeState==='recovering'?'recovering':inFlightAi>0?'awaiting_ai':'processing',
     worker_seen_at:lastWorkerSeenAt,last_result_at:lastEvidenceAt,phase_started_at:started});
    const heart=setInterval(()=>{
@@ -454,7 +453,7 @@ async function backgroundStep(env,request,waitUntil){
   const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
    const saved=await recoverSavedDiscovery(env,input,durable);
   if(saved?.generation===task.generation){input.recovering=!!saved.failure;input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;
-    input.transportMode=saved.checkpoint?.transport_mode==='json'||saved.failure?.upstream_kind==='SSE_FAILED'?'json':undefined;if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
+    input.transportMode=v4RecoveredTransportMode(saved.checkpoint,saved.failure);if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
