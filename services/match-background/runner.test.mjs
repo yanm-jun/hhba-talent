@@ -38,6 +38,30 @@ test('job fan-out preserves reporting and verification across durable follow-up 
  assert.equal(calls.filter(x=>x.url.endsWith('/background-job-step')&&x.body.lane==='verification').length,7);
  assert.equal(calls.filter(x=>x.url.endsWith('/background-job-step')&&x.body.lane==='reporting').length,1);
 });
+test('pending independent JDs pause on a durable Workflow timer without repeating AI research',async()=>{
+ assert.equal(await requestPhase(async()=>event('complete',{status:'CONTINUE',waiting_for_jobs:true}),ticket),'WAIT_JOBS');
+ const requests=[],sleeps=[],statuses=[
+  {status:'CONTINUE',waiting_for_jobs:true},
+  {status:'CONTINUE',waiting_for_jobs:true},
+  {status:'CONTINUE'},
+  {status:'COMPLETE'}
+ ];
+ const step={
+  async do(_name,_opts,fn){return fn();},
+  async sleep(name,duration){sleeps.push({name,duration});}
+ };
+ const result=await driveBackgroundMatch(step,ticket,async(url,options)=>{
+  requests.push({url,body:JSON.parse(options.body)});
+  if(url.endsWith('/background-job-step'))return Response.json({status:'EMPTY'});
+  return event('complete',statuses.shift());
+ },{jobsEnabled:true,maxSteps:10});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.deepEqual(sleeps.map(x=>x.duration),['30 seconds','30 seconds']);
+ assert.deepEqual(sleeps.map(x=>x.name),['wait-independent-jobs-0','wait-independent-jobs-1']);
+ assert.equal(requests.filter(x=>x.url.endsWith('/background-step')).length,4);
+ assert.equal(requests.filter(x=>x.url.endsWith('/background-job-step')).length,8,
+  'already-queued independent jobs keep getting execution opportunities');
+});
 test('edge-compatible manual redirects never send ticket to another destination',async()=>{
  let calls=0;
  for(const status of [301,302,303,307,308])assert.equal(await requestPhase(async(url,init)=>{calls++;assert.equal(init.redirect,'manual');return new Response(null,{status,headers:{Location:'https://other.example/'}});},ticket),'FAILED');
