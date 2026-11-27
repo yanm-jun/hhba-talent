@@ -207,3 +207,25 @@ test('completed large queue revisits older rows and invalidates changed source r
  assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE lane='verification'").get().n,500);
  assert.ok(before);
 });
+
+
+test('expired JD job resumes its saved revision before 500 fresh jobs; active lease remains fenced',async()=>{
+ const {db,local}=fixture();
+ const urls=Array.from({length:120},(_,i)=>url+'/resume-'+String(i+1).padStart(4,'0'));
+ const cp={phase:'research',rows:urls.map(u=>[u,{...source(),employer_proof_url:u}]),processedEarlier:[],processedEvidence:[],matches:[]};
+ for(let i=0;i<3;i++)await reconcileV4JobWork(db,taskKey,0,cp,{now:1000+i,maxChanges:40});
+ const stalled=await claimV4JobWork(db,taskKey,0,'verification',{now:1100,leaseMs:15000,owner:'old-worker'});
+ const active=await claimV4JobWork(db,taskKey,0,'verification',{now:1101,leaseMs:120000,owner:'live-worker'});
+ assert.ok(stalled&&active&&stalled.job_key!==active.job_key);
+ assert.equal(await claimV4JobWork(db,taskKey,0,'verification',{now:1300,owner:'not-allowed'}),null,
+  'two active claims fence all duplicate model calls');
+ const resumed=await claimV4JobWork(db,taskKey,0,'verification',{now:16101,owner:'new-worker',leaseMs:15000});
+ assert.ok(resumed);
+ assert.equal(resumed.job_key,stalled.job_key,'overdue JD resumes before 118 never-before-seen candidates');
+ assert.equal(resumed.revision,stalled.revision,'research results use the same source revision and saved sidecar');
+ assert.equal(resumed.attempts,2);
+ assert.notEqual(resumed.job_key,active.job_key,'in-flight sibling must never be stolen');
+ assert.equal(await finishV4JobWork(db,stalled,{now:16102}),false,'old owner cannot commit a stale result');
+ assert.equal(await finishV4JobWork(db,resumed,{now:16103,completed:true}),true);
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE state='PENDING'").get().n,118);
+});
