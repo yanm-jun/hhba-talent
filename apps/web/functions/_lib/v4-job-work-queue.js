@@ -93,14 +93,14 @@ export async function renewV4JobWork(db,claim,{now=Date.now(),leaseMs=120000}={}
  .bind(until,now,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
  return r?.meta?.changes===1;
 }
-export async function finishV4JobWork(db,claim,{now=Date.now(),completed=true}={}){
+export async function finishV4JobWork(db,claim,{now=Date.now(),completed=true,continued=false}={}){
  if(!db?.prepare||!valid(claim?.task_key,claim?.generation)||!laneOk(claim?.lane))return false;
  const state=completed?'COMPLETED':'PENDING';
  const r=await db.prepare(`UPDATE hhba_v4_job_work_queue SET
- state=?,lease_owner=NULL,lease_until_ms=0,updated_at_ms=?
+ state=?,lease_owner=NULL,lease_until_ms=0,updated_at_ms=?,attempts=CASE WHEN ?=1 THEN MAX(0,attempts-1) ELSE attempts END
  WHERE task_key=? AND generation=? AND lane=? AND job_key=?
  AND revision=? AND state='LEASED' AND lease_owner=? AND lease_until_ms>?`)
- .bind(state,now,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
+ .bind(state,now,continued?1:0,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
  return r?.meta?.changes===1;
 }
 export async function clearV4JobWork(db,taskKey,generation){
