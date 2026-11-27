@@ -21,7 +21,12 @@ export const v4RecoveredResourcePhase=code=>code==='AI_EDGE_RESOURCE_EXHAUSTED'|
 // Keep relay transport remediation scoped to one encrypted task generation.
 // Only a specific SSE failure warrants JSON failover; ordinary HTTP 5xx and
 // network failures retain the configured transport until evidence says otherwise.
-export const v4RecoveredTransportMode=(checkpoint,failure)=>
- checkpoint?.transport_mode==='json'||failure?.upstream_kind==='SSE_FAILED'?'json':'sse';
+export const v4RecoveredTransportMode=(checkpoint,failure,recoveryHint)=>
+ checkpoint?.transport_mode==='json'||failure?.upstream_kind==='SSE_FAILED'||
+ // Legacy in-flight tasks predating upstream-kind diagnostics only have the
+ // durable retry error. A matching Workflow recovery hint confirms another
+ // attempt of the same failed stage, so try the alternate transport once.
+ recoveryHint==='AI_PROVIDER_UPSTREAM_ERROR'&&failure?.error==='AI_PROVIDER_UPSTREAM_ERROR'
+ ?'json':'sse';
 export const v4StampTransport=(checkpoint,mode)=>
  mode==='json'&&checkpoint?{...checkpoint,transport_mode:'json'}:checkpoint;
