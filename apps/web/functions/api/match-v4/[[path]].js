@@ -28,7 +28,7 @@ import {getSessionTask,updateSessionTask,assertSessionTaskActive,renewActiveSess
 import {backgroundEnabled,tryScheduleBackgroundMatch,loadBackgroundMatch,isV4RetryableTaskFailure} from '../../_lib/v4-background-match.js';
 import {isV4TerminalTaskFailure,terminalV4SavedFailure,retryableV4SavedFailure,normalizeV4RecoveryRecord,normalizeV4RecoveryView,v4RecoveredResourcePhase,v4RecoveredTransportMode,v4StampTransport} from '../../_lib/v4-task-failure-policy.js';
 
-import {v4ManagedResourceBudget,phaseModelReplay,PHASE_YIELD} from '../../_lib/v4-phase-budget.js';
+import {v4ManagedResourceBudget,phaseModelReplay,PHASE_YIELD,deferV4RecoveryHousekeeping} from '../../_lib/v4-phase-budget.js';
 import {createV4ProgressPublisher} from '../../_lib/v4-progress-publisher.js';
 import {createV4DeliveryTelemetry} from '../../_lib/v4-live-delivery-telemetry.js';
 import {createV4SearchSpeedTracker,recordV4SearchSpeed} from '../../_lib/v4-search-speed.js';
@@ -317,8 +317,9 @@ function events(env,request,input,waitUntil){
       // JD workers keep their own revision-fenced leases and can continue
       // without any main-checkpoint merge; the next healthy phase merges them.
       // This skips no candidate, provider research round, or completed result.
-      const deferRecoveryHousekeeping=!!(input.background&&input.resourceRecovery&&
-       input.checkpoint?.phase==='research'&&input.checkpoint.rows?.length>0&&v4JobExecutorEnabled(env));
+      const deferRecoveryHousekeeping=deferV4RecoveryHousekeeping({
+       background:input.background,resourceRecovery:input.resourceRecovery,
+       checkpoint:input.checkpoint,independentExecutor:v4JobExecutorEnabled(env)});
       if(deferRecoveryHousekeeping)console.info('HHBA_V4_RESOURCE_RECOVERY_DISCOVERY_PRIORITY');
       if(input.background&&input.taskKey&&input.checkpoint&&v4JobExecutorEnabled(env)&&!deferRecoveryHousekeeping){
        try{
