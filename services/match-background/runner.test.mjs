@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {driveBackgroundMatch,requestPhase} from './runner.mjs';
+import {driveBackgroundMatch,requestPhase,requestIndependentJobPhase} from './runner.mjs';
 const ticket='a'.repeat(64);
 const event=(kind,value)=>new Response('event: '+kind+'\ndata: '+JSON.stringify(value)+'\n\n',{headers:{'Content-Type':'text/event-stream'}});
 test('independent runner advances persisted phases until terminal success, without browser state',async()=>{
@@ -405,4 +405,24 @@ test('misconfigured staged verifier fails closed instead of taking discovery mas
  const result=await driveBackgroundMatch(step,ticket,async url=>{if(url.endsWith('/background-step'))mainCalls++;else jobCalls++;return event('complete',{status:'COMPLETE'});},{lane:'verification',jobsEnabled:false});
  assert.deepEqual(result,{status:'FAILED',error:'AI_JOB_EXECUTOR_DISABLED'});
  assert.equal(mainCalls,0);assert.equal(jobCalls,0);
+});
+
+test('JD driver preserves the exact sanitized upstream error instead of a featureless RETRY',async()=>{
+ const resp=await requestIndependentJobPhase(async()=>Response.json({status:'RETRY',error:'AI_PROVIDER_UPSTREAM_ERROR'}),ticket,'verification');
+ assert.deepEqual(resp,{status:'RETRY',error:'AI_PROVIDER_UPSTREAM_ERROR'});
+ const html=await requestIndependentJobPhase(async()=>new Response('<h1>Cloudflare Worker exceeded resources Error 1102</h1>',{status:503}),ticket,'verification');
+ assert.deepEqual(html,{status:'DEFERRED',error:'AI_EDGE_RESOURCE_EXHAUSTED'});
+ assert.deepEqual(await requestIndependentJobPhase(async()=>Response.json({error:'AI_AUTH_SESSION_EXPIRED'},{status:403}),ticket,'verification'),{status:'STOP',error:'AI_AUTH_SESSION_EXPIRED'});
+});
+test('JD retry cooldown tracks resource exhaustion while preserving all queued jobs',async()=>{
+ const sleeps=[],calls=[];
+ const step={async waitForEvent(){return {payload:{done:false}};},async do(_n,_cfg,fn){return fn();},async sleep(name,value){sleeps.push({name,value});}};
+ const result=await driveBackgroundMatch(step,ticket,async(url,opts)=>{
+  calls.push({url,body:JSON.parse(opts.body)});
+  if(calls.length<=2)return new Response('1102 Worker exceeded resources',{status:503});
+  return Response.json({status:'FINISHED'});
+ },{lane:'verification',jobsEnabled:true,maxSteps:4});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.deepEqual(sleeps.map(x=>x.value),['90 seconds']);
+ assert.ok(calls.every(x=>x.url.endsWith('/background-job-step')&&x.body.lane==='verification'));
 });

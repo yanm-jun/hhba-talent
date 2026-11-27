@@ -80,13 +80,20 @@ export async function requestIndependentJobPhase(fetcher,ticket,lane){
  try{
   const response=await fetcher('https://hhba.work/api/match-v4/background-job-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,lane})});
   if(!response.ok){
-   const body=await response.json().catch(()=>null),code=safeCode(body?.error,'AI_BACKGROUND_EXECUTION_FAILED');
+   // Cloudflare 1102 may return HTML instead of JSON. Preserve its exact
+   // sanitized error classification so a retry is not mistaken for an empty
+   // queue or an unknown provider failure.
+   const raw=(await response.text().catch(()=>'' )).slice(0,4096);
+   let body=null;try{body=JSON.parse(raw);}catch{}
+   const code=safeCode(body?.error,/1102|exceededResources|worker exceeded resource/i.test(raw)
+    ?'AI_EDGE_RESOURCE_EXHAUSTED':response.status>=500?'AI_BACKGROUND_HTTP_'+response.status:'AI_BACKGROUND_EXECUTION_FAILED');
    if(stopCodes.has(code))return {status:'STOP',error:code};
    if(permanentCodes.has(code))return {status:'FAILED',error:code};
-   return {status:'DEFERRED'};
+   return {status:'DEFERRED',error:code};
   }
   const data=await response.json().catch(()=>null);
-  return {status:['DONE','CONTINUE','EMPTY','RETRY','STALE','DISABLED','FINISHED'].includes(data?.status)?data.status:'DEFERRED'};
+  const status=['DONE','CONTINUE','EMPTY','RETRY','STALE','DISABLED','FINISHED'].includes(data?.status)?data.status:'DEFERRED';
+  return {status,...(status==='RETRY'?{error:safeCode(data?.error,'AI_BACKGROUND_EXECUTION_FAILED')}: {})};
  }catch{return {status:'DEFERRED'};}
 }
 // Dedicated verification and reporting Workflows MUST NEVER call
@@ -108,7 +115,11 @@ export async function driveIndependentJobLane(step,ticket,fetcher,{lane,maxSteps
     if(completed)console.info('HHBA_V4_INDEPENDENT_JOB_COMPLETED',JSON.stringify({count:completed,lane}));
     if(values.some(x=>x.status==='DONE'||x.status==='CONTINUE'))return {status:'CONTINUE'};
     if(values.every(x=>x.status==='DISABLED'))return {status:'FAILED',error:'AI_JOB_EXECUTOR_DISABLED'};
-    if(values.some(x=>x.status==='RETRY'||x.status==='DEFERRED'))return {status:'RETRY'};
+    if(values.some(x=>x.status==='RETRY'||x.status==='DEFERRED')){
+     const code=values.find(x=>x.status==='RETRY'&&x.error)?.error||values.find(x=>x.error)?.error||'AI_BACKGROUND_EXECUTION_FAILED';
+     console.warn('HHBA_V4_INDEPENDENT_JOB_RETRY',JSON.stringify({lane,error:code}));
+     return {status:'RETRY',error:code};
+    }
     return {status:'IDLE'};
    });
   }catch(e){
@@ -121,7 +132,10 @@ export async function driveIndependentJobLane(step,ticket,fetcher,{lane,maxSteps
   // Empty or cooled-down job queues are not terminal. The next discovery
   // checkpoint can enqueue more rows, so sleep durably and re-check the same
   // authenticated ticket without any new main research invocation.
-  await step.sleep('independent-'+lane+'-idle-'+phase,state?.status==='RETRY'?'45 seconds':'30 seconds');
+  const cooldown=state?.error==='AI_PROVIDER_RATE_LIMITED'?'120 seconds':
+   state?.error==='AI_EDGE_RESOURCE_EXHAUSTED'?'90 seconds':
+   state?.status==='RETRY'?'45 seconds':'30 seconds';
+  await step.sleep('independent-'+lane+'-idle-'+phase,cooldown);
  }
  return pending('AI_BACKGROUND_WORKFLOW_ROLLOVER');
 }

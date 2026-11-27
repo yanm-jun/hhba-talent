@@ -53,6 +53,12 @@ function jobFromCheckpoint(checkpoint,url,original){
  return candidates.find(x=>itemUrl(x)===url||x.official_url===original?.official_url)||null;
 }
 const errorCode=e=>typeof e?.code==='string'&&/^[A-Z][A-Z0-9_]{4,90}$/.test(e.code)?e.code:'AI_BACKGROUND_EXECUTION_FAILED';
+// A failed provider SSE is a per-job transport problem, not an instruction to
+// discard the verified JD research or retry the same failing stream forever.
+// Persist this flag in the encrypted, revision-fenced job continuation so the
+// next invocation uses Responses JSON with identical model/search parameters.
+export const v4IndependentJobTransport=(previous,error,providerStream=true)=>
+ previous?.transport_mode==='json'||providerStream===true&&error?.code==='AI_PROVIDER_UPSTREAM_ERROR'&&error?.upstreamKind==='SSE_FAILED'?'json':'configured';
 
 // A claimed job runs with its own invocation budget and encrypted continuation.
 // It never owns the main task lease; only its own D1 job lease may be renewed.
@@ -117,6 +123,11 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   const scoped=budget.env(env),provider=v4JobProvider(scoped);
   if(!provider)return {status:'DISABLED'};
   provider.phaseResourceBudget=budget;
+  const jobTransport=v4IndependentJobTransport(vettedPrevious?previous:null);
+  if(jobTransport==='json'){
+   provider.stream=false;
+   console.info('HHBA_V4_INDEPENDENT_JOB_JSON_RECOVERY',JSON.stringify({lane}));
+  }
   let recovery=()=>child;
   heartbeat=setInterval(()=>{void renewV4JobWork(db,claim,{leaseMs:300000}).then(ok=>{if(!ok)leaseLost=true;}).catch(()=>{leaseLost=true;});},45000);
   let run;
@@ -129,9 +140,12 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   }catch(e){
    if(e?.code==='AI_AGENT_CANCELLED')throw e;
    const snapshot=recovery();
+   const transportMode=v4IndependentJobTransport(vettedPrevious?previous:null,e,provider.stream);
+   if(transportMode==='json'&&jobTransport!=='json')console.warn('HHBA_V4_INDEPENDENT_JOB_SSE_FALLBACK_NEXT_STEP',JSON.stringify({lane}));
    if(snapshot&&!leaseLost&&await renewV4JobWork(db,claim,{leaseMs:300000})){
     await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
-     job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,checkpoint:snapshot,complete:false});
+     job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,
+     ...(transportMode==='json'?{transport_mode:'json'}:{}),checkpoint:snapshot,complete:false});
    }
    retryError=errorCode(e);return {status:'RETRY',error:retryError};
   }
@@ -146,7 +160,8 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   // Avoid decrypting a 500-job master checkpoint again after the AI call.
   if(leaseLost||!await renewV4JobWork(db,claim,{leaseMs:300000}))throw Object.assign(Error('AI_CHECKPOINT_LEASE_LOST'),{code:'AI_CHECKPOINT_LEASE_LOST'});
   await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
-   job_key:claim.job_key,checkpoint:snapshot,job:result,complete:done,source_url:url,seed_source:source,seed_score:activeScore});
+   job_key:claim.job_key,checkpoint:snapshot,job:result,complete:done,source_url:url,seed_source:source,seed_score:activeScore,
+   ...(jobTransport==='json'?{transport_mode:'json'}:{})});
   await finishV4JobWork(db,claim,{completed:done,continued:!done});
   return {status:done?'DONE':'CONTINUE',lane,
    ...(done?{evidence:{verified_jd:lane==='verification'&&result?.jd_source_status==='VERIFIED_JD',
