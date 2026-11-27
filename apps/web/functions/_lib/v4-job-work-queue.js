@@ -74,14 +74,21 @@ export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=D
 export async function claimV4JobWork(db,taskKey,generation,lane,{now=Date.now(),leaseMs=120000,owner=crypto.randomUUID()}={}){
  if(!db?.prepare||!valid(taskKey,generation)||!laneOk(lane)||typeof owner!=='string'||!owner)return null;
  const until=now+Math.max(15000,Math.min(300000,Math.floor(leaseMs)));
+ // Cloudflare Free has a finite concurrent-invocation/CPU budget. Atomically
+ // reserve no more than two live job leases per task generation, regardless of
+ // how many older Workflow instances dispatch at once. This controls only
+ // simultaneous processing, never the research size or job queue length.
+ const maxActiveLeases=2;
  const sql=`UPDATE hhba_v4_job_work_queue SET
  state='LEASED',lease_owner=?,lease_until_ms=?,attempts=attempts+1,updated_at_ms=?
  WHERE rowid=(SELECT rowid FROM hhba_v4_job_work_queue
  WHERE task_key=? AND generation=? AND lane=?
  AND attempts<3 AND (state='PENDING' OR state='LEASED' AND lease_until_ms<=?)
  ORDER BY updated_at_ms,job_key LIMIT 1)
+ AND (SELECT COUNT(*) FROM hhba_v4_job_work_queue
+ WHERE task_key=? AND generation=? AND state='LEASED' AND lease_until_ms>?)<?
  RETURNING job_key,revision,attempts,lease_until_ms`;
- const result=await db.prepare(sql).bind(owner,until,now,taskKey,generation,lane,now).all();
+ const result=await db.prepare(sql).bind(owner,until,now,taskKey,generation,lane,now,taskKey,generation,now,maxActiveLeases).all();
  const job=result?.results?.[0];
  return job?{...job,task_key:taskKey,generation,lane,owner}:null;
 }
