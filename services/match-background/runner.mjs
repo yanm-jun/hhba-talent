@@ -33,11 +33,24 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
   const code=safeCode(body.error,/\b1102\b|exceededResources|worker exceeded resource/i.test(raw)?'AI_EDGE_RESOURCE_EXHAUSTED':/\b1027\b/i.test(raw)?'AI_EDGE_DAILY_LIMIT':'AI_BACKGROUND_HTTP_'+response.status);
   if(stopCodes.has(code))return terminal('STOP',code);
   if(permanentCodes.has(code))return terminal('FAILED',code);
+  if(code==='AI_TASK_IN_PROGRESS'&&diagnostic){
+   const delay=Number(body.retry_after_seconds),lease=body.lease_state;
+   return {status:'RECOVERING',error:code,...(Number.isSafeInteger(delay)&&delay>=3&&delay<=60?{retry_after_seconds:delay}:{}),...(['ACTIVE','EXPIRED','FREE'].includes(lease)?{lease_state:lease}:{})};
+  }
   if(recoverableCodes.has(code)||response.status===408||response.status===425||response.status===429||response.status>=500)throw retry(code);
   return terminal('FAILED',code);
  }
- let text;try{text=await response.text();}catch{throw retry('AI_BACKGROUND_TRANSPORT_INTERRUPTED');}
- for(const event of text.replace(/\r\n/g,'\n').split('\n\n')){
+ // Consume SSE incrementally: a committed terminal event is authoritative even
+ // if the connection subsequently drops during metrics or cleanup.
+ const reader=response.body?.getReader();if(!reader)throw retry('AI_BACKGROUND_RESPONSE_INCOMPLETE');
+ const decoder=new TextDecoder();let buffer='';
+ try{while(true){
+  let chunk;try{chunk=await reader.read();}catch{throw retry('AI_BACKGROUND_TRANSPORT_INTERRUPTED');}
+  buffer+=(chunk.done?decoder.decode():decoder.decode(chunk.value,{stream:true}));
+  buffer=buffer.replace(/\r\n/g,'\n');
+  const frames=buffer.split('\n\n');buffer=frames.pop()||'';
+  if(chunk.done&&buffer.trim())frames.push(buffer);
+  for(const event of frames){
   const kind=event.split('\n').find(x=>x.startsWith('event: '))?.slice(7);
   if(kind!=='complete'&&kind!=='failure')continue;
   const line=event.split('\n').find(x=>x.startsWith('data: '));
@@ -51,10 +64,12 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
    return terminal('FAILED',code);
   }
   if(value?.status==='COMPLETE')return terminal('COMPLETE');
-  if(value?.status==='HANDOFF')return terminal('HANDOFF');
+  if(value?.status==='HANDOFF')return diagnostic&&validStageLane(value.next_lane)?{status:'HANDOFF',next_lane:value.next_lane}:terminal('HANDOFF');
    if(value?.status==='CONTINUE'&&value?.waiting_for_jobs===true)return terminal('WAIT_JOBS');
    if(value?.status==='CONTINUE')return value?.fallback===true&&diagnostic?{status:'CONTINUE',fallback:true}:terminal('CONTINUE');
- }
+  }
+  if(chunk.done)break;
+ }}finally{try{reader.releaseLock();}catch{}}
  throw retry('AI_BACKGROUND_RESPONSE_INCOMPLETE');
 }
 // Each job-step is a distinct Pages invocation with its own resource budget,
@@ -85,7 +100,11 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
    state=await step.do('resume-research-phase-'+phase,{retries:{limit:5,delay:'15 seconds',backoff:'exponential'},timeout:'30 minutes'},async()=>{
     try{
      const primary=requestPhase(fetcher,ticket,{diagnostic:true,recovery,lane:currentLane,stagedFallback:stagedOrigin&&!currentLane});
-     if(!jobsEnabled)return await primary;
+     // A staged discovery worker must not await expensive JD invocations.
+     // Verification has its own durable Workflow, awakened as soon as the
+     // first encrypted candidate checkpoint is queued. Legacy single-driver
+     // mode still fans out work here for backward compatibility.
+     if(!jobsEnabled||currentLane==='discovery')return await primary;
      // Keep the primary discovery phase moving. Large parallel Pages/model
      // bursts risk exhausting a Cloudflare Free invocation and delaying the
      // workflow even when its own research step has already finished. Spread
@@ -127,6 +146,13 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
     streak=0;recovery=undefined;continue;
    }
    if(result?.status==='HANDOFF'){
+    if(currentLane==='verification'&&jobsEnabled&&result.next_lane==='discovery'){
+     // Verification is allowed to research already queued JDs before the
+     // discovery stage finishes. Never take over its main checkpoint lease.
+     // The two revision-fenced job calls above are independent and persisted.
+     await step.sleep('early-verification-'+phase,'30 seconds');
+     streak=0;recovery=undefined;continue;
+    }
     if(!currentLane){streak=0;continue;}
     const wake=await step.waitForEvent('next-'+currentLane+'-'+phase,{type:'wake_'+currentLane,timeout:'24 hours'});
     if(wake?.done||wake?.payload?.done)return {status:'COMPLETE'};
@@ -135,8 +161,9 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
   if(['COMPLETE','STOP','FAILED'].includes(result?.status))return result;
   const error=safeCode(result?.error,'AI_BACKGROUND_RESPONSE_INVALID');
   recovery=error;
-  const seconds=recoveryDelaySeconds(error,++streak);
-  console.info('HHBA_MATCH_RECOVERY_SCHEDULED',JSON.stringify({phase,error,streak,seconds}));
+  const ordinaryDelay=recoveryDelaySeconds(error,++streak);
+  const seconds=error==='AI_TASK_IN_PROGRESS'&&Number.isSafeInteger(result?.retry_after_seconds)?Math.max(3,Math.min(60,result.retry_after_seconds)):ordinaryDelay;
+  console.info('HHBA_MATCH_RECOVERY_SCHEDULED',JSON.stringify({phase,error,streak,seconds,...(result?.lease_state?{lease_state:result.lease_state}:{})}));
   // Durable sleep releases the execution slot. On wake, Pages re-checks
   // session authorization and acquires the same exclusive research lease.
   // Cloudflare WorkflowStep.sleep(number) interprets numbers as MILLISECONDS,

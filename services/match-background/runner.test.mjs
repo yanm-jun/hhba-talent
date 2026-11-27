@@ -306,3 +306,75 @@ test('authorized recovery helper never restarts active, waiting or terminal work
  assert.equal(await restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{now}),true,'due failure may now restart');
  assert.equal(restarted,1);
 });
+
+
+test('terminal SSE result survives a transport that remains open after commit',async()=>{
+ const encoder=new TextEncoder();
+ const stream=new ReadableStream({start(controller){controller.enqueue(encoder.encode('event: complete\ndata: {"status":"CONTINUE"}\n\n'));}});
+ const result=await requestPhase(async()=>new Response(stream),ticket,{diagnostic:true});
+ assert.deepEqual(result,{status:'CONTINUE'});
+});
+test('split terminal SSE frames retain their result; EOF without terminal remains recoverable',async()=>{
+ const encoder=new TextEncoder();
+ const stream=new ReadableStream({start(controller){for(const part of ['event: heartbeat\n','data: {}\n\nevent: com','plete\ndata: {"status":"HANDOFF"}\n','\n'])controller.enqueue(encoder.encode(part));controller.close();}});
+ assert.equal(await requestPhase(async()=>new Response(stream),ticket),'HANDOFF');
+ await assert.rejects(requestPhase(async()=>event('heartbeat',{}),ticket),/AI_BACKGROUND_RESPONSE_INCOMPLETE/);
+});
+
+
+test('early verifier processes independently queued JDs without waiting for discovery to finish',async()=>{
+ const values=[{status:'HANDOFF',next_lane:'discovery'},{status:'COMPLETE'}],calls=[],sleeps=[],waits=[];
+ const step={async waitForEvent(name){waits.push(name);return {payload:{done:false}};},async do(_name,_opts,fn){return fn();},async sleep(name,seconds){sleeps.push([name,seconds]);}};
+ const result=await driveBackgroundMatch(step,ticket,async(url)=>{
+  calls.push(url);
+  if(url.endsWith('/background-job-step'))return Response.json({status:'DONE'});
+  return event('complete',values.shift());
+ },{lane:'verification',jobsEnabled:true,maxSteps:3});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.ok(sleeps.some(([name,duration])=>name.startsWith('early-verification-')&&duration==='30 seconds'));
+ assert.equal(waits.length,1,'early JD work must not wait for a second wake event');
+ assert.equal(calls.filter(x=>x.endsWith('/background-job-step')).length,4);
+ assert.equal(calls.filter(x=>x.endsWith('/background-step')).length,2);
+});
+
+
+test('workflow distinguishes live task lease from a stale one and respects the reported wait',async()=>{
+ const response=()=>Response.json({ok:false,error:'AI_TASK_IN_PROGRESS',lease_state:'ACTIVE',retry_after_seconds:38},{status:409});
+ assert.deepEqual(await requestPhase(async()=>response(),ticket,{diagnostic:true}),{status:'RECOVERING',error:'AI_TASK_IN_PROGRESS',retry_after_seconds:38,lease_state:'ACTIVE'});
+ let calls=0;const sleeps=[];
+ const step={async do(_name,_options,fn){return fn();},async sleep(_name,duration){sleeps.push(duration);}};
+ const result=await driveBackgroundMatch(step,ticket,async()=>++calls===1?response():event('complete',{status:'COMPLETE'}),{maxSteps:3});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.deepEqual(sleeps,['38 seconds']);
+ assert.equal(calls,2,'lease owner must not be force-unlocked or duplicated');
+ const expired=await requestPhase(async()=>Response.json({error:'AI_TASK_IN_PROGRESS',lease_state:'EXPIRED',retry_after_seconds:3},{status:409}),ticket,{diagnostic:true});
+ assert.equal(expired.lease_state,'EXPIRED');
+ assert.equal(expired.retry_after_seconds,3);
+});
+
+
+test('staged discovery is not blocked behind slow JD requests while verification has its own workflow',async()=>{
+ let research=0,unwantedJobCalls=0;
+ const step={async do(_name,_cfg,fn){return fn();}};
+ const result=await driveBackgroundMatch(step,ticket,async(url)=>{
+  if(url.endsWith('/background-job-step')){unwantedJobCalls++;throw Error('JD should run in verification stage');}
+  research++;
+  return event('complete',{status:research===1?'CONTINUE':'COMPLETE'});
+ },{lane:'discovery',jobsEnabled:true,maxSteps:3});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.equal(research,2);assert.equal(unwantedJobCalls,0);
+});
+test('incomplete second-round response retries the original ticket and preserves recovery code',async()=>{
+ const calls=[],sleeps=[];
+ const step={async do(_name,_opts,fn){return fn();},async sleep(_name,delay){sleeps.push(delay);}};
+ const result=await driveBackgroundMatch(step,ticket,async(_url,init)=>{
+  calls.push(JSON.parse(init.body));
+  if(calls.length===1)return event('complete',{status:'CONTINUE'});
+  if(calls.length===2)return event('heartbeat',{stage:'research'});
+  return event('complete',{status:'COMPLETE'});
+ },{maxSteps:4});
+ assert.deepEqual(result,{status:'COMPLETE'});assert.equal(calls.length,3);
+ assert.ok(calls.every(x=>x.ticket===ticket));
+ assert.equal(calls[2].recovery,'AI_BACKGROUND_RESPONSE_INCOMPLETE');
+ assert.deepEqual(sleeps,['15 seconds']);
+});

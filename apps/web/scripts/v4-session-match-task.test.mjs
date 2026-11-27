@@ -542,3 +542,31 @@ test('classified Cloudflare invocation budget counts each D1 batch as one bindin
  assert.ok(recovery.snapshot().hard<observed.hard);
  const resumed=v4ManagedResourceBudget({background:true});assert.equal(resumed.denied,false);
 });
+
+
+test('research lease inspection distinguishes a living owner from an expired lock without stealing it',async()=>{
+ const {leaseMatchTask,inspectMatchTaskLease}=await import('../functions/_lib/ai-checkpoint-claim.js');
+ const {env}=fixture(),db=env.HHBA_PNVS_AUTH_DB,key='a'.repeat(64),now=Date.now();
+ const original=await leaseMatchTask(db,key,now);assert.ok(original);
+ assert.equal((await inspectMatchTaskLease(db,key,now+1000)).state,'ACTIVE');
+ assert.equal(await leaseMatchTask(db,key,now+1000),null,'live owner prevents duplicate AI execution');
+ assert.equal((await inspectMatchTaskLease(db,key,now+180001)).state,'EXPIRED');
+ const successor=await leaseMatchTask(db,key,now+180001);assert.ok(successor);
+ await original.release();
+ assert.equal((await inspectMatchTaskLease(db,key,now+180001)).state,'ACTIVE','old worker cannot release successor');
+ await successor.release();
+ assert.equal((await inspectMatchTaskLease(db,key,now+180001)).state,'FREE');
+});
+test('heartbeat loss stops checkpoint writes rather than publishing from a former owner',async()=>{
+ const {startMatchPhaseHeartbeat}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ let renewal=0,writes=0,errors=0;
+ const hb=startMatchPhaseHeartbeat({renew:async()=>{if(++renewal===2)throw Error('AI_CHECKPOINT_LEASE_LOST');},getCheckpoint:()=>({phase:'research',round:2}),persist:async()=>{writes++;},onError:()=>{errors++;},interval:3600000});
+ await hb.tick();await hb.tick();await hb.tick();await hb.stop();
+ assert.equal(writes,1);assert.equal(errors,1);assert.equal(renewal,2);
+});
+test('background lock contention is read-only and reports a bounded lease wait',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ assert.match(route,/inspectMatchTaskLease\(db,taskKey\)/);
+ assert.match(route,/lease_state:state\.state,retry_after_seconds:state\.retry_after_seconds/);
+ assert.match(route,/if\(!input\.lease\)return leaseBusy/);
+});
