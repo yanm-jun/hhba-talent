@@ -10,6 +10,7 @@ import {loadBackgroundMatch} from './v4-background-match.js';
 import {assertSessionTaskActive} from './v4-session-match-task.js';
 import {v4JobProvider,v4Match} from './simple-match-v4.js';
 import {v4ManagedResourceBudget} from './v4-phase-budget.js';
+import {locateV4ClaimCandidate,v4VerifiedJobLocator} from './v4-job-locator.js';
 
 const keyOk=x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x);
 export async function pendingIndependentV4Work(env,taskKey,generation){
@@ -66,10 +67,8 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   const latest=await readMatchTask(env,taskKey);
   if(latest?.generation!==generation||latest.result||!latest.checkpoint)return {status:'STALE'};
   const checkpoint=latest.checkpoint;
-  let url='',source=null;
-  for(const [u,j] of checkpoint.rows||[]){
-   if(await workKey(taskKey,u)===claim.job_key){url=u;source=j;break;}
-  }
+  const located=await locateV4ClaimCandidate(checkpoint,taskKey,claim.job_key);
+  const url=located?.url,source=located?.source;
   if(!url||!source)return {status:'STALE'};
   const activeScore=sourceFor(checkpoint,url);
   const currentVersion=lane==='reporting'?reportWorkRevision(source,activeScore):candidateRevision(source);
@@ -138,26 +137,44 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
  const result=await db.prepare("SELECT lane,job_key,revision FROM hhba_v4_job_work_queue WHERE task_key=? AND generation=? AND state='COMPLETED' ORDER BY lane,job_key").bind(taskKey,generation).all();
  const entries=result?.results||[];
  if(!entries.length)return {checkpoint,count:0};
- const byKey=new Map();
- for(const [url,job] of checkpoint.rows||[]){const scored=sourceFor(checkpoint,url),rr=reportWorkRevision(job,scored);
-  byKey.set(await workKey(taskKey,url),{url,job,revision:await revKey(candidateRevision(job)),reportRevision:rr?await revKey(rr):null});
+ const byKey=new Map(),locator=await v4VerifiedJobLocator(checkpoint,taskKey);
+ const scoredByUrl=new Map();
+ for(const scored of [...(checkpoint.priorState?.matches||[]),...(checkpoint.matches||[])]){
+  const url=itemUrl(scored);if(url&&!scoredByUrl.has(url))scoredByUrl.set(url,scored);
  }
- const next=structuredClone(checkpoint),done=new Set(next.processedEarlier||[]),revisions=new Map(next.processedEvidence||[]);
+ for(let i=0;i<checkpoint.rows.length;i++){
+  const [url,job]=checkpoint.rows[i];
+  if(typeof url!=='string'||!job)continue;
+  const scored=scoredByUrl.get(url),rr=reportWorkRevision(job,scored);
+  const key=locator?.[i]||await workKey(taskKey,url);
+  byKey.set(key,{url,job,revision:await revKey(candidateRevision(job)),reportRevision:rr?await revKey(rr):null});
+ }
+ let next=null;
+ const done=new Set(checkpoint.processedEarlier||[]),revisions=new Map(checkpoint.processedEvidence||[]);
  let count=0;
  for(const record of entries){
   const current=byKey.get(record.job_key);
   if(!current||(record.lane==='reporting'?current.reportRevision:current.revision)!==record.revision)continue;
   if(record.lane==='verification'&&done.has(current.url)&&revisions.get(current.url)===candidateRevision(current.job))continue;
+  // The encrypted locator is an optimization hint, not authorization:
+  // re-check the actual candidate URL against the D1 claim before merging.
+  if(await workKey(taskKey,current.url)!==record.job_key)continue;
   const resultKey=await independentJobKey(taskKey,generation,record.lane,record.job_key,record.revision);
   const saved=await read(env,resultKey);
   if(saved?.kind!=='V4_INDEPENDENT_JOB_V1'||!saved.complete||saved.generation!==generation||saved.revision!==record.revision||saved.source_url!==current.url||!saved.job)continue;
   if(record.lane==='reporting'&&!doneReport(saved.job))continue;
+  const available=(next||checkpoint);
+  const existingMatches=(available.phase==='research'?available.priorState?.matches:available.matches)||[];
+  const present=existingMatches.findIndex(x=>itemUrl(x)===current.url);
+  if(record.lane==='verification'&&present>=0&&suitableScore(existingMatches[present]))continue;
+  if(record.lane==='reporting'&&present<0)continue;
+  if(record.lane==='reporting'&&doneReport(existingMatches[present]))continue;
+  // Most resume phases have no new independent evidence. Clone the large
+  // checkpoint only after a revision-fenced, not-yet-applied result exists.
+  if(!next)next=structuredClone(checkpoint);
   const parent=next.phase==='research'?(next.priorState||(next.priorState={matches:[],read:0,scored:0,archived:0,scoreFailures:0,reportFailures:0})):next;
   const matches=parent.matches||(parent.matches=[]);
   const idx=matches.findIndex(x=>itemUrl(x)===current.url);
-  if(record.lane==='verification'&&idx>=0&&suitableScore(matches[idx]))continue;
-  if(record.lane==='reporting'&&idx<0)continue;
-  if(record.lane==='reporting'&&doneReport(matches[idx]))continue;
   const row=structuredClone(saved.job);
   if(idx<0)matches.push(row);else matches[idx]={...matches[idx],...row};
   if(record.lane==='verification'){
@@ -170,5 +187,5 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   count++;
  }
  if(count){next.processedEarlier=[...done];next.processedEvidence=[...revisions];next.diagnostics={...next.diagnostics,INDEPENDENT_JOB_RESULTS_MERGED:(next.diagnostics?.INDEPENDENT_JOB_RESULTS_MERGED||0)+count};}
- return {checkpoint:next,count};
+ return {checkpoint:next||checkpoint,count};
 }

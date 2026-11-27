@@ -37,6 +37,7 @@ test('completed verification merges from encrypted job result exactly once',asyn
  assert.equal(first.checkpoint.scored,1);
  const second=await mergeIndependentV4Jobs(env,taskKey,0,first.checkpoint,{read});
  assert.equal(second.count,0);assert.equal(second.checkpoint.scored,1);assert.equal(reads,1);
+ assert.equal(second.checkpoint,first.checkpoint,'no new independent results must not clone a 500-job checkpoint');
  const changed={...cp,rows:[[url,{...candidate(),requirements:'要求已变更'}]]};
  const invalidated=await mergeIndependentV4Jobs(env,taskKey,0,changed,{read});
  assert.equal(invalidated.count,0);assert.equal(reads,1,'stale revision never causes a result fetch');
