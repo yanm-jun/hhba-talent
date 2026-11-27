@@ -100,7 +100,7 @@ test('browser candidate reception uses direct SSE and actual managed snapshots; 
  assert.ok(service.includes("event==='discovery_candidate'"));
  assert.ok(service.includes('liveCandidates.receive(event)'));
  assert.ok(service.includes('addedCandidates=liveCandidates.snapshot(data.progress.jobs)'));
- assert.ok(service.includes('data.failure?.retryable?15000:addedCandidates>0?2000:3000'));
+ assert.ok(service.includes('data.failure?.retryable?15000:completed?.more?1000:addedCandidates>0||deliveredJobs>0?2000:3000'));
  assert.ok(service.includes('liveCandidates.snapshot(data.research_leads,{final:true})'));
  assert.ok(/const reports=verifiedMatchReports\(liveCandidates\.jobs\(\)\);\s*onPartial\?\.\(reports\)/.test(service));
  assert.ok(panels.includes('Math.max(report?.discovered??0,jobs.length)'));
