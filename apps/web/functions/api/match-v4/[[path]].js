@@ -547,7 +547,9 @@ export async function onRequest(context){
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
  if(suffix==='/background-job-step')return backgroundJobStep(env,request);
  const activeTaskRoute=suffix==='/active-task';
- if(!(activeTaskRoute&&['GET','POST'].includes(request.method))&&(!['/resume','/ocr'].includes(suffix)||request.method!=='POST'))return fail('NOT_FOUND',404);
+ // /progress is strictly read-only. It does not schedule workflows, own a
+ // research lease, decrypt a full checkpoint or invoke an AI provider.
+ if(!(activeTaskRoute&&['GET','POST'].includes(request.method))&&(!['/resume','/ocr','/progress'].includes(suffix)||request.method!=='POST'))return fail('NOT_FOUND',404);
  if(!enabled(env,request)&&!(activeTaskRoute&&allowedHost(request)&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function'))return fail('MATCH_NOT_ENABLED',503);
  const origin=new URL(request.url).origin;
  if((request.method!=='GET'&&request.headers.get('Origin')!==origin)||
@@ -576,6 +578,25 @@ export async function onRequest(context){
   if(text.length>8000000)return fail('INVALID_RESUME_TEXT',413);
   body=JSON.parse(text);
  }catch{return fail('INVALID_REQUEST',400)}
+ if(suffix==='/progress'){
+  if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
+  if(!body||typeof body.task_id!=='string'||body.task_id.length>40||
+   !Number.isSafeInteger(body.generation)||body.generation<0||
+   (body.progress_stamp!==undefined&&
+    (typeof body.progress_stamp!=='string'||body.progress_stamp.length>80)))return fail('INVALID_REQUEST',400);
+  try{
+   const task=await assertSessionTaskActive(env,session,body.task_id,body.generation);
+   const taskKey=await researchTaskKey(env,session,task);
+   const view=normalizeV4RecoveryView(await readMatchProgress(env,taskKey),body.generation);
+   // Only the existing /resume driver is allowed to handle completed, failed
+   // or expired tasks. Never infer completion from a stale lightweight view.
+   if(view?.generation!==body.generation||view.status!=='PENDING')
+    return reply({status:'CHECK_DRIVER'});
+   return pendingManagedView(env,{managed:true,taskKey},body.generation,
+    {job_delta:body.job_delta,job_cursor:body.job_cursor,progress_stamp:body.progress_stamp},
+    view.progress,view.failure);
+  }catch(e){return fail(e?.code==='AI_AGENT_CANCELLED'?'AI_AGENT_CANCELLED':'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
+ }
  if(activeTaskRoute){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
   const action=body?.action;
