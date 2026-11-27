@@ -163,6 +163,8 @@ test('failed verification jobs cool down durably instead of permanently disappea
   assert.equal(await claimV4JobWork(db,taskKey,0,'verification',{now:failedAt+delay-1}),null,'backoff blocks hot-looping and paid duplicate requests');
   eligibleAt=failedAt+delay;
  }
- assert.equal(v4JobRetryDelayMs(99),1800000,'even repeated provider failures have a bounded retry interval, not a permanent stop');
+ assert.equal(v4JobRetryDelayMs(99),300000,'transient repeated failures recover within five minutes');
+ assert.equal(v4JobRetryDelayMs(99,'AI_PROVIDER_RATE_LIMITED'),600000);
+ assert.equal(v4JobRetryDelayMs(99,'AI_EDGE_DAILY_LIMIT'),3600000);
  assert.equal(local.prepare("SELECT state FROM hhba_v4_job_work_queue WHERE lane='verification'").get().state,'PENDING');
 });
