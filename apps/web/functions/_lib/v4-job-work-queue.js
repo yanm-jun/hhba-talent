@@ -9,6 +9,7 @@ import {eligibleCuratedScore,qualifiedReport,FINAL_TARGET} from './v4-curated-re
 const taskId=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
 const generationOk=v=>Number.isSafeInteger(v)&&v>=0;
 const laneOk=v=>v==='verification'||v==='reporting';
+export const reportWorkRevision=(candidate,scored)=>scored?JSON.stringify([candidateRevision(candidate),scored.match_score,scored.jd_sha256,scored.jd_version_id,scored.score_evidence_status,scored.reference_vacancy_verified]):null;
 const valid=(key,generation)=>taskId(key)&&generationOk(generation);
 export const v4JobWorkQueueEnabled=env=>env?.HHBA_V4_JOB_QUEUE_ENABLED==='1'&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 
@@ -35,7 +36,7 @@ export async function desiredV4JobWork(taskKey,generation,checkpoint){
   if(task){task.state=!pending.has(url)&&completed.has(url)&&revisions.get(url)===version&&!rechecks.has(url)?'COMPLETED':'PENDING';results.push(task);}
   const scored=byUrl.get(url);
   if(scored&&reportSelection.has(scored.official_url)&&(eligibleCuratedScore(scored)||qualifiedReport(scored))){
-   const reportVersion=JSON.stringify([version,scored.match_score,scored.jd_sha256,scored.jd_version_id,scored.score_evidence_status,scored.reference_vacancy_verified]);
+   const reportVersion=reportWorkRevision(job,scored);
    const report=await digest(url,'reporting',reportVersion);
    if(report){report.state=qualifiedReport(scored)?'COMPLETED':'PENDING';results.push(report);}
   }
