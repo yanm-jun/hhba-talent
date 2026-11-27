@@ -11,7 +11,7 @@ import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metr
 import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSignal} from '../../_lib/v4-stage-workflows.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {v4JobWorkQueueEnabled,reconcileV4JobWork,clearV4JobWork} from '../../_lib/v4-job-work-queue.js';
-import {v4JobExecutorEnabled,runIndependentV4Job,mergeIndependentV4Jobs} from '../../_lib/v4-job-executor.js';
+import {v4JobExecutorEnabled,runIndependentV4Job,mergeIndependentV4Jobs,pendingIndependentV4Work} from '../../_lib/v4-job-executor.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
@@ -243,6 +243,7 @@ function events(env,request,input,waitUntil){
       if(input.background&&input.taskKey&&input.checkpoint&&v4JobExecutorEnabled(env)){
        try{const merged=await mergeIndependentV4Jobs(env,input.taskKey,input.generation||0,input.checkpoint);
         if(merged.count){input.checkpoint=merged.checkpoint;console.info('HHBA_V4_INDEPENDENT_JOB_MERGED',JSON.stringify({count:merged.count}));}
+        researchEnv.__v4IndependentPending=await pendingIndependentV4Work(env,input.taskKey,input.generation||0);
        }catch{console.warn('HHBA_V4_INDEPENDENT_JOB_MERGE_DEFERRED');}
       }
       const result=await v4Match(budget?budget.fetch(fetch):fetch,provider,input.text,input.role_hint,{
