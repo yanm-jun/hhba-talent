@@ -321,7 +321,15 @@ export async function closeSessionMatchTask(task:Pick<SessionMatchTask,'id'|'gen
 type MatchContinuation={status:'CONTINUE';continuation:{state:unknown;token:string}};
 type MatchStreamResponse=MatchResponse|MatchContinuation;
 type DeliveryStamp={version:number;phase_started_at:number;prepared_at:number;candidates:number;reports:number};
-type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;failure?:{error:string;retryable?:boolean}|null};
+export type MatchExecution={state:'processing'|'awaiting_ai'|'recovering';worker_seen_at:number;last_result_at:number;phase_started_at:number};
+export function matchExecutionFromServer(value:unknown):MatchExecution|null{
+ if(!value||typeof value!=='object')return null;
+ const x=value as Partial<MatchExecution>;
+ if(!['processing','awaiting_ai','recovering'].includes(x.state||'')||
+    ![x.worker_seen_at,x.last_result_at,x.phase_started_at].every(n=>Number.isSafeInteger(n)&&Number(n)>=0))return null;
+ return x as MatchExecution;
+}
+type PendingManagedMatch={status:'PENDING'|'FAILED';progress?:{stage?:NativeMatchProgress;activity?:NativeMatchActivity;execution?:MatchExecution;report?:MatchResearchReport;jobs?:MatchedJob[];job_events?:{seq:number;kind:'candidate'|'jd'|'score'|'report';url:string;at:number}[];delivery_stamp?:DeliveryStamp}|null;failure?:{error:string;retryable?:boolean}|null};
 // Only an opaque ID and expiry are persisted locally; no raw CV, access
 // token, signed continuation or model output is written to localStorage.
 async function matchTaskReference(text:string,opts:MatchOptions,resumeId?:string){
@@ -340,7 +348,8 @@ async function consumeNativeMatchStream(
  response:Response,onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
  onActivity?:(activity:NativeMatchActivity)=>void,onReceive?:()=>void,
- onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void,onDiscoveryCandidate?:(event:unknown)=>void
+ onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void,onDiscoveryCandidate?:(event:unknown)=>void,
+ onExecution?:(execution:MatchExecution|null)=>void
 ):Promise<MatchStreamResponse>{
  if(!response.body)throw new MatchError(502,'智能匹配连接没有返回可读取的结果。',true);
  const decoder=new TextDecoder(),reader=response.body.getReader();
@@ -363,7 +372,9 @@ async function consumeNativeMatchStream(
    return;
   }
   onReceive?.();
-  if(event==='progress'){
+  if(event==='heartbeat'){
+   onExecution?.(matchExecutionFromServer(value?.execution));
+  }else if(event==='progress'){
    const stage=value?.stage;
    if(['preparing','parsing','connected','planning','searching','reading','researching','writing','scoring','waiting'].includes(stage))
     onProgress?.(stage as NativeMatchProgress);
@@ -451,7 +462,8 @@ export async function submitExtractedResumeText(
  onProgress?:(stage:NativeMatchProgress)=>void,
  onPartial?:(jobs:MatchedJob[])=>void,
  onActivity?:(activity:NativeMatchActivity)=>void,
- onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void
+ onResearch?:(report:MatchResearchReport)=>void,onResearchJobs?:(jobs:MatchedJob[])=>void,
+ onExecution?:(execution:MatchExecution|null)=>void
 ):Promise<MatchResponse>{
  if(!consent)throw new MatchError(400,errorMap.EXPLICIT_AI_SHARING_CONSENT_REQUIRED);
  const token=session();
@@ -468,6 +480,7 @@ export async function submitExtractedResumeText(
  const reconnect=async()=>{
   if(requestSignal.aborted)throw requestSignal.reason;
   onActivity?.({stage:'waiting',message:'连接暂时异常，正在恢复原任务进度。'});
+  onExecution?.(null); // Client reconnect is not evidence of server liveness.
   await new Promise<void>((resolve,reject)=>{const stop=()=>{clearTimeout(timer);reject(requestSignal.reason)};const timer=setTimeout(()=>{requestSignal.removeEventListener('abort',stop);resolve()},reconnectDelay);requestSignal.addEventListener('abort',stop,{once:true});});
   reconnectDelay=Math.min(reconnectDelay*2,30000);
  };
@@ -488,7 +501,7 @@ export async function submitExtractedResumeText(
    throw new MatchError(503,'暂时无法连接 HHBA 智能匹配服务。',true);});
   const isStream=(response.headers.get('content-type')||'').includes('text/event-stream');
   if(isStream&&!response.ok)throw new MatchError(response.status,'智能匹配流式连接失败。',response.status===429||response.status>=500);
-  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,jobs=>{liveCandidates.snapshot(jobs);},event=>{liveCandidates.receive(event);}):
+  const data=isStream?await consumeNativeMatchStream(response,onProgress,onPartial,onActivity,undefined,onResearch,jobs=>{liveCandidates.snapshot(jobs);},event=>{liveCandidates.receive(event);},onExecution):
    await response.json().catch(()=>({})) as (Partial<MatchResponse>|MatchContinuation|PendingManagedMatch)&{error?:string};
   if(!response.ok){
    const code=(data as {error?:string}).error||'';
@@ -497,6 +510,7 @@ export async function submitExtractedResumeText(
    throw new MatchError(response.status,errorMap[code]||'智能匹配服务暂时不可用。',['AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT'].includes(code)||(!code&&(response.status===429||response.status>=500)));
   }
   if(data.status==='PENDING'||data.status==='FAILED'){
+   onExecution?.(matchExecutionFromServer(data.progress?.execution));
    if(!opts.managed_task)throw new MatchError(502,'任务恢复状态异常。');
    if(data.progress?.stage)onProgress?.(data.progress.stage);
    if(data.progress?.activity)onActivity?.(data.progress.activity);

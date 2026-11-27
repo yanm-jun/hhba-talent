@@ -8,7 +8,7 @@ import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDial
 import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
-import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,resumeMatchFileLimit,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress} from '../services/resumeMatch';
+import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,resumeMatchFileLimit,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress,type MatchExecution} from '../services/resumeMatch';
 import {sessionMatchRecoveryAvailable,MATCH_TASK_SIGNAL,readSessionMatchTask,beginSessionMatchTask,advanceSessionMatchTask,closeSessionMatchTask,managedMatchOptions,type SessionMatchTask} from '../services/resumeMatch';
 import '../styles/resume-match.css';
 
@@ -49,6 +49,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const [researchJobs,setResearchJobs]=useState<MatchedJob[]>([]);
  const [stage,setStage]=useState<NativeMatchProgress>('preparing');
  const [activity,setActivity]=useState<NativeMatchActivity|null>(null);
+ const [execution,setExecution]=useState<MatchExecution|null>(null);
  const progress=(next:NativeMatchProgress)=>setStage(previous=>next==='waiting'?previous:next);
  const [error,setError]=useState('');
 
@@ -231,7 +232,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   if(controller.current||closingTask.current)return;
   const abort=new AbortController();controller.current=abort;
   taskOpen.current=true;sessionTask.current=task;pendingStart.current=null;setRestoringTask(true);setTaskFailure(false);
-  setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
+  setWorking(true);setStage('preparing');setActivity(null);setExecution(null);setError('');setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   previewController.current?.abort();wordVersionRequest.current?.abort();setFile(null);setSavedId(task.resume_id||'');setPreviewText(task.text);setPreviewLoaded(true);setConsent(false);
   const opts=managedMatchOptions(task);setOptions(opts);setOptimizationSource(redactResumeTextLocally(task.text));
   lastSearch.current={text:task.text,options:opts,resumeId:task.resume_id||undefined};
@@ -239,14 +240,15 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
    const matched=await submitExtractedResumeText(task.text,opts,true,abort.signal,task.resume_id||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
     detail=>{if(!abort.signal.aborted)setActivity(detail);},report=>{if(!abort.signal.aborted)setResearchReport(report);},
-    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);});
+    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);},
+    state=>{if(!abort.signal.aborted)setExecution(state);});
    if(!abort.signal.aborted){setResult(matched);setPartialJobs([]);}
   }catch(e){if(!abort.signal.aborted){setTaskFailure(true);setError(e instanceof Error?e.message:'原研究任务暂未恢复。');}}
   finally{if(controller.current===abort){controller.current=null;setWorking(false);}}
  }
  function clearTaskLocally(){
   controller.current?.abort();controller.current=null;taskOpen.current=false;sessionTask.current=null;pendingStart.current=null;
-  setTaskFailure(false);setRestoringTask(false);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setResult(null);setWorking(false);
+  setTaskFailure(false);setRestoringTask(false);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setResult(null);setExecution(null);setWorking(false);
  }
  // Initial reload and other tabs only discover an authorized server task.
  // They never re-submit a new CV or create a new task automatically.
@@ -289,7 +291,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
    identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
    (file&&!savedId&&storageChoice==='undecided'))return;
   taskOpen.current=true;setTaskFailure(false);setRestoringTask(false);
-  setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
+  setWorking(true);setStage('preparing');setActivity(null);setExecution(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   const abort=new AbortController();
   controller.current=abort;
   try{
@@ -330,7 +332,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
     jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
     detail=>{if(!abort.signal.aborted)setActivity(detail);},
     report=>{if(!abort.signal.aborted)setResearchReport(report);},
-    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);});
+    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);},
+    state=>{if(!abort.signal.aborted)setExecution(state);});
    if(abort.signal.aborted)return;
    setOptimizationSource(redactResumeTextLocally(searchText));
    lastSearch.current={text:searchText,options:searchOptions,resumeId:matchResumeId||undefined};
@@ -349,7 +352,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
    [...previous.matches,...jobs].map(job=>[job.official_url,job])
   ).values());
   let collected=previous.matches;
-  setWorking(true);setStage('preparing');setActivity(null);setError('');setResult(null);setPartialJobs(collected);
+  setWorking(true);setStage('preparing');setActivity(null);setExecution(null);setError('');setResult(null);setPartialJobs(collected);
   try{
    const durable=!!previous.research_task_id&&typeof previous.research_generation==='number';
    const registered=sessionTask.current?await advanceSessionMatchTask(sessionTask.current,abort.signal):null;
@@ -360,7 +363,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
     jobs=>{if(!abort.signal.aborted){collected=durable?jobs:combine(jobs);setPartialJobs(collected);}},
     detail=>{if(!abort.signal.aborted)setActivity(detail);},
     report=>{if(!abort.signal.aborted)setResearchReport(report);},
-    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);});
+    jobs=>{if(!abort.signal.aborted)setResearchJobs(jobs);},
+    state=>{if(!abort.signal.aborted)setExecution(state);});
    if(abort.signal.aborted)return;
    setResult(durable?next:{...next,matches:combine(next.matches)});
    setPartialJobs([]);
@@ -515,7 +519,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
       hostRoute={hostRoute} taskStartedAt={sessionTask.current?.started_at} taskFailed={taskFailure} initialMinimized={restoringTask||!!hostRoute&&!/\/candidate\/(?:account\/)?match$/.test(hostRoute)}
       result={result||{matches:partialJobs,profile:researchReport?.profile}}
       researchReport={result?.research_report||researchReport} researchJobs={result?.research_leads||researchJobs}
-      pending={working&&!result} progressStage={stage} progressActivity={activity}
+      pending={working&&!result} progressStage={stage} progressActivity={activity} execution={execution}
       onContinue={result?.can_continue?()=>void continueSearch():undefined}
       notice={working?'':error}
       sourceText={optimizationSource||undefined}

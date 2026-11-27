@@ -84,8 +84,16 @@ function events(env,request,input,waitUntil){
      }else controller.enqueue(encoder.encode('event: '+type+'\ndata: '+serialized+'\n\n'));
     }catch{closed=true;}
    };
-   const heart=setInterval(()=>send('heartbeat',{stage:phase,
-    elapsed_ms:Date.now()-started}),12000);
+   let lastWorkerSeenAt=Date.now(),lastEvidenceAt=Number(input.savedProgress?.execution?.last_result_at)||0;
+   let inFlightAi=0,runtimeState='processing';
+   // A live worker heartbeat is separate from actual research progress.
+   const workerSnapshot=()=>({state:runtimeState==='recovering'?'recovering':inFlightAi>0?'awaiting_ai':'processing',
+    worker_seen_at:lastWorkerSeenAt,last_result_at:lastEvidenceAt,phase_started_at:started});
+   const heart=setInterval(()=>{
+    lastWorkerSeenAt=Date.now();
+    send('heartbeat',{stage:phase,elapsed_ms:lastWorkerSeenAt-started,execution:workerSnapshot()});
+    if(input.background)queueProgress('routine');
+   },12000);
    const progress=stage=>{phase=stage;send('progress',{stage});queueProgress();};
    const activity=(stage,message)=>{if(latestActivity?.stage===stage&&latestActivity?.message===message)return;latestActivity={stage,message};send('activity',latestActivity);queueProgress();};
    const sendJobs=(kind,matches)=>{
@@ -100,7 +108,8 @@ function events(env,request,input,waitUntil){
    const jobJournal=createV4JobEventJournal(input.savedProgress?.job_events);
    const searchSpeed=createV4SearchSpeedTracker({previous:input.savedProgress?.search_speed,savedJobs:lastJobs});
    const initialEventSequence=Math.max(0,...(input.savedProgress?.job_events||[]).map(e=>Number.isSafeInteger(e?.seq)?e.seq:0));
-   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs],job_events:jobJournal.snapshot(),search_speed:searchSpeed.snapshot()});
+   const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs],
+    job_events:jobJournal.snapshot(),search_speed:searchSpeed.snapshot(),execution:workerSnapshot()});
     let reportRecovery;
     const captureTime=()=>Date.now();
    const seenResults={candidate:new Set(lastJobs.map(j=>j.official_url)),jd:new Set(lastJobs.filter(j=>j.jd_source_status==='VERIFIED_JD').map(j=>j.official_url)),score:new Set(lastJobs.filter(j=>Number.isInteger(j.match_score)).map(j=>j.official_url)),report:new Set(lastJobs.filter(officialJob).map(j=>j.official_url))};
@@ -138,8 +147,12 @@ function events(env,request,input,waitUntil){
     send('complete',{status:'CONTINUE',continuation:{state:{task:true},token:'server-task'}});
    };
    const finishWorkflowStages=async()=>{if(input.backgroundTicket)await stageWorkflowSignal(env,input.backgroundTicket,{finish:true});};
-   const sendResearch=r=>{if(r){lastReport={...r,discovered:Math.max(r.discovered||0,lastJobs.length,lastReport?.discovered||0),excluded_count:Math.max(r.excluded_count||0,lastReport?.excluded_count||0),search_source_count:Math.max(r.search_source_count||0,lastReport?.search_source_count||0)};send('research_report',lastReport);queueProgress();}};
-   const rememberDiscoveryStats=stats=>{if(!lastReport)return;lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,stats.discovered||0),excluded_count:Math.max(lastReport.excluded_count||0,stats.excluded_count||0),search_source_count:Math.max(lastReport.search_source_count||0,stats.search_source_count||0)};if(!input.background)send('research_report',lastReport);queueProgress('candidate');};
+   const sendResearch=r=>{if(r){
+    if((r.discovered||0)>(lastReport?.discovered||0)||(r.search_source_count||0)>(lastReport?.search_source_count||0))lastEvidenceAt=Date.now();
+    lastReport={...r,discovered:Math.max(r.discovered||0,lastJobs.length,lastReport?.discovered||0),excluded_count:Math.max(r.excluded_count||0,lastReport?.excluded_count||0),search_source_count:Math.max(r.search_source_count||0,lastReport?.search_source_count||0)};send('research_report',lastReport);queueProgress();}};
+   const rememberDiscoveryStats=stats=>{if(!lastReport)return;
+    if((stats.discovered||0)>(lastReport.discovered||0)||(stats.search_source_count||0)>(lastReport.search_source_count||0))lastEvidenceAt=Date.now();
+    lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,stats.discovered||0),excluded_count:Math.max(lastReport.excluded_count||0,stats.excluded_count||0),search_source_count:Math.max(lastReport.search_source_count||0,stats.search_source_count||0)};if(!input.background)send('research_report',lastReport);queueProgress('candidate');};
    const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
    let lastReportSignature=reportSignature(lastJobs);
    const researchEvidence=j=>officialJob(j)||!!(j.evidence_excerpt||j.reference_jd||j.jd_research?.facts?.length||j.jd_research?.inference||j.reference_vacancy_verified||j.jd_source_status==='VERIFIED_JD'||Number.isInteger(j.match_score));
@@ -166,6 +179,7 @@ function events(env,request,input,waitUntil){
     currentCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
     let newCandidate=false;
     for(const j of lastJobs){const key=v4DiscoveryCandidateKey(j.official_url);if(key&&!publishedCandidateKeys.has(key)){publishedCandidateKeys.add(key);newCandidate=true;}}
+    if(changed||evidenceChanged||newCandidate)lastEvidenceAt=Date.now();
     queueProgress(changed||evidenceChanged?'report':newCandidate?'candidate':'routine');
    };
    // The authenticated background route can append one compact, unverified
@@ -177,6 +191,7 @@ function events(env,request,input,waitUntil){
     const j=event?.candidate,key=v4DiscoveryCandidateKey(j?.official_url);
     if(!key||!allowedJob(j)||currentCandidateKeys.has(key)||leaseAbort.signal.aborted)return;
     currentCandidateKeys.add(key);publishedCandidateKeys.add(key);searchSpeed.observe({...j,official_url:key});observeResult('candidate',key);
+    lastEvidenceAt=Date.now();
     lastJobs.push({
      id:'v4-live:'+key,company:j.company,title:j.title,location:j.location,official_url:key,
      platform:'招聘来源（企业官网待核实）',source:meta?.source==='source_read'?'公开招聘页读取候选':'AI搜索候选',remote:false,reference_score:0,match_score:null,
@@ -227,6 +242,11 @@ function events(env,request,input,waitUntil){
      // Keep one durable phase per Pages invocation. The hosting platform's
      // subrequest budget resets on the next continuation, not on a JS loop.
           const provider=v4JobProvider(researchEnv);if(provider){provider.deliveryTelemetry=delivery;
+       provider.onCallState=kind=>{
+        if(kind==='start'){inFlightAi++;runtimeState='processing';}
+        else if(kind==='end')inFlightAi=Math.max(0,inFlightAi-1);
+        lastWorkerSeenAt=Date.now();queueProgress('routine');
+       };
       // Request actual provider SSE by default on managed background research.
       // Honor an explicit opt-out; the existing adapter handles JSON fallback.
       if(input.background&&env.HHBA_AGENT_RELAY_STREAM!=='0')provider.stream=true;
@@ -258,7 +278,7 @@ function events(env,request,input,waitUntil){
       // A fully returned continuation is newer than an earlier in-flight
       // recovery closure. Persist it even when the invocation ran out of
       // optional resource capacity; terminal storage has reserved headroom.
-      if(result.status==='CONTINUE')input.recoveryState=()=>result.checkpoint;
+      if(result.status==='CONTINUE'){input.recoveryState=()=>result.checkpoint;runtimeState='recovering';}
       if(budget?.denied&&result.status!=='CONTINUE'&&result.status!=='COMPLETE')throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});
       if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
@@ -329,7 +349,7 @@ function events(env,request,input,waitUntil){
        await guard();await input.lease.renew();
        const checkpoint=input.recoveryState?.()||input.checkpoint||null;
        if(checkpoint){checkpoint.diagnostics={...checkpoint.diagnostics,EDGE_RESOURCE_YIELDS:(checkpoint.diagnostics?.EDGE_RESOURCE_YIELDS||0)+1};}
-       latestActivity={stage:phase,message:'已保存本段研究成果，正在接续下一段执行。'};
+       latestActivity={stage:phase,message:'已保存本段研究成果，正在接续下一段执行。'};runtimeState='recovering';
        await saveMatchTask(env,input.taskKey,{checkpoint,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime()});
        await publishProgress();
         console.info('HHBA_V4_RESOURCE_YIELD',JSON.stringify({trace,stage:phase,...budget?.snapshot()}));
@@ -339,6 +359,7 @@ function events(env,request,input,waitUntil){
      }
      metricOutcome=code===PHASE_YIELD?'RESOURCE_YIELD':!isV4TerminalTaskFailure(code)&&!!input.taskKey?'RETRYABLE_FAILURE':'TERMINAL_FAILURE';metricError=code;
      const retryable=!isV4TerminalTaskFailure(code)&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
+      if(retryable)runtimeState='recovering';
       if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));

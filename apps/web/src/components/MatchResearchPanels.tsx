@@ -5,7 +5,7 @@ import {ChevronLeft,ChevronRight,ChevronDown,ArrowUpRight,MapPin,Sparkles} from 
 import '../styles/resume-match-dialog.css';
 import {CuratedJobReport} from './CuratedJobReport';
 import {verifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
-import type {MatchProfile,MatchResearchReport,MatchedJob,NativeMatchProgress,NativeMatchActivity} from '../services/resumeMatch';
+import type {MatchProfile,MatchResearchReport,MatchedJob,NativeMatchProgress,NativeMatchActivity,MatchExecution} from '../services/resumeMatch';
 
 const stages=[
  {label:'识别简历',english:'CAREER PROFILE',stages:['preparing','parsing']},
@@ -98,9 +98,9 @@ function JdResearchContent({job}:{job:MatchedJob}){
   {excerpt&&<section className="hhba-refined-section"><h3>{confirmed(job)?'完整 JD 原文':'现有岗位资料线索 · 尚非完整官方JD'}</h3><p style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere'}}>{recruitmentText(excerpt)}</p></section>}
  </>;
 }
-export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=false,provisional=false,progressStage='preparing',activity,elapsed,selection,onSelectionChange,onFollow,selectedJobUrl,onJobChange,onOptimize,optimizationAvailable=false}:{
+export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=false,provisional=false,progressStage='preparing',activity,execution,elapsed,selection,onSelectionChange,onFollow,selectedJobUrl,onJobChange,onOptimize,optimizationAvailable=false}:{
  profile?:MatchProfile;report?:MatchResearchReport;jobs:MatchedJob[];officialJobs:MatchedJob[];pending?:boolean;provisional?:boolean;progressStage?:NativeMatchProgress;
- activity?:NativeMatchActivity|null;elapsed?:number;selection?:number;onSelectionChange?:(i:number)=>void;onFollow?:()=>void;selectedJobUrl?:string|null;onJobChange?:(url:string)=>void;onOptimize?:(job:MatchedJob)=>void;optimizationAvailable?:boolean;
+ activity?:NativeMatchActivity|null;execution?:MatchExecution|null;elapsed?:number;selection?:number;onSelectionChange?:(i:number)=>void;onFollow?:()=>void;selectedJobUrl?:string|null;onJobChange?:(url:string)=>void;onOptimize?:(job:MatchedJob)=>void;optimizationAvailable?:boolean;
 }){
  const id=useId();
  const [selected,setSelected]=useState(2);
@@ -156,6 +156,18 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  };
  const pendingCount=all.filter(j=>!confirmed(j)&&!j.reference_vacancy_verified).length;
  const empty=(message:string)=><p className="hhba-stage-empty">{message}</p>;
+ // A worker heartbeat is evidence of liveness, not of a new job.
+ // Missing heartbeats mean unknown, never an invented failure.
+ const workerAge=execution?.worker_seen_at&&Number.isSafeInteger(execution.worker_seen_at)?
+   Math.max(0,Math.floor((Date.now()-execution.worker_seen_at)/1000)):null;
+ const evidenceAge=execution?.last_result_at&&Number.isSafeInteger(execution.last_result_at)?
+   Math.max(0,Math.floor((Date.now()-execution.last_result_at)/1000)):null;
+ const workerStatus=workerAge===null?'正在确认后台执行状态':workerAge>90?
+   '后台状态暂无法确认 · 最近没有收到新的执行心跳':workerAge>45?
+   '后台近期有回应 · 正在确认下一次执行状态':
+   execution?.state==='recovering'?'后台正在接续研究 · 已收到恢复状态':
+   execution?.state==='awaiting_ai'?'后台在线 · AI 请求正在进行':
+   '后台在线 · 正在处理研究任务';
  const status=(i:number)=>!pending?'':i===0&&identified?'分析已完成':actual===i?'正在处理':actual>i?'可查看已有成果':'等待处理';
  return <>
  <ol className="hhba-match-progress-steps hhba-refined-steps" aria-label="匹配进度及研究报告">
@@ -164,6 +176,11 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     onClick={()=>{setSelected(i);onSelectionChange?.(i)}}><span className="hhba-step-no">0{i+1}</span><span className="hhba-step-copy">{step.label}<small>{status(i)||step.english}</small></span><ChevronDown size={13} aria-hidden="true"/></button>
   </li>)}
  </ol>
+ {pending&&<p className="hhba-refined-note hhba-worker-status" role="status" aria-live="polite">
+  <strong>{workerStatus}</strong>
+  {workerAge!==null&&<span aria-hidden="true"> · 后台最近回应 {workerAge} 秒前</span>}
+  {evidenceAge!==null&&<span aria-hidden="true"> · 最近新增研究成果 {evidenceAge} 秒前</span>}
+ </p>}
  <section id={id} className="hhba-stage-report hhba-refined-stage" aria-label={stages[active].label+'报告'} data-stage={active}>
   {active!==2&&<header className="hhba-refined-header"><span className="hhba-refined-brand">HHBA</span><small>{stages[active].english}</small>{pending&&onFollow&&<button type="button" onClick={onFollow}>跟随进度</button>}</header>}
   {active===0&&<>
