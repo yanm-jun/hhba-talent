@@ -24,7 +24,7 @@ export async function updateSessionTask(env,session,action,input){
   if(action==='start'){
    // Concurrent tabs attach to the existing task. They never replace its CV.
    if(current)return current;
-   if(await readMatchTask(env,await cancelKey(env,session,input.id)))throw taskError('AI_AGENT_CANCELLED');
+   if(await readMatchTask(env,await cancelKey(env,session,input.id)))throw taskError('AI_TASK_USER_CANCELLED');
    const task={...input,generation:0,started_at:Date.now(),renewed_at:Date.now()};
    await saveMatchTask(env,slot,task);
    return task;
@@ -32,7 +32,7 @@ export async function updateSessionTask(env,session,action,input){
   if(action==='cancel'){
    // Explicit cancellation also fences a start that has not arrived yet.
    await saveMatchTask(env,await cancelKey(env,session,input.id),{cancelled:true});
-   if(current?.id===input.id)await saveMatchTask(env,slot,{closed:true});
+   if(current?.id===input.id)await saveMatchTask(env,slot,{closed:true,reason:'user_cancelled',task_id:input.id,generation:current.generation});
    return null;
   }
   if(!current||current.id!==input.id||current.generation!==input.generation){
@@ -42,7 +42,7 @@ export async function updateSessionTask(env,session,action,input){
   if(action==='close'){
    // An encrypted tombstone does not contain the input CV. Late workers
    // cannot recreate the session slot; only an explicit start can do so.
-   await saveMatchTask(env,slot,{closed:true});
+   await saveMatchTask(env,slot,{closed:true,reason:'completed',task_id:current.id,generation:current.generation});
    return null;
   }
   if(action==='continue'){
@@ -59,10 +59,20 @@ export async function assertSessionTaskActive(env,session,id,generation){
  // Read-only session check: a revoked/expired session stops server work even
  // if a browser cannot deliver a cancellation request.
  const row=await env.HHBA_PNVS_AUTH_DB.prepare('SELECT * FROM hhba_auth_sessions WHERE token_hash=?').bind(session.token_hash).first();
- if(!sessionValid(row,Date.now())||row.phone!==session.phone)throw taskError('AI_AGENT_CANCELLED',401);
- const task=await getSessionTask(env,session);
- if(!task||task.id!==id||task.generation!==generation)throw taskError('AI_AGENT_CANCELLED');
- return task;
+ if(!sessionValid(row,Date.now())||row.phone!==session.phone)
+  throw taskError('AI_AUTH_SESSION_EXPIRED',401);
+ const slot=await readMatchTask(env,await sessionTaskSlot(env,session));
+ if(slot?.closed){
+  if(slot.task_id===id&&slot.reason==='user_cancelled')throw taskError('AI_TASK_USER_CANCELLED');
+  if(slot.task_id===id&&slot.reason==='completed')throw taskError('AI_TASK_CLOSED');
+  throw taskError('AI_TASK_SUPERSEDED');
+ }
+ if(!slot?.id){
+  if(await readMatchTask(env,await cancelKey(env,session,id)))throw taskError('AI_TASK_USER_CANCELLED');
+  throw taskError('AI_TASK_NOT_ACTIVE');
+ }
+ if(slot.id!==id||slot.generation!==generation)throw taskError('AI_TASK_SUPERSEDED');
+ return slot;
 }
 
 // Refresh only a still-authorized active slot under the same lease as cancel/close.
