@@ -27,6 +27,39 @@ test('actual V4 discovery overlaps three provider calls, deduplicates and preser
  assert.ok(wave.checkpoint.rows.every(([,j])=>!j.match_score));
  assert.equal(wave.checkpoint.toolUrls.length,4);
 });
+test('enabled independent JD queue avoids a second in-process verifier inside discovery',async()=>{
+ const {v4ManagedResourceBudget}=await import('../functions/_lib/v4-phase-budget.js');
+ const runEnv={HHBA_MATCH_V4_READY:'1',HHBA_V4_PARALLEL_RESEARCH:'1',
+  HHBA_V4_JOB_QUEUE_ENABLED:'1',HHBA_V4_JOB_EXECUTOR_ENABLED:'1'};
+ const budget=v4ManagedResourceBudget({background:true});
+ const original=job(1),source=job(2),calls=[],events=[],providerStages=[];
+ const fetcher=async(u,options)=>{
+  if(!u.endsWith('/responses')){calls.push({type:'source_read',url:u});return new Response('unavailable',{status:503});}
+  const payload=JSON.parse(options.body);calls.push({type:'provider',payload});
+  return model({research_complete:false,continue_search:true,jobs:[source],
+   reviewed_sources:[],completion_reason:'synthetic wave'},[source.url]);
+ };
+ const cp={phase:'research',round:1,rows:[[original.url,original]],profile,
+  sourceLeads:[],toolUrls:[original.url],liveDeliveryTurn:'verification',diagnostics:{}};
+ const result=await v4Match(fetcher,{key:'synthetic',baseUrl:'https://provider.invalid/v1',model:'test',onCallState:(kind,stage)=>{if(kind==='start')providerStages.push(stage);}},
+  resume,'全国',{env:runEnv,checkpoint:cp,resourceBudget:budget,
+   curated:true,officialOnly:true,stepMode:true,parallelResearch:true,
+   deferDiscoverySnapshots:true,onActivity:(stage,message)=>events.push({stage,message})});
+ assert.equal(result.status,'CONTINUE');
+ assert.equal(result.checkpoint.phase,'research');
+ assert.ok(result.checkpoint.rows.some(([u])=>u===original.url),'existing candidate survives research');
+ assert.ok(calls.some(c=>c.type==='provider'),'AI discovery still runs');
+ assert.ok(providerStages.some(x=>x==='discovery'),'normal AI search and its public-source reading remain enabled');
+ assert.ok(providerStages.every(x=>!['jd','verification','score','report'].includes(x)),
+  'discovery never starts an internal JD/score/report model operation while dedicated workers own those jobs');
+ assert.ok(events.every(x=>x.stage!=='reading'&&x.stage!=='scoring'),
+  'same Pages phase must not spawn another internal JD verification coordinator');
+ const core=(await import('node:fs/promises')).readFile;
+ const sourceCode=await core(new URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
+ assert.ok(sourceCode.includes('if(fullResearch&&parallelResearch&&!pipelineChild&&!independentExecutor&&deferDiscoverySnapshots'),
+  'regression must not silently re-enable the duplicate in-process research/verification pipeline');
+});
+
 test('discovery capacity grows with available hosting headroom instead of fixed three lanes',()=>{
  const roomy={remainingResearch:()=>36,availableFor:()=>32};
  const tight={remainingResearch:()=>9,availableFor:()=>2};
