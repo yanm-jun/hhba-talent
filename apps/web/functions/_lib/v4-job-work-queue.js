@@ -13,7 +13,7 @@ export const reportWorkRevision=(candidate,scored)=>scored?JSON.stringify([candi
 const valid=(key,generation)=>taskId(key)&&generationOk(generation);
 export const v4JobWorkQueueEnabled=env=>env?.HHBA_V4_JOB_QUEUE_ENABLED==='1'&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 
-export async function desiredV4JobWork(taskKey,generation,checkpoint){
+export async function desiredV4JobWork(taskKey,generation,checkpoint,{candidateRows=checkpoint?.rows}={}){
  if(!valid(taskKey,generation)||!checkpoint||!Array.isArray(checkpoint.rows))return [];
  const results=[],dedupe=new Set(),completed=new Set(checkpoint.processedEarlier||[]),
   revisions=new Map(checkpoint.processedEvidence||[]),rechecks=new Set(checkpoint.explicitRechecks||[]),
@@ -29,7 +29,7 @@ export async function desiredV4JobWork(taskKey,generation,checkpoint){
   const id=lane+':'+job_key;if(dedupe.has(id))return;
   dedupe.add(id);return {lane,job_key,revision:rev,state:'PENDING'};
  };
- for(const [url,job] of checkpoint.rows){
+ for(const [url,job] of candidateRows||[]){
   if(typeof url!=='string'||!job||job.excluded_closed||job.excluded_board||job.availability_status==='CLOSED_LISTED')continue;
   const version=candidateRevision(job);
   const task=await digest(url,'verification',version);
@@ -55,13 +55,46 @@ attempts=CASE WHEN revision!=excluded.revision THEN 0 ELSE attempts END,
 updated_at_ms=excluded.updated_at_ms`;
 export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=Date.now(),maxChanges=40}={}){
  if(!db?.prepare||!valid(taskKey,generation))return {available:false};
- const desired=await desiredV4JobWork(taskKey,generation,checkpoint);
+ const changes=Math.max(1,Math.min(100,Number.isSafeInteger(maxChanges)?maxChanges:40));
+ const allRows=Array.isArray(checkpoint?.rows)?checkpoint.rows:[];
+ // Small checkpoints keep the old full exact reconciliation, including
+ // removing stale entries. For hundreds of candidates, computing SHA-256
+ // for every candidate on EVERY invocation exhausted Cloudflare Free CPU
+ // before any AI call. Derive only the next bounded page of work instead.
+ const bounded=allRows.length>Math.max(80,changes*2);
  const found=await db.prepare('SELECT lane,job_key,revision,state FROM hhba_v4_job_work_queue WHERE task_key=? AND generation=?').bind(taskKey,generation).all();
  const existing=new Map((found.results||[]).map(r=>[r.lane+':'+r.job_key,r]));
+ if(bounded){
+  const validRows=allRows.filter(([url,job])=>typeof url==='string'&&job&&!job.excluded_closed&&!job.excluded_board&&job.availability_status!=='CLOSED_LISTED');
+  const candidateCount=validRows.length,verificationCount=(found.results||[]).filter(r=>r.lane==='verification').length;
+  const selectedScores=new Map([...(checkpoint.priorState?.matches||[]),...(checkpoint.matches||[])].map(job=>[job.research_candidate_url||job.official_url,job]));
+  const rank=checkpoint.phase==='reporting'&&checkpoint.globalRankState?.done===true&&Array.isArray(checkpoint.globalOrder)?new Set(checkpoint.globalOrder.slice(0,FINAL_TARGET)):new Set();
+  const reportRows=rank.size?validRows.filter(([url])=>{
+   const score=selectedScores.get(url);return score&&rank.has(score.official_url)&&(eligibleCuratedScore(score)||qualifiedReport(score));
+  }):[];
+  const reportingCount=(found.results||[]).filter(r=>r.lane==='reporting').length;
+  const choosePage=(rows,count)=>{
+   if(!rows.length)return [];
+   const offset=count<rows.length?count:Math.floor(now/30000)%Math.ceil(rows.length/changes)*changes;
+   return rows.slice(offset,offset+changes);
+  };
+  const rowsToHash=verificationCount<candidateCount?choosePage(validRows,verificationCount):reportingCount<reportRows.length?choosePage(reportRows,reportingCount):choosePage(validRows,verificationCount);
+  const desired=await desiredV4JobWork(taskKey,generation,checkpoint,{candidateRows:rowsToHash});
+  const updates=desired.filter(row=>{const prev=existing.get(row.lane+':'+row.job_key);return !prev||prev.revision!==row.revision||row.state==='COMPLETED'&&prev.state!=='COMPLETED';});
+  const selected=updates.slice(0,changes);
+  if(selected.length)await db.batch(selected.map(r=>db.prepare(UPSERT).bind(taskKey,generation,r.lane,r.job_key,r.revision,r.state,now,now)));
+  // An obsolete key is rejected by the revision-fenced job executor and
+  // retired there, rather than deleting live leases during partial scans.
+  // Existing completed work is kept until task cleanup.
+  const addedVerification=selected.filter(r=>r.lane==='verification'&&!existing.has(r.lane+':'+r.job_key)).length;
+  const addedReports=selected.filter(r=>r.lane==='reporting'&&!existing.has(r.lane+':'+r.job_key)).length;
+  return {available:true,work:candidateCount+reportRows.length,createdOrUpdated:selected.length,invalidated:0,
+   remaining:Math.max(0,candidateCount-verificationCount-addedVerification)+Math.max(0,reportRows.length-reportingCount-addedReports)};
+ }
+ const desired=await desiredV4JobWork(taskKey,generation,checkpoint);
  const expected=new Set(desired.map(r=>r.lane+':'+r.job_key));
  const updates=desired.filter(row=>{const prev=existing.get(row.lane+':'+row.job_key);return !prev||prev.revision!==row.revision||row.state==='COMPLETED'&&prev.state!=='COMPLETED';});
  const stale=[...existing.values()].filter(r=>!expected.has(r.lane+':'+r.job_key));
- const changes=Math.max(1,Math.min(100,Number.isSafeInteger(maxChanges)?maxChanges:40));
  const selected=updates.slice(0,changes);
  const deletions=stale.slice(0,Math.max(0,changes-selected.length));
  const queries=[...selected.map(r=>db.prepare(UPSERT).bind(taskKey,generation,r.lane,r.job_key,r.revision,r.state,now,now)),
@@ -69,6 +102,7 @@ export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=D
  if(queries.length)await db.batch(queries);
  return {available:true,work:desired.length,createdOrUpdated:selected.length,invalidated:deletions.length,remaining:Math.max(0,updates.length+stale.length-queries.length)};
 }
+
 // PENDING rows also use lease_until_ms as an eligible-after timestamp after
 // failed attempts. They remain visible in the queue and are retried later;
 // unlike the old attempts<3 guard, no job silently becomes unclaimable.
