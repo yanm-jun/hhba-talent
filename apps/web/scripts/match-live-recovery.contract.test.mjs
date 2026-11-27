@@ -157,3 +157,22 @@ test('independently complete JD report can open optimizer without cancelling ong
  assert.ok(panel.includes('disabled={!optimizationAvailable||'));
  assert.ok(page.includes('sourceText={optimizationSource||undefined}'));
 });
+
+test('discovered vacancies present one official application action without customer-facing verification labels',()=>{
+ const panel=readFileSync(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ const css=readFileSync(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
+ assert.match(panel,/function OfficialApplyAction\(/);
+ assert.match(panel,/const label='投递官网'/);
+ assert.match(panel,/const href=officialApplicationHref\(job\)/);
+ assert.match(panel,/href=\{href\} target="_blank" rel="noopener noreferrer"/);
+ assert.match(panel,/<button type="button" className="hhba-discovery-apply" disabled/);
+ assert.match(panel,/recent\.map\(job=>[\s\S]*?<OfficialApplyAction job=\{job\}\/>/);
+ assert.match(panel,/visible\.map\(job=>[\s\S]*?<OfficialApplyAction job=\{job\}\/>/);
+ assert.doesNotMatch(panel,/liveResearchLabel\(job\)/,'discovery rows must not show technical verification statuses');
+ assert.doesNotMatch(panel,/查看招聘来源|查看官方招聘页面/,'discovery must have one action label');
+ assert.match(panel,/job\.source_type!=='站外官方招聘'/);
+ assert.match(panel,/job\.reference_vacancy_verified===true/);
+ assert.match(panel,/POSSIBLY_CLOSED/);
+ assert.match(panel,/job\.excluded_board\|\|job\.excluded_closed/);
+ assert.match(css,/\.hhba-discovery-apply:disabled/);
+});
