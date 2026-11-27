@@ -33,6 +33,10 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
   const code=safeCode(body.error,/\b1102\b|exceededResources|worker exceeded resource/i.test(raw)?'AI_EDGE_RESOURCE_EXHAUSTED':/\b1027\b/i.test(raw)?'AI_EDGE_DAILY_LIMIT':'AI_BACKGROUND_HTTP_'+response.status);
   if(stopCodes.has(code))return terminal('STOP',code);
   if(permanentCodes.has(code))return terminal('FAILED',code);
+  if(code==='AI_TASK_IN_PROGRESS'&&diagnostic){
+   const delay=Number(body.retry_after_seconds),lease=body.lease_state;
+   return {status:'RECOVERING',error:code,...(Number.isSafeInteger(delay)&&delay>=3&&delay<=60?{retry_after_seconds:delay}:{}),...(['ACTIVE','EXPIRED','FREE'].includes(lease)?{lease_state:lease}:{})};
+  }
   if(recoverableCodes.has(code)||response.status===408||response.status===425||response.status===429||response.status>=500)throw retry(code);
   return terminal('FAILED',code);
  }
@@ -153,8 +157,9 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
   if(['COMPLETE','STOP','FAILED'].includes(result?.status))return result;
   const error=safeCode(result?.error,'AI_BACKGROUND_RESPONSE_INVALID');
   recovery=error;
-  const seconds=recoveryDelaySeconds(error,++streak);
-  console.info('HHBA_MATCH_RECOVERY_SCHEDULED',JSON.stringify({phase,error,streak,seconds}));
+  const ordinaryDelay=recoveryDelaySeconds(error,++streak);
+  const seconds=error==='AI_TASK_IN_PROGRESS'&&Number.isSafeInteger(result?.retry_after_seconds)?Math.max(3,Math.min(60,result.retry_after_seconds)):ordinaryDelay;
+  console.info('HHBA_MATCH_RECOVERY_SCHEDULED',JSON.stringify({phase,error,streak,seconds,...(result?.lease_state?{lease_state:result.lease_state}:{})}));
   // Durable sleep releases the execution slot. On wake, Pages re-checks
   // session authorization and acquires the same exclusive research lease.
   // Cloudflare WorkflowStep.sleep(number) interprets numbers as MILLISECONDS,
