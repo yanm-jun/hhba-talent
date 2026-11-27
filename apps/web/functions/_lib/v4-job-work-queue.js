@@ -51,6 +51,7 @@ revision=excluded.revision,
 state=CASE WHEN revision!=excluded.revision OR excluded.state='COMPLETED' THEN excluded.state ELSE state END,
 lease_owner=CASE WHEN revision!=excluded.revision OR excluded.state='COMPLETED' THEN NULL ELSE lease_owner END,
 lease_until_ms=CASE WHEN revision!=excluded.revision OR excluded.state='COMPLETED' THEN 0 ELSE lease_until_ms END,
+attempts=CASE WHEN revision!=excluded.revision THEN 0 ELSE attempts END,
 updated_at_ms=excluded.updated_at_ms`;
 export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=Date.now(),maxChanges=40}={}){
  if(!db?.prepare||!valid(taskKey,generation))return {available:false};
@@ -68,6 +69,10 @@ export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=D
  if(queries.length)await db.batch(queries);
  return {available:true,work:desired.length,createdOrUpdated:selected.length,invalidated:deletions.length,remaining:Math.max(0,updates.length+stale.length-queries.length)};
 }
+// PENDING rows also use lease_until_ms as an eligible-after timestamp after
+// failed attempts. They remain visible in the queue and are retried later;
+// unlike the old attempts<3 guard, no job silently becomes unclaimable.
+export const v4JobRetryDelayMs=attempt=>Math.min(1800000,30000*2**Math.min(6,Math.max(0,(Number(attempt)||1)-1)));
 // Atomic D1 UPDATE ... RETURNING fences duplicate lease owners. The worker
 // must independently re-read encrypted checkpoint, verify revision, and check
 // task authorization before doing any AI research.
@@ -83,12 +88,12 @@ export async function claimV4JobWork(db,taskKey,generation,lane,{now=Date.now(),
  state='LEASED',lease_owner=?,lease_until_ms=?,attempts=attempts+1,updated_at_ms=?
  WHERE rowid=(SELECT rowid FROM hhba_v4_job_work_queue
  WHERE task_key=? AND generation=? AND lane=?
- AND attempts<3 AND (state='PENDING' OR state='LEASED' AND lease_until_ms<=?)
- ORDER BY updated_at_ms,job_key LIMIT 1)
+ AND ((state='PENDING' AND lease_until_ms<=?) OR (state='LEASED' AND lease_until_ms<=?))
+ ORDER BY lease_until_ms,updated_at_ms,job_key LIMIT 1)
  AND (SELECT COUNT(*) FROM hhba_v4_job_work_queue
  WHERE task_key=? AND generation=? AND state='LEASED' AND lease_until_ms>?)<?
  RETURNING job_key,revision,attempts,lease_until_ms`;
- const result=await db.prepare(sql).bind(owner,until,now,taskKey,generation,lane,now,taskKey,generation,now,maxActiveLeases).all();
+ const result=await db.prepare(sql).bind(owner,until,now,taskKey,generation,lane,now,now,taskKey,generation,now,maxActiveLeases).all();
  const job=result?.results?.[0];
  return job?{...job,task_key:taskKey,generation,lane,owner}:null;
 }
@@ -103,11 +108,15 @@ export async function renewV4JobWork(db,claim,{now=Date.now(),leaseMs=120000}={}
 export async function finishV4JobWork(db,claim,{now=Date.now(),completed=true,continued=false}={}){
  if(!db?.prepare||!valid(claim?.task_key,claim?.generation)||!laneOk(claim?.lane))return false;
  const state=completed?'COMPLETED':'PENDING';
+ // Each real failure receives an increasing durable cooldown, not an
+ // artificial maximum number of research attempts. A successful continuation
+ // clears the cooldown and restores normal queue scheduling.
+ const eligibleAt=completed||continued?0:now+v4JobRetryDelayMs(claim.attempts);
  const r=await db.prepare(`UPDATE hhba_v4_job_work_queue SET
- state=?,lease_owner=NULL,lease_until_ms=0,updated_at_ms=?,attempts=CASE WHEN ?=1 THEN MAX(0,attempts-1) ELSE attempts END
+ state=?,lease_owner=NULL,lease_until_ms=?,updated_at_ms=?,attempts=CASE WHEN ?=1 THEN MAX(0,attempts-1) ELSE attempts END
  WHERE task_key=? AND generation=? AND lane=? AND job_key=?
  AND revision=? AND state='LEASED' AND lease_owner=? AND lease_until_ms>?`)
- .bind(state,now,continued?1:0,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
+ .bind(state,eligibleAt,now,continued?1:0,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
  return r?.meta?.changes===1;
 }
 export async function clearV4JobWork(db,taskKey,generation){
