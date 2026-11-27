@@ -172,3 +172,38 @@ test('failed verification jobs cool down durably instead of permanently disappea
  assert.equal(v4JobRetryDelayMs(99,'AI_EDGE_DAILY_LIMIT'),3600000);
  assert.equal(local.prepare("SELECT state FROM hhba_v4_job_work_queue WHERE lane='verification'").get().state,'PENDING');
 });
+
+
+test('bounded reconciliation can enqueue 500 jobs then the ranked top 50 without full-pool rehashing on each pass',async()=>{
+ const {db,local}=fixture();
+ const urls=Array.from({length:500},(_,i)=>url+'/large-'+String(i+1).padStart(4,'0'));
+ const rows=urls.map(u=>[u,{...source(),employer_proof_url:u}]);
+ const ranked=urls.slice(440,490);
+ const cp={phase:'reporting',rows,processedEarlier:[],processedEvidence:[],
+  globalRankState:{done:true},globalOrder:ranked,
+  matches:ranked.map(u=>({...scored(),official_url:u,research_candidate_url:u}))};
+ let remaining=Infinity;
+ for(let i=0;i<20;i++){
+  const next=await reconcileV4JobWork(db,taskKey,0,cp,{now:1000+i,maxChanges:40});
+  assert.ok(next.createdOrUpdated<=40,'CPU-heavy revision hashing and writes must stay page-bounded');
+  assert.ok(next.remaining<=remaining);
+  remaining=next.remaining;
+  if(!remaining)break;
+ }
+ assert.equal(remaining,0,'all 500 verified candidates and 50 ranked reports become schedulable');
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE lane='verification'").get().n,500);
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE lane='reporting'").get().n,50);
+});
+test('completed large queue revisits older rows and invalidates changed source revision without duplicate work',async()=>{
+ const {db,local}=fixture();
+ const urls=Array.from({length:500},(_,i)=>url+'/rev-'+String(i+1).padStart(4,'0'));
+ const cp={phase:'verification',rows:urls.map(u=>[u,{...source(),employer_proof_url:u}]),processedEarlier:[],processedEvidence:[],matches:[]};
+ for(let i=0;i<13;i++)await reconcileV4JobWork(db,taskKey,0,cp,{now:1000+i,maxChanges:40});
+ const before=local.prepare("SELECT revision FROM hhba_v4_job_work_queue WHERE lane='verification' ORDER BY created_at_ms DESC,job_key LIMIT 1").get()?.revision;
+ const changed={...cp,rows:cp.rows.map(([u,j],i)=>i===480?[u,{...j,requirements:'新版真实招聘条件'}]:[u,j])};
+ const check=await reconcileV4JobWork(db,taskKey,0,changed,{now:12*30000,maxChanges:40});
+ assert.equal(check.createdOrUpdated,1,'a rotating page eventually sees revised evidence');
+ assert.equal(check.remaining,0);
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE lane='verification'").get().n,500);
+ assert.ok(before);
+});
