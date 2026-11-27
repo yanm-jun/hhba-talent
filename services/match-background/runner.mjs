@@ -12,9 +12,14 @@ export function recoveryDelaySeconds(code,streak=1){
  // A lease is released by its owner or expires after a few minutes. Do not
  // turn temporary ownership contention into a half-hour research delay.
  if(code==='AI_TASK_IN_PROGRESS')return Math.min(60,15*Math.max(1,streak));
+ // Transient network, provider or Cloudflare resource trouble must not park
+ // the matching workflow for a half hour. The sleep is durable and does not
+ // consume paid AI calls while waiting; there is no task-wide attempt cap.
  const ordinary=[15,30,60,120,300,600,1800][Math.min(6,Math.max(0,streak-1))];
- const minimum=code==='AI_EDGE_DAILY_LIMIT'?3600:code==='AI_EDGE_RESOURCE_EXHAUSTED'?180:code==='AI_PROVIDER_RATE_LIMITED'?60:15;
- return Math.max(minimum,ordinary);
+ if(code==='AI_EDGE_DAILY_LIMIT')return 3600;
+ if(code==='AI_PROVIDER_RATE_LIMITED')return Math.min(600,Math.max(60,ordinary));
+ if(code==='AI_EDGE_RESOURCE_EXHAUSTED')return Math.min(300,Math.max(180,ordinary));
+ return Math.min(300,ordinary);
 }
 export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lane,stagedFallback=false}={}){
  const terminal=(status,error)=>diagnostic?{status,...(error?{error}: {})}:status;
