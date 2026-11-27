@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS hhba_v4_job_ops_daily (
  day TEXT NOT NULL,
  lane TEXT NOT NULL CHECK(lane IN ('verification','reporting')),
- outcome TEXT NOT NULL CHECK(outcome IN ('DONE','CONTINUE','RETRY','STALE','FAILED')),
+ outcome TEXT NOT NULL CHECK(outcome IN ('DONE','CACHED','CONTINUE','RETRY','STALE','FAILED')),
  error_code TEXT NOT NULL DEFAULT '-',
  executions INTEGER NOT NULL DEFAULT 0,
  elapsed_ms_total INTEGER NOT NULL DEFAULT 0,
