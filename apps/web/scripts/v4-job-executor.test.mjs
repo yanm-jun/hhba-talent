@@ -47,7 +47,9 @@ test('independent report result can replace only the selected ranked job',async(
  const claim=await claimV4JobWork(db,taskKey,1,'reporting',{owner:'reporter'});assert.ok(claim);
  assert.equal(await finishV4JobWork(db,claim),true);
  const read=async()=>({kind:'V4_INDEPENDENT_JOB_V1',complete:true,generation:1,lane:'reporting',job_key:claim.job_key,revision:claim.revision,source_url:url,job:{...scored(),report_status:'UNAVAILABLE',report_retry_reason:'VALIDATED_EVIDENCE_MISSING'}});
+ const records=await db.prepare("SELECT lane,job_key,revision,state FROM hhba_v4_job_work_queue WHERE task_key=? AND generation=?").bind(taskKey,1).all();
+ assert.equal(records.results.filter(r=>r.lane==='reporting'&&r.state==='COMPLETED').length,1);
  const result=await mergeIndependentV4Jobs(env,taskKey,1,cp,{read});
- assert.equal(result.count,1);assert.equal(result.checkpoint.matches[0].report_status,'UNAVAILABLE');
+ assert.equal(result.count,1,JSON.stringify({records:records.results,original:cp.matches,merged:result.checkpoint.matches}));assert.equal(result.checkpoint.matches[0].report_status,'UNAVAILABLE');
  assert.equal((await mergeIndependentV4Jobs(env,taskKey,1,result.checkpoint,{read})).count,0);
 });
