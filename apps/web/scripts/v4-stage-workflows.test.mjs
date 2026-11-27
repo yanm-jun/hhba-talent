@@ -33,7 +33,11 @@ test('stage wake uses only private service binding and deterministic opaque inst
 test('staged handoff always happens after encrypted checkpoint save and task lease release',()=>{
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/await saveMatchTask\(env,input\.taskKey,\{checkpoint:result\.checkpoint/);
- assert.match(route,/await publishProgress\(\);await releaseTask\(\);\s*await stageCompleteOrHandoff\(result\.checkpoint\)/);
+ assert.match(route,/await publishProgress\(\);await releaseTask\(\);\s*if\(result\.waitingIndependentJobs\)/);
+ assert.ok(route.includes("}else await stageCompleteOrHandoff(result.checkpoint)"),
+  'normal saved continuation still releases its lease and signals the next stage');
+ assert.ok(route.includes("if(!result.waitingIndependentJobs||mergedIndependentJobs>0)"),
+  'the authoritative checkpoint is persisted on every real advance and merged JD result');
  assert.match(route,/if\(input\.backgroundLane&&!input\.cachedResult\)/);
  assert.match(route,/if\(next!==input\.backgroundLane\)/);
  assert.equal(route.split('v4CheckpointLane(checkpoint,{independentJobs:v4JobExecutorEnabled(env)})').length-1,1);
