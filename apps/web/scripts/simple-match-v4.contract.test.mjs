@@ -1366,3 +1366,12 @@ test('V4 no-cost acceptance: SSE error -> encrypted durable checkpoint -> JSON r
  assert.equal(requests,1,'no restart or repetition of completed first-phase model call');
  assert.ok(htmlReads>=0);
 });
+
+
+test('an incomplete Cloudflare background stream resumes the same checkpoint using JSON transport',async()=>{
+ const {v4RecoveredTransportMode}=await import('../functions/_lib/v4-task-failure-policy.js');
+ assert.equal(v4RecoveredTransportMode({phase:'research',round:2},null,'AI_BACKGROUND_RESPONSE_INCOMPLETE'),'json');
+ assert.equal(v4RecoveredTransportMode({phase:'research',round:2},null,'AI_BACKGROUND_TRANSPORT_INTERRUPTED'),'json');
+ assert.equal(v4RecoveredTransportMode({phase:'research',round:2},null,'AI_EDGE_RESOURCE_EXHAUSTED'),'sse');
+ assert.equal(v4RecoveredTransportMode({phase:'research',transport_mode:'json'},null),'json');
+});
