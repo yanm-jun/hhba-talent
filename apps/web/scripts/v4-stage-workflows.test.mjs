@@ -40,6 +40,16 @@ test('staged handoff always happens after encrypted checkpoint save and task lea
  assert.equal(route.split('v4CheckpointLane(input.checkpoint,{independentJobs:v4JobExecutorEnabled(env)})').length-1,1);
 });
 
+test('independent job wait does not re-save unchanged private checkpoints or fake completion',()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const runner=readFileSync(new URL('../../../services/match-background/runner.mjs',import.meta.url),'utf8');
+ assert.ok(route.includes("if(!result.waitingIndependentJobs||mergedIndependentJobs>0)"),
+  'new independent evidence is saved while an unchanged checkpoint is not re-encrypted every idle tick');
+ assert.ok(route.includes("send('complete',{status:'CONTINUE',waiting_for_jobs:true})"),
+  'pending JD progress must never be reported as finished');
+ assert.ok(runner.includes("value?.waiting_for_jobs===true"));
+ assert.ok(runner.includes("step.sleep('wait-independent-jobs-'+phase,'30 seconds')"));
+});
 test('fallback driver retains authorized task cleanup without adding an AI provider call',()=>{
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const runner=readFileSync(new URL('../../../services/match-background/runner.mjs',import.meta.url),'utf8');
