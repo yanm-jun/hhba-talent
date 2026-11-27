@@ -139,12 +139,15 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscover
  }
  const callStarted=Date.now();let failure;
  try{
+  // Observability only: do not constrain AI reasoning, research or model calls.
+  try{provider.onCallState?.('start',stage)}catch{}
   if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
   data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,onDiscoveryJob:stage==='discovery'?onDiscoveryJob:undefined,onDiscoverySource:stage==='discovery'?onDiscoverySource:undefined,stage,timing});
   if(replayKey&&data.status==='completed')provider.phaseReplay.remember(replayKey,data);
   return data;
  }catch(e){failure=e;throw e;}
  finally{
+  try{provider.onCallState?.('end',stage)}catch{}
   timing?.finish(data?.status||'failed');
   console.info('HHBA_V4_STAGE_TIMING',JSON.stringify({stage,elapsed_ms:Date.now()-callStarted,status:data?.status||'failed',error:failure?(failure.code||'AI_CALL_FAILED'):null}));
   if(failure?.code!=='AI_PHASE_RESOURCE_YIELD'){
