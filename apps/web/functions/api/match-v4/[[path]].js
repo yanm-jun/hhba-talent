@@ -596,7 +596,7 @@ export async function onRequest(context){
    return pendingManagedView(env,{managed:true,taskKey},body.generation,
     {job_delta:body.job_delta,job_cursor:body.job_cursor,progress_stamp:body.progress_stamp},
     view.progress,view.failure);
-  }catch(e){return fail(e?.code==='AI_AGENT_CANCELLED'?'AI_AGENT_CANCELLED':'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
+  }catch(e){return fail(/^AI_(?:AGENT_CANCELLED|TASK_USER_CANCELLED|AUTH_SESSION_EXPIRED|TASK_SUPERSEDED|TASK_CLOSED|TASK_NOT_ACTIVE)$/.test(e?.code||'')?e.code:'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
  if(activeTaskRoute){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);
