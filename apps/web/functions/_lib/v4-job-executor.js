@@ -9,7 +9,7 @@ import {readMatchTask,saveMatchTask,readMatchProgress} from './v4-match-checkpoi
 import {loadBackgroundMatch} from './v4-background-match.js';
 import {assertSessionTaskActive} from './v4-session-match-task.js';
 import {v4JobProvider,v4Match} from './simple-match-v4.js';
-import {v4ManagedResourceBudget} from './v4-phase-budget.js';
+import {v4IndependentJobBudget} from './v4-phase-budget.js';
 import {locateV4ClaimCandidate,v4VerifiedJobLocator} from './v4-job-locator.js';
 
 const keyOk=x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x);
@@ -126,7 +126,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   }
   let child=(exactSeed||vettedPrevious)?previous.checkpoint:null;
   if(!child)child=oneJobCheckpoint(checkpoint,url,source,lane);
-  const budget=v4ManagedResourceBudget({background:true,recovering:!!previous});
+  const budget=v4IndependentJobBudget();
   const scoped=budget.env(env),provider=v4JobProvider(scoped);
   if(!provider)return {status:'DISABLED'};
   provider.phaseResourceBudget=budget;
@@ -154,7 +154,9 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
      job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,
      ...(transportMode==='json'?{transport_mode:'json'}:{}),checkpoint:snapshot,complete:false});
    }
-   retryError=errorCode(e);return {status:'RETRY',error:retryError};
+   retryError=errorCode(e);
+   if(retryError==='AI_PHASE_RESOURCE_YIELD')console.warn('HHBA_V4_INDEPENDENT_JOB_BUDGET_YIELD',JSON.stringify({lane,resource:e?.resource_kind||'unknown',budget:budget.snapshot()}));
+   return {status:'RETRY',error:retryError};
   }
   const snapshot=run.status==='CONTINUE'?run.checkpoint:run.resume_checkpoint||recovery();
   const result=jobFromCheckpoint(snapshot,url,source)||run.matches?.find(x=>itemUrl(x)===url)||null;

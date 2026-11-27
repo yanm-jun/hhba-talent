@@ -97,6 +97,16 @@ export function v4ManagedResourceBudget({background=false,recovering=false}={}){
  });
 }
 
+// A revision-fenced, ONE-job worker has no 500-job research coordinator,
+// progress publisher or broad candidate-reconciliation work. Recovered job
+// sidecars need the same hosting headroom as the first attempt rather than
+// losing seven weighted operations on EVERY retry. Both use the original
+// conservative per-invocation caps, with four units reserved for persistence.
+// This changes neither total AI research depth nor Cloudflare's real limits.
+export function v4IndependentJobBudget(){
+ return phaseResourceBudget({mode:'classified',initial:8,soft:36,hard:44,progressReserve:4});
+}
+
 // Only replay exact, already completed calls from an interrupted invocation.
 // Never store raw prompts, credentials or private reasoning. Within a live
 // invocation an intentional repeated call still goes to the provider.
