@@ -89,14 +89,14 @@ test('V4 upstream diagnostics distinguish HTTP status from streamed failure with
   await assert.rejects(()=>v4Call(async()=>new Response(null,{status}),provider,{input:'synthetic'},{stage:'discovery'}),
    e=>e?.code==='AI_PROVIDER_UPSTREAM_ERROR'&&e?.upstreamKind==='HTTP_'+status);
  }
- const failedFrame='data: '+JSON.stringify({type:'response.failed',response:{status:'failed'}})+'\\n\\n';
+ const failedFrame='data: '+JSON.stringify({type:'response.failed',response:{status:'failed'}})+'\n\n';
  await assert.rejects(()=>v4Call(async()=>new Response(failedFrame,{headers:{'content-type':'text/event-stream'}}),
   {...provider,stream:true},{input:'synthetic'},{stage:'discovery'}),
   e=>e?.code==='AI_PROVIDER_UPSTREAM_ERROR'&&e?.upstreamKind==='SSE_FAILED');
  const {readFile}=await import('node:fs/promises');
  const route=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(route,/metricError=code==='AI_PROVIDER_UPSTREAM_ERROR'/);
- assert.match(route,/upstream_kind:metricError!==code\\?upstreamKind:null/);
+ assert.match(route,/upstream_kind:metricError!==code\?upstreamKind:null/);
 });
 
 test('V4 backend heartbeat reaches frontend without inventing new candidate counts',async()=>{
