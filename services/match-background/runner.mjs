@@ -85,7 +85,7 @@ export async function requestIndependentJobPhase(fetcher,ticket,lane){
    // queue or an unknown provider failure.
    const raw=(await response.text().catch(()=>'' )).slice(0,4096);
    let body=null;try{body=JSON.parse(raw);}catch{}
-   const code=safeCode(body?.error,/\\b1102\\b|exceededResources|worker exceeded resource/i.test(raw)
+   const code=safeCode(body?.error,/1102|exceededResources|worker exceeded resource/i.test(raw)
     ?'AI_EDGE_RESOURCE_EXHAUSTED':response.status>=500?'AI_BACKGROUND_HTTP_'+response.status:'AI_BACKGROUND_EXECUTION_FAILED');
    if(stopCodes.has(code))return {status:'STOP',error:code};
    if(permanentCodes.has(code))return {status:'FAILED',error:code};
