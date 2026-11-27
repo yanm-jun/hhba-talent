@@ -111,8 +111,7 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscover
  // Only non-discovery stages may reuse a successful JSON fallback in this
  // invocation; discovery always retains the requested live event transport.
  if(stage!=='discovery'&&provider.transportState?.jsonStages?.has(stage))effective.stream=false;
- // Explicit payload overrides are also normalized for normal GPT-6 business requests.
- if(stage!=='probe'&&/^gpt-6(?:\.|-)/i.test(provider.model||'')&&payload.reasoning)payload={...payload,reasoning:{...payload.reasoning,effort:'medium'}};
+ // Preserve explicit request reasoning; no GPT-family stage clamp.
  let data;
  const replayKey=provider.phaseReplay?await sha256Hex(JSON.stringify([provider.model,stage,effort,payload])):null;
  const prior=replayKey?provider.phaseReplay.take(replayKey):null;
