@@ -13,6 +13,17 @@ export function nextDiscoveryWidth(previous,codes=[],{maxConnections=6,elapsed,p
  if(Number.isFinite(elapsed)&&Number.isFinite(previousElapsed)&&previousElapsed>0&&elapsed/width>1.5*previousElapsed/Math.max(1,width-1))return Math.max(1,Math.min(maxConnections,width-1));
  return Math.min(maxConnections,width+1);
 }
+// Admit concurrent model calls using real remaining invocation resources, not a
+// static width of three. This is a *transport* guard: deferred lanes remain in
+// the durable discovery task and are not dropped from the candidate target.
+export function admittedDiscoveryWidth(desired,budget,{maxConnections=6,inFlight=0,reserve=6,requestCost=2}={}){
+ const sockets=Math.max(1,maxConnections-Math.max(0,inFlight));
+ const wanted=Math.max(1,Number.isSafeInteger(desired)?desired:initialDiscoveryWidth);
+ if(!budget)return Math.min(wanted,sockets);
+ const budgetCalls=Math.max(1,Math.floor(Math.max(0,budget.remainingResearch()-reserve)/Math.max(1,requestCost)));
+ const externalCalls=typeof budget.availableFor==='function'?Math.max(1,Math.floor(budget.availableFor('fetch'))):sockets;
+ return Math.max(1,Math.min(wanted,sockets,budgetCalls,externalCalls));
+}
 export function discoveryLaneContext({profile,roleHint,round,lane,width,previousJobs,candidateTarget,remainingCandidates}){
  const roles=Array.isArray(profile?.target_roles)?profile.target_roles.filter(x=>typeof x==='string'&&x.trim()):[];
  // Roles are hints for diversity, never an allowlist. Rotate hints over waves.
