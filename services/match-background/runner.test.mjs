@@ -336,3 +336,18 @@ test('early verifier processes independently queued JDs without waiting for disc
  assert.equal(calls.filter(x=>x.endsWith('/background-job-step')).length,4);
  assert.equal(calls.filter(x=>x.endsWith('/background-step')).length,2);
 });
+
+
+test('workflow distinguishes live task lease from a stale one and respects the reported wait',async()=>{
+ const response=()=>Response.json({ok:false,error:'AI_TASK_IN_PROGRESS',lease_state:'ACTIVE',retry_after_seconds:38},{status:409});
+ assert.deepEqual(await requestPhase(async()=>response(),ticket,{diagnostic:true}),{status:'RECOVERING',error:'AI_TASK_IN_PROGRESS',retry_after_seconds:38,lease_state:'ACTIVE'});
+ let calls=0;const sleeps=[];
+ const step={async do(_name,_options,fn){return fn();},async sleep(_name,duration){sleeps.push(duration);}};
+ const result=await driveBackgroundMatch(step,ticket,async()=>++calls===1?response():event('complete',{status:'COMPLETE'}),{maxSteps:3});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.deepEqual(sleeps,['38 seconds']);
+ assert.equal(calls,2,'lease owner must not be force-unlocked or duplicated');
+ const expired=await requestPhase(async()=>Response.json({error:'AI_TASK_IN_PROGRESS',lease_state:'EXPIRED',retry_after_seconds:3},{status:409}),ticket,{diagnostic:true});
+ assert.equal(expired.lease_state,'EXPIRED');
+ assert.equal(expired.retry_after_seconds,3);
+});
