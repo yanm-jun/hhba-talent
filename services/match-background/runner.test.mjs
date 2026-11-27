@@ -306,3 +306,17 @@ test('authorized recovery helper never restarts active, waiting or terminal work
  assert.equal(await restartRecoveredWorkflowOnAuthorizedStart(db,workflow,id,{now}),true,'due failure may now restart');
  assert.equal(restarted,1);
 });
+
+
+test('terminal SSE result survives a transport that remains open after commit',async()=>{
+ const encoder=new TextEncoder();
+ const stream=new ReadableStream({start(controller){controller.enqueue(encoder.encode('event: complete\ndata: {"status":"CONTINUE"}\n\n'));}});
+ const result=await requestPhase(async()=>new Response(stream),ticket,{diagnostic:true});
+ assert.deepEqual(result,{status:'CONTINUE'});
+});
+test('split terminal SSE frames retain their result; EOF without terminal remains recoverable',async()=>{
+ const encoder=new TextEncoder();
+ const stream=new ReadableStream({start(controller){for(const part of ['event: heartbeat\n','data: {}\n\nevent: com','plete\ndata: {"status":"HANDOFF"}\n','\n'])controller.enqueue(encoder.encode(part));controller.close();}});
+ assert.equal(await requestPhase(async()=>new Response(stream),ticket),'HANDOFF');
+ await assert.rejects(requestPhase(async()=>event('heartbeat',{}),ticket),/AI_BACKGROUND_RESPONSE_INCOMPLETE/);
+});
