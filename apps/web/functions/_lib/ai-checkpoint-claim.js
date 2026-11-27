@@ -12,6 +12,17 @@ export async function claimAiCheckpoint(db,token,now=Date.now()){
  return {async release(){await db.prepare('DELETE FROM hhba_ai_checkpoint_claims WHERE token_hash=?').bind(hash).run();}};
 }
 
+// Diagnostic only: an occupied lock is either unexpired (another worker owns
+// the phase) or stale (the next claimant may atomically replace it). No caller
+// may revoke an unexpired lease or infer the applicant identity from this data.
+export async function inspectMatchTaskLease(db,taskKey,now=Date.now()){
+ const hash=await sha256Hex('hhba-v4-task-lease:'+taskKey);
+ const row=await db.prepare('SELECT expires_at FROM hhba_ai_checkpoint_claims WHERE token_hash=?').bind(hash).first();
+ const expiry=Date.parse(row?.expires_at||'');
+ const seconds=Number.isFinite(expiry)?Math.max(0,Math.ceil((expiry-now)/1000)):0;
+ return {state:seconds>0?'ACTIVE':row?'EXPIRED':'FREE',retry_after_seconds:seconds>0?Math.min(60,Math.max(3,seconds)):3};
+}
+
 // Renewable request lease. Unlike a one-time continuation token this can
 // recover after a worker/browser disconnect. Compare the exact expiry when
 // releasing or renewing so a stale worker cannot unlock its successor.
