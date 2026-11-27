@@ -132,7 +132,13 @@ export async function claimV4JobWork(db,taskKey,generation,lane,{now=Date.now(),
  WHERE rowid=(SELECT rowid FROM hhba_v4_job_work_queue
  WHERE task_key=? AND generation=? AND lane=?
  AND ((state='PENDING' AND lease_until_ms<=?) OR (state='LEASED' AND lease_until_ms<=?))
- ORDER BY lease_until_ms,updated_at_ms,job_key LIMIT 1)
+ -- A crashed Pages invocation can leave an expired LEASED row with a
+ -- revision-fenced encrypted continuation. Prefer that overdue recovery
+ -- over newly queued candidates so 500 new PENDING rows cannot postpone
+ -- the interrupted JD until the entire pool has been visited. Active leases
+ -- are excluded above and never stolen.
+ ORDER BY CASE WHEN state='LEASED' THEN 0 ELSE 1 END,
+          lease_until_ms,updated_at_ms,job_key LIMIT 1)
  AND (SELECT COUNT(*) FROM hhba_v4_job_work_queue
  WHERE task_key=? AND generation=? AND state='LEASED' AND lease_until_ms>?)<?
  RETURNING job_key,revision,attempts,lease_until_ms`;
