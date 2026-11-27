@@ -75,14 +75,54 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
 // Each job-step is a distinct Pages invocation with its own resource budget,
 // encrypted continuation and revision-fenced D1 lease. The Workflow carries
 // only an opaque ticket; no CV, job URL or model response leaves Pages.
+const jdControl=(value)=>{
+ const status=['DONE','CONTINUE','EMPTY','RETRY','STALE','DISABLED','FINISHED'].includes(value?.status)?value.status:'DEFERRED';
+ return {status,...(status==='RETRY'||status==='DEFERRED'?{error:safeCode(value?.error,'AI_BACKGROUND_RESPONSE_INVALID')}: {})};
+};
+// A JD may take minutes of real employer research and model reasoning.
+// Consume heartbeat frames without buffering private data or waiting for
+// the socket to close; the first terminal frame is authoritative even if
+// Cloudflare leaves the stream open for metrics flushing.
+export async function readIndependentJobControlResponse(response){
+ if(!(response.headers.get('content-type')||'').toLowerCase().includes('text/event-stream')){
+  const data=await response.json().catch(()=>null);
+  return jdControl(data);
+ }
+ const reader=response.body?.getReader();
+ if(!reader)return {status:'DEFERRED',error:'AI_BACKGROUND_RESPONSE_INCOMPLETE'};
+ const decoder=new TextDecoder();let buffer='';
+ try{
+  while(true){
+   let chunk;try{chunk=await reader.read();}catch{return {status:'DEFERRED',error:'AI_BACKGROUND_TRANSPORT_INTERRUPTED'};}
+   buffer+=(chunk.done?decoder.decode():decoder.decode(chunk.value,{stream:true}));
+   buffer=buffer.replace(/\r\n/g,'\n');
+   const frames=buffer.split('\n\n');buffer=frames.pop()||'';
+   if(chunk.done&&buffer.trim())frames.push(buffer);
+   for(const frame of frames){
+    const lines=frame.split('\n');
+    const kind=lines.find(x=>x.startsWith('event:'))?.slice(6).trim();
+    if(kind!=='complete'&&kind!=='failure')continue;
+    const payloadLine=lines.find(x=>x.startsWith('data:'));
+    if(!payloadLine)return {status:'DEFERRED',error:'AI_BACKGROUND_RESPONSE_INVALID'};
+    let data;try{data=JSON.parse(payloadLine.slice(5).trim());}catch{return {status:'DEFERRED',error:'AI_BACKGROUND_RESPONSE_INVALID'};}
+    if(kind==='complete')return jdControl(data);
+    const code=safeCode(data?.error,'AI_BACKGROUND_EXECUTION_FAILED');
+    if(stopCodes.has(code))return {status:'STOP',error:code};
+    if(permanentCodes.has(code))return {status:'FAILED',error:code};
+    return {status:'DEFERRED',error:code};
+   }
+   if(chunk.done)break;
+   // Bound memory if an unexpected source streams no valid frame delimiter.
+   if(buffer.length>8192)return {status:'DEFERRED',error:'AI_BACKGROUND_RESPONSE_INVALID'};
+  }
+ }finally{try{reader.releaseLock();}catch{}}
+ return {status:'DEFERRED',error:'AI_BACKGROUND_RESPONSE_INCOMPLETE'};
+}
 export async function requestIndependentJobPhase(fetcher,ticket,lane){
  if(!['verification','reporting'].includes(lane))return {status:'INVALID'};
  try{
-  const response=await fetcher('https://hhba.work/api/match-v4/background-job-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,lane})});
+  const response=await fetcher('https://hhba.work/api/match-v4/background-job-step',{method:'POST',redirect:'manual',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket,lane,stream:true})});
   if(!response.ok){
-   // Cloudflare 1102 may return HTML instead of JSON. Preserve its exact
-   // sanitized error classification so a retry is not mistaken for an empty
-   // queue or an unknown provider failure.
    const raw=(await response.text().catch(()=>'' )).slice(0,4096);
    let body=null;try{body=JSON.parse(raw);}catch{}
    const code=safeCode(body?.error,/1102|exceededResources|worker exceeded resource/i.test(raw)
@@ -91,10 +131,8 @@ export async function requestIndependentJobPhase(fetcher,ticket,lane){
    if(permanentCodes.has(code))return {status:'FAILED',error:code};
    return {status:'DEFERRED',error:code};
   }
-  const data=await response.json().catch(()=>null);
-  const status=['DONE','CONTINUE','EMPTY','RETRY','STALE','DISABLED','FINISHED'].includes(data?.status)?data.status:'DEFERRED';
-  return {status,...(status==='RETRY'?{error:safeCode(data?.error,'AI_BACKGROUND_EXECUTION_FAILED')}: {})};
- }catch{return {status:'DEFERRED'};}
+  return await readIndependentJobControlResponse(response);
+ }catch{return {status:'DEFERRED',error:'AI_BACKGROUND_TRANSPORT_INTERRUPTED'};}
 }
 // Dedicated verification and reporting Workflows MUST NEVER call
 // /background-step: it holds the discovery/master-checkpoint D1 lease.

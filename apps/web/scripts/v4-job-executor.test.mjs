@@ -74,3 +74,37 @@ test('independent JD preserves a transport-specific SSE failure across a durable
  assert.match(route,/transportMode=v4IndependentJobTransport\(vettedPrevious\?previous:null,e,provider\.stream,claim\.attempts\)/);
  assert.match(route,/await saveMatchTask\(env,resultKey,/,'job checkpoint remains persisted for same candidate and revision');
 });
+
+
+test('job-step control stream writes immediate heartbeat and periodic keepalive before private AI finishes',async()=>{
+ const {streamV4JobControl}=await import('../functions/_lib/v4-job-control-stream.js');
+ let finishJob;
+ const work=new Promise(resolve=>{finishJob=resolve;});
+ const result=streamV4JobControl(()=>work,{heartbeatMs:10});
+ assert.match(result.headers.get('content-type'),/text\/event-stream/);
+ const reader=result.body.getReader(),decoder=new TextDecoder();
+ const first=decoder.decode((await reader.read()).value);
+ assert.match(first,/event: heartbeat/);
+ assert.doesNotMatch(first,/Bearer|resume|research|cv_text/);
+ const second=decoder.decode((await reader.read()).value);
+ assert.match(second,/event: heartbeat/);
+ finishJob({ok:true,body:{status:'DONE',lane:'verification'}});
+ const third=decoder.decode((await reader.read()).value);
+ assert.match(third,/event: complete/);
+ assert.match(third,/"status":"DONE"/);
+ assert.equal((await reader.read()).done,true);
+});
+test('job stream returns sanitized failures, not private JD evidence or full exception messages',async()=>{
+ const {streamV4JobControl}=await import('../functions/_lib/v4-job-control-stream.js');
+ for(const failure of [{ok:false,error:'AI_PROVIDER_UPSTREAM_ERROR'},{ok:false,error:'SECRET_RAW_PROMPT'}]){
+  const stream=streamV4JobControl(async()=>failure,{heartbeatMs:10000});
+  const frames=await stream.text();
+  assert.match(frames,/event: heartbeat/);
+  assert.match(frames,/event: failure/);
+  assert.doesNotMatch(frames,/SECRET_RAW_PROMPT/);
+  assert.ok(frames.includes(failure.error==='AI_PROVIDER_UPSTREAM_ERROR'?'AI_PROVIDER_UPSTREAM_ERROR':'AI_BACKGROUND_EXECUTION_FAILED'));
+ }
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ assert.match(route,/if\(data\.stream===true\)return streamV4JobControl\(execute\)/);
+ assert.match(route,/const result=await execute\(\)/,'legacy caller has JSON fallback');
+});

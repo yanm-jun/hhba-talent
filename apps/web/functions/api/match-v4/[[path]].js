@@ -9,6 +9,7 @@ import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
 import {v4JobMetricSample,recordV4JobOps} from '../../_lib/v4-job-ops-metrics.js';
+import {streamV4JobControl} from '../../_lib/v4-job-control-stream.js';
 import {recordV4MinuteOps} from '../../_lib/v4-minute-performance.js';
 import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSignal} from '../../_lib/v4-stage-workflows.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
@@ -516,28 +517,39 @@ async function backgroundJobStep(env,request){
  if(!v4JobExecutorEnabled(env)||!matchEnabled(env,request))return fail('AI_JOB_EXECUTOR_DISABLED',503);
  let data;try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);data=JSON.parse(raw);}catch{return fail('INVALID_REQUEST',400);}
  if(typeof data?.ticket!=='string'||! /^[a-f0-9]{64}$/.test(data.ticket)||!['verification','reporting'].includes(data.lane))return fail('INVALID_REQUEST',400);
- const started=Date.now();let observed=null;
- try{
-  const result=await runIndependentV4Job(env,data.ticket,data.lane);
-  observed=v4JobMetricSample({started,lane:data.lane,status:result.status,error:result.error,
-   cached:result.cached,evidence:result.evidence});
-  // The Worker receives only its control result, never private JD evidence.
-  const {evidence,cached,...publicStatus}=result;
-  return reply(publicStatus);
- }catch(e){
-  const code=typeof e?.code==='string'&&/^AI_[A-Z0-9_]{4,90}$/.test(e.code)?e.code:'AI_BACKGROUND_EXECUTION_FAILED';
-  observed=v4JobMetricSample({started,lane:data.lane,status:'FAILED',error:code});
-  console.warn('HHBA_V4_INDEPENDENT_JOB_FAILED',JSON.stringify({error:code}));return fail(code,503);
- }finally{
-  if(observed){
-   await recordV4JobOps(env.HHBA_METRICS_DB,observed);
-   const stamp=Date.now(),events=[];
-   if(observed.verified_jds)events.push({at:stamp,kind:'jd'});
-   if(observed.scored_jobs)events.push({at:stamp,kind:'score'});
-   if(observed.completed_reports)events.push({at:stamp,kind:'report'});
-   if(events.length)await recordV4MinuteOps(env.HHBA_METRICS_DB,events,{source:'independent'});
+ const execute=async()=>{
+  const started=Date.now();let observed=null;
+  try{
+   const result=await runIndependentV4Job(env,data.ticket,data.lane);
+   observed=v4JobMetricSample({started,lane:data.lane,status:result.status,error:result.error,
+    cached:result.cached,evidence:result.evidence});
+   // The Workflow receives ONLY sanitized control fields, never private JD.
+   const {evidence,cached,...publicStatus}=result;
+   return {ok:true,body:publicStatus};
+  }catch(e){
+   const code=typeof e?.code==='string'&&/^AI_[A-Z0-9_]{4,90}$/.test(e.code)?e.code:'AI_BACKGROUND_EXECUTION_FAILED';
+   observed=v4JobMetricSample({started,lane:data.lane,status:'FAILED',error:code});
+   console.warn('HHBA_V4_INDEPENDENT_JOB_FAILED',JSON.stringify({error:code}));
+   return {ok:false,error:code};
+  }finally{
+   if(observed){
+    // Optional analytics must not turn a saved JD into a failed job response.
+    try{
+     await recordV4JobOps(env.HHBA_METRICS_DB,observed);
+     const stamp=Date.now(),events=[];
+     if(observed.verified_jds)events.push({at:stamp,kind:'jd'});
+     if(observed.scored_jobs)events.push({at:stamp,kind:'score'});
+     if(observed.completed_reports)events.push({at:stamp,kind:'report'});
+     if(events.length)await recordV4MinuteOps(env.HHBA_METRICS_DB,events,{source:'independent'});
+    }catch{console.warn('HHBA_V4_INDEPENDENT_JOB_METRICS_DEFERRED');}
+   }
   }
- }
+ };
+ // One Pages invocation keeps its original D1 job lease and checkpoint,
+ // but streams control heartbeats while AI works. No idle 524 at ~120s.
+ if(data.stream===true)return streamV4JobControl(execute);
+ const result=await execute();
+ return result.ok?reply(result.body):fail(result.error,503);
 }
 // Only the already authenticated and generation-fenced managed match request
 // can fetch independent completions. This never triggers a provider request.
