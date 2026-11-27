@@ -99,6 +99,28 @@ test('V4 upstream diagnostics distinguish HTTP status from streamed failure with
  assert.match(route,/upstream_kind:metricError!==code\?upstreamKind:null/);
 });
 
+test('V4 resumes explicit relay SSE failures with a durable JSON transport preference',async()=>{
+ const {v4RecoveredTransportMode,v4StampTransport}=await import('../functions/_lib/v4-task-failure-policy.js');
+ const failure={error:'AI_PROVIDER_UPSTREAM_ERROR',retryable:true,upstream_kind:'SSE_FAILED'};
+ assert.equal(v4RecoveredTransportMode(null,failure),'json');
+ assert.equal(v4RecoveredTransportMode(null,{...failure,upstream_kind:'HTTP_503'}),'sse');
+ assert.equal(v4RecoveredTransportMode(null,{error:'AI_PROVIDER_NETWORK_ERROR'}),'sse');
+ const saved=v4StampTransport({phase:'research',round:11,rows:[['https://careers.example.com/jobs/7',{title:'实习岗位'}]]},'json');
+ assert.equal(saved.transport_mode,'json');
+ assert.equal(saved.round,11);
+ assert.equal(saved.rows.length,1);
+ assert.equal(v4RecoveredTransportMode(saved,{error:'AI_PROVIDER_UPSTREAM_ERROR',upstream_kind:'HTTP_502'}),'json','JSON preference survives later failures');
+ assert.equal(v4StampTransport(saved,'sse'),saved,'original checkpoint is left intact without JSON preference');
+ assert.equal(v4StampTransport(null,'json'),null);
+ const {readFile}=await import('node:fs/promises');
+ const route=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ assert.match(route,/input\\.transportMode=v4RecoveredTransportMode\\(saved\\.checkpoint,saved\\.failure\\)/);
+ assert.match(route,/provider\\.stream=input\\.transportMode==='json'\\?false:/);
+ assert.match(route,/result\\.checkpoint=stampTransport\\(result\\.checkpoint\\)/);
+ assert.match(route,/checkpoint:stampTransport\\(input\\.recoveryState\\?\\.\\(\\)\\|\\|input\\.checkpoint\\|\\|null\\)/);
+ assert.match(route,/upstream_kind:'SSE_FAILED'/);
+});
+
 test('V4 backend heartbeat reaches frontend without inventing new candidate counts',async()=>{
  const {readFile}=await import('node:fs/promises');
  const api=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
