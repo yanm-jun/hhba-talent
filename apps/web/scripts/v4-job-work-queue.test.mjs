@@ -94,3 +94,21 @@ test('report queue cannot launch 500 long reports before global AI ranking confi
  await reconcileV4JobWork(db,taskKey,0,cp);
  assert.equal(await claimV4JobWork(db,taskKey,0,'reporting'),null);
 });
+
+test('completed phase checkpoints do not exhaust the independent worker failure allowance',async()=>{
+ const {db,local}=fixture(),cp={phase:'verification',rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[]};
+ await reconcileV4JobWork(db,taskKey,0,cp);
+ for(let i=0;i<5;i++){
+  const claim=await claimV4JobWork(db,taskKey,0,'verification',{now:1000+i*100,owner:'worker-'+i});
+  assert.ok(claim,'continued model research should remain independently schedulable');
+  assert.equal(await finishV4JobWork(db,claim,{now:1001+i*100,completed:false,continued:true}),true);
+ }
+ assert.equal(local.prepare("SELECT attempts FROM hhba_v4_job_work_queue WHERE lane='verification'").get().attempts,0);
+ const broken=[];
+ for(let i=0;i<3;i++){
+  const claim=await claimV4JobWork(db,taskKey,0,'verification',{now:2000+i*100,owner:'error-'+i});assert.ok(claim);
+  broken.push(claim.attempts);await finishV4JobWork(db,claim,{now:2001+i*100,completed:false});
+ }
+ assert.deepEqual(broken,[1,2,3]);
+ assert.equal(await claimV4JobWork(db,taskKey,0,'verification',{now:3000}),null,'after genuine repeated failures the main V4 driver retains the fallback');
+});
