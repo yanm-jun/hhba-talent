@@ -1324,7 +1324,7 @@ test('V4 no-cost acceptance: SSE error -> encrypted durable checkpoint -> JSON r
  const failSse=async(u,opts)=>{
   assert.ok(u.endsWith('/responses'),'provider requests only the expected model endpoint');
   failedTransport=JSON.parse(opts.body).stream;
-  return new Response('data: '+JSON.stringify({type:'response.failed',response:{status:'failed'}})+'\\n\\n',
+  return new Response('data: '+JSON.stringify({type:'response.failed',response:{status:'failed'}})+'\n\n',
    {headers:{'content-type':'text/event-stream'}});
  };
  let observedFailure;
