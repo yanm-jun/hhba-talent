@@ -12,6 +12,12 @@ import {v4JobProvider,v4Match} from './simple-match-v4.js';
 import {v4ManagedResourceBudget} from './v4-phase-budget.js';
 
 const keyOk=x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x);
+export async function pendingIndependentV4Work(env,taskKey,generation){
+ if(!v4JobExecutorEnabled(env)||!keyOk(taskKey))return 0;
+ const result=await env.HHBA_PNVS_AUTH_DB.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE task_key=? AND generation=? AND state IN ('PENDING','LEASED') AND attempts<3").bind(taskKey,generation).first();
+ return Math.max(0,Number(result?.n)||0);
+}
+
 export const v4JobExecutorEnabled=env=>env?.HHBA_V4_JOB_EXECUTOR_ENABLED==='1'&&v4JobWorkQueueEnabled(env);
 export const independentJobKey=(taskKey,generation,lane,jobKey,revision)=>
  sha256Hex(JSON.stringify(['HHBA_V4_INDEPENDENT_JOB_RESULT_V1',taskKey,generation,lane,jobKey,revision]));
