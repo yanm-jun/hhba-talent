@@ -14,16 +14,6 @@ const stages=[
  {label:'岗位研究与匹配',english:'MATCH REPORT',stages:['reading','researching','writing','scoring']}
 ];
 export const matchStageIndex=(stage:NativeMatchProgress)=>stages.findIndex(s=>s.stages.includes(stage));
-const safeLink=(raw:string)=>{
- try{
-  const u=new URL(raw);
-  const host=u.hostname.toLowerCase().replace(/\.$/,'');
-  if(u.protocol!=='https:'||u.username||u.password||(u.port&&u.port!=='443')||
-     !host.includes('.')||/^(?:localhost|.*\.(?:local|internal|test|invalid|example|onion))$/i.test(host)||
-     /^\d+\.\d+\.\d+\.\d+$/.test(host))return null;
-  return u.href;
- }catch{return null}
-};
 const confirmed=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.source_type==='站外官方招聘'&&!!job.evidence_excerpt?.trim();
 // A discovered URL can be opened immediately without waiting for JD research.
 // This only validates the outbound URL and known board exclusions; it does
