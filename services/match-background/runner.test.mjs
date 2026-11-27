@@ -351,3 +351,30 @@ test('workflow distinguishes live task lease from a stale one and respects the r
  assert.equal(expired.lease_state,'EXPIRED');
  assert.equal(expired.retry_after_seconds,3);
 });
+
+
+test('staged discovery is not blocked behind slow JD requests while verification has its own workflow',async()=>{
+ let research=0,unwantedJobCalls=0;
+ const step={async do(_name,_cfg,fn){return fn();}};
+ const result=await driveBackgroundMatch(step,ticket,async(url)=>{
+  if(url.endsWith('/background-job-step')){unwantedJobCalls++;throw Error('JD should run in verification stage');}
+  research++;
+  return event('complete',{status:research===1?'CONTINUE':'COMPLETE'});
+ },{lane:'discovery',jobsEnabled:true,maxSteps:3});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.equal(research,2);assert.equal(unwantedJobCalls,0);
+});
+test('incomplete second-round response retries the original ticket and preserves recovery code',async()=>{
+ const calls=[],sleeps=[];
+ const step={async do(_name,_opts,fn){return fn();},async sleep(_name,delay){sleeps.push(delay);}};
+ const result=await driveBackgroundMatch(step,ticket,async(_url,init)=>{
+  calls.push(JSON.parse(init.body));
+  if(calls.length===1)return event('complete',{status:'CONTINUE'});
+  if(calls.length===2)return event('heartbeat',{stage:'research'});
+  return event('complete',{status:'COMPLETE'});
+ },{maxSteps:4});
+ assert.deepEqual(result,{status:'COMPLETE'});assert.equal(calls.length,3);
+ assert.ok(calls.every(x=>x.ticket===ticket));
+ assert.equal(calls[2].recovery,'AI_BACKGROUND_RESPONSE_INCOMPLETE');
+ assert.deepEqual(sleeps,['15 seconds']);
+});
