@@ -7,6 +7,12 @@ test('autonomous discovery, JD/score and reporting use independent durable stage
  assert.equal(v4CheckpointLane(null),'discovery');
  assert.equal(v4CheckpointLane({phase:'research',rows:[candidate('https://company.invalid/job/1')],liveDeliveryTurn:'search'}),'discovery');
  assert.equal(v4CheckpointLane({phase:'research',rows:[candidate('https://company.invalid/job/1')],liveDeliveryTurn:'verification'}),'verification');
+ // The enabled independent job queue owns JD/score/report work while the
+ // discovery Workflow keeps searching beyond its first research wave.
+ assert.equal(v4CheckpointLane({phase:'research',rows:[candidate('https://company.invalid/job/1')],liveDeliveryTurn:'verification'},{independentJobs:true}),'discovery');
+ assert.equal(v4CheckpointLane({phase:'research',rows:[candidate('https://company.invalid/job/1')],liveDeliveryTurn:'verification',priorState:{matches:[]}},{independentJobs:true}),'discovery');
+ assert.equal(v4CheckpointLane({phase:'verification'},{independentJobs:true}),'verification');
+ assert.equal(v4CheckpointLane({phase:'reporting'},{independentJobs:true}),'reporting');
  assert.equal(v4CheckpointLane({phase:'verification'}),'verification');
  assert.equal(v4CheckpointLane({phase:'reporting'}),'reporting');
  assert.equal(v4CheckpointLane({phase:'research',backfillSignature:'active',rows:[candidate('https://company.invalid/job/1')],liveDeliveryTurn:'verification'}),'discovery');
@@ -30,6 +36,7 @@ test('staged handoff always happens after encrypted checkpoint save and task lea
  assert.match(route,/await publishProgress\(\);await releaseTask\(\);\s*await stageCompleteOrHandoff\(result\.checkpoint\)/);
  assert.match(route,/if\(input\.backgroundLane&&!input\.cachedResult\)/);
  assert.match(route,/if\(next!==input\.backgroundLane\)/);
+ assert.equal((route.match(/v4CheckpointLane\\((?:input\\.)?checkpoint,\\{independentJobs:v4JobExecutorEnabled\\(env\\)\\}\\)/g)||[]).length,2,'phase handoff and phase admission use the same independent queue-aware ownership');
 });
 
 test('fallback driver retains authorized task cleanup without adding an AI provider call',()=>{
