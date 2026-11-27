@@ -357,12 +357,16 @@ function events(env,request,input,waitUntil){
        await releaseTask();await stageCompleteOrHandoff(checkpoint);succeeded=true;return;
       }catch(recoveryError){console.warn('HHBA_V4_RESOURCE_YIELD_SAVE_FAILED',JSON.stringify({trace,error:recoveryError?.code||'CHECKPOINT_SAVE_FAILED'}));}
      }
-     metricOutcome=code===PHASE_YIELD?'RESOURCE_YIELD':!isV4TerminalTaskFailure(code)&&!!input.taskKey?'RETRYABLE_FAILURE':'TERMINAL_FAILURE';metricError=code;
+     metricOutcome=code===PHASE_YIELD?'RESOURCE_YIELD':!isV4TerminalTaskFailure(code)&&!!input.taskKey?'RETRYABLE_FAILURE':'TERMINAL_FAILURE';
+      // Aggregated diagnostics distinguish HTTP 5xx from a failed Responses
+      // stream without changing the stable client/Workflow recovery error.
+      const upstreamKind=String(e?.upstreamKind||'');
+      metricError=code==='AI_PROVIDER_UPSTREAM_ERROR'&&/^(?:HTTP_5[0-9]{2}|SSE_FAILED)$/.test(upstreamKind)?'AI_PROVIDER_'+upstreamKind:code;
      const retryable=!isV4TerminalTaskFailure(code)&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
       if(retryable)runtimeState='recovering';
       if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:input.recoveryState?.()||input.checkpoint||null,generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
       if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
-       console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
+       console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,upstream_kind:metricError!==code?upstreamKind:null,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
       if(!retryable)await finishWorkflowStages();
       send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
     }finally{
