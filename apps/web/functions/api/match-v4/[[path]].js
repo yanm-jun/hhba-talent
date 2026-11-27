@@ -13,6 +13,7 @@ import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSig
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {v4JobWorkQueueEnabled,reconcileV4JobWork,clearV4JobWork} from '../../_lib/v4-job-work-queue.js';
 import {v4JobExecutorEnabled,runIndependentV4Job,mergeIndependentV4Jobs,pendingIndependentV4Work} from '../../_lib/v4-job-executor.js';
+import {stampV4JobLocator} from '../../_lib/v4-job-locator.js';
 import {isCommercialRecruitmentBoard} from '../../_lib/match-employer-source.js';
 import {v4Provider,v4JobProvider,v4Match,isV4RetryableProviderError} from '../../_lib/simple-match-v4.js';
 import {v4ParallelResearchEnabled} from '../../_lib/v4-parallel-discovery.js';
@@ -297,7 +298,18 @@ function events(env,request,input,waitUntil){
       // A fully returned continuation is newer than an earlier in-flight
       // recovery closure. Persist it even when the invocation ran out of
       // optional resource capacity; terminal storage has reserved headroom.
-      if(result.status==='CONTINUE'){result.checkpoint=stampTransport(result.checkpoint);input.recoveryState=()=>result.checkpoint;runtimeState='recovering';}
+      if(result.status==='CONTINUE'){
+       // The candidate locator is an optional performance hint encrypted
+       // inside the same authorized checkpoint. Work continues safely with
+       // its original hash scan if resource pressure prevents building it.
+       if(input.background&&input.taskKey&&!result.waitingIndependentJobs&&v4JobExecutorEnabled(env)&&
+          result.checkpoint?.rows?.length>=32&&(!budget||budget.canPublish())){
+        try{result.checkpoint=await stampV4JobLocator(result.checkpoint,input.taskKey);}
+        catch{console.warn('HHBA_V4_PRIVATE_JOB_LOCATOR_DEFERRED');}
+       }
+       result.checkpoint=stampTransport(result.checkpoint);
+       input.recoveryState=()=>result.checkpoint;runtimeState='recovering';
+      }
       if(budget?.denied&&result.status!=='CONTINUE'&&result.status!=='COMPLETE')throw Object.assign(Error(PHASE_YIELD),{code:PHASE_YIELD});
       if(executionSignal.aborted)throw executionSignal.reason||Object.assign(Error('AI_AGENT_CANCELLED'),{code:'AI_AGENT_CANCELLED'});
      await guard();
