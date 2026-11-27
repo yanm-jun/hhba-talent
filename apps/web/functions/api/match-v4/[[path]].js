@@ -9,6 +9,7 @@ import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
 import {v4JobMetricSample,recordV4JobOps} from '../../_lib/v4-job-ops-metrics.js';
+import {recordV4MinuteOps} from '../../_lib/v4-minute-performance.js';
 import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSignal} from '../../_lib/v4-stage-workflows.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {v4JobWorkQueueEnabled,reconcileV4JobWork,clearV4JobWork} from '../../_lib/v4-job-work-queue.js';
@@ -420,11 +421,13 @@ function events(env,request,input,waitUntil){
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
      await usageBuffer?.flush();
-     if(input.managed){const snapshot=delivery.snapshot();await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,resources:budget?.snapshot(),events:jobJournal.snapshot().filter(e=>e.seq>initialEventSequence)}));
-      // Privacy-preserving cross-invocation measurements; never part of a research admission gate.
-      await recordV4SearchSpeed(env.HHBA_METRICS_DB,searchSpeed.snapshot(),metricOutcome);
-     }
-     if(!closed){closed=true;try{controller.close()}catch{}}
+     if(input.managed){const snapshot=delivery.snapshot(),newEvidence=jobJournal.snapshot().filter(e=>e.seq>initialEventSequence);
+       await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,resources:budget?.snapshot(),events:newEvidence}));
+       // Minute observations must remain separate from paid AI admission.
+       await recordV4MinuteOps(env.HHBA_METRICS_DB,newEvidence,{source:'phase'});
+       await recordV4SearchSpeed(env.HHBA_METRICS_DB,searchSpeed.snapshot(),metricOutcome);
+      }
+      if(!closed){closed=true;try{controller.close()}catch{}}
     }
    })();
    if(input.managed&&typeof waitUntil==='function')waitUntil(execution);
@@ -479,7 +482,14 @@ async function backgroundJobStep(env,request){
   observed=v4JobMetricSample({started,lane:data.lane,status:'FAILED',error:code});
   console.warn('HHBA_V4_INDEPENDENT_JOB_FAILED',JSON.stringify({error:code}));return fail(code,503);
  }finally{
-  if(observed)await recordV4JobOps(env.HHBA_METRICS_DB,observed);
+  if(observed){
+   await recordV4JobOps(env.HHBA_METRICS_DB,observed);
+   const stamp=Date.now(),events=[];
+   if(observed.verified_jds)events.push({at:stamp,kind:'jd'});
+   if(observed.scored_jobs)events.push({at:stamp,kind:'score'});
+   if(observed.completed_reports)events.push({at:stamp,kind:'report'});
+   if(events.length)await recordV4MinuteOps(env.HHBA_METRICS_DB,events,{source:'independent'});
+  }
  }
 }
 // Only the already authenticated and generation-fenced managed match request
