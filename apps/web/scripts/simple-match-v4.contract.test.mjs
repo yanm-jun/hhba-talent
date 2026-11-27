@@ -105,6 +105,8 @@ test('V4 resumes explicit relay SSE failures with a durable JSON transport prefe
  assert.equal(v4RecoveredTransportMode(null,failure),'json');
  assert.equal(v4RecoveredTransportMode(null,{...failure,upstream_kind:'HTTP_503'}),'sse');
  assert.equal(v4RecoveredTransportMode(null,{error:'AI_PROVIDER_NETWORK_ERROR'}),'sse');
+ assert.equal(v4RecoveredTransportMode(null,{error:'AI_PROVIDER_UPSTREAM_ERROR'},'AI_PROVIDER_UPSTREAM_ERROR'),'json','legacy in-flight upstream failures can try JSON on recovery');
+ assert.equal(v4RecoveredTransportMode(null,{error:'AI_PROVIDER_UPSTREAM_ERROR'},'AI_PROVIDER_NETWORK_ERROR'),'sse','mismatched recovery hints do not select fallback');
  const saved=v4StampTransport({phase:'research',round:11,rows:[['https://careers.example.com/jobs/7',{title:'实习岗位'}]]},'json');
  assert.equal(saved.transport_mode,'json');
  assert.equal(saved.round,11);
@@ -114,8 +116,8 @@ test('V4 resumes explicit relay SSE failures with a durable JSON transport prefe
  assert.equal(v4StampTransport(null,'json'),null);
  const {readFile}=await import('node:fs/promises');
  const route=await readFile(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
- assert.ok(route.includes("input.transportMode=v4RecoveredTransportMode(saved.checkpoint,saved.failure)"));
- assert.ok(route.includes("input.transportMode=v4RecoveredTransportMode(saved.checkpoint,saved.failure)"));
+ assert.ok(route.includes("input.transportMode=v4RecoveredTransportMode(saved.checkpoint,saved.failure,recoveryHint)"));
+ assert.ok(route.includes("provider.stream=input.transportMode==='json'?false:"));
  assert.ok(route.includes("result.checkpoint=stampTransport(result.checkpoint)"));
  assert.ok(route.includes("checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null)"));
  assert.match(route,/upstream_kind:'SSE_FAILED'/);
