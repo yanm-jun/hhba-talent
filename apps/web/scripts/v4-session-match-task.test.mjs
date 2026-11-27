@@ -24,7 +24,7 @@ test('same-session start is idempotent, tabs share exact input, different sessio
  assert.equal(await getSessionTask(env,b),null);assert.equal(await getSessionTask(env,c),null);
  for(const raw of objects.values())assert.ok(!new TextDecoder().decode(raw).includes(original.text));
  assert.deepEqual(await assertSessionTaskActive(env,a,task.id,0),task);
- await assert.rejects(assertSessionTaskActive(env,b,task.id,0),{code:'AI_AGENT_CANCELLED'});
+ await assert.rejects(assertSessionTaskActive(env,b,task.id,0),{code:'AI_TASK_NOT_ACTIVE'});
 });
 test('refresh reuses exact checkpoint; only explicit continue advances generation',async()=>{
  const {env,session,input}=fixture(),a=session('13800000000','a'),task=await updateSessionTask(env,a,'start',input()),key=await researchTaskKey(env,a,task);
@@ -42,17 +42,29 @@ test('refresh reuses exact checkpoint; only explicit continue advances generatio
 test('explicit cancellation fences a delayed start and cannot close a different task',async()=>{
  const {env,session,input}=fixture(),a=session('13800000000','a'),pending=input();
  await updateSessionTask(env,a,'cancel',{id:pending.id,generation:0});
- await assert.rejects(updateSessionTask(env,a,'start',pending),{code:'AI_AGENT_CANCELLED'});
+ await assert.rejects(updateSessionTask(env,a,'start',pending),{code:'AI_TASK_USER_CANCELLED'});
  const task=await updateSessionTask(env,a,'start',input());
  await updateSessionTask(env,a,'cancel',{id:pending.id,generation:0});
  assert.equal((await getSessionTask(env,a)).id,task.id);
  await updateSessionTask(env,a,'cancel',task);
- await assert.rejects(assertSessionTaskActive(env,a,task.id,0),{code:'AI_AGENT_CANCELLED'});
+ await assert.rejects(assertSessionTaskActive(env,a,task.id,0),{code:'AI_TASK_USER_CANCELLED'});
 });
 test('server detects revoked sessions without a browser cancel request',async()=>{
  const {env,session,input,sql}=fixture(),a=session('13800000000','a'),task=await updateSessionTask(env,a,'start',input());
  sql.prepare('UPDATE hhba_auth_sessions SET revoked=1 WHERE token_hash=?').run(a.token_hash);
- await assert.rejects(assertSessionTaskActive(env,a,task.id,0),{code:'AI_AGENT_CANCELLED'});
+ await assert.rejects(assertSessionTaskActive(env,a,task.id,0),{code:'AI_AUTH_SESSION_EXPIRED'});
+});
+test('task state reasons distinguish completion, superseded generation and revoked login',async()=>{
+ const {env,session,input,sql}=fixture(),s=session('13800000003','q'),task=await updateSessionTask(env,s,'start',input());
+ await assert.rejects(assertSessionTaskActive(env,s,task.id,1),{code:'AI_TASK_SUPERSEDED'});
+ const unrelated=input();
+ await assert.rejects(assertSessionTaskActive(env,s,unrelated.id,0),{code:'AI_TASK_SUPERSEDED'});
+ await updateSessionTask(env,s,'close',task);
+ await assert.rejects(assertSessionTaskActive(env,s,task.id,0),{code:'AI_TASK_CLOSED'});
+ const later=await updateSessionTask(env,s,'start',input());
+ assert.equal((await assertSessionTaskActive(env,s,later.id,0)).id,later.id);
+ sql.prepare('UPDATE hhba_auth_sessions SET expires_at=? WHERE token_hash=?').run('2020-01-01T00:00:00.000Z',s.token_hash);
+ await assert.rejects(assertSessionTaskActive(env,s,later.id,0),{code:'AI_AUTH_SESSION_EXPIRED'});
 });
 test('client uses opaque cross-tab signals, scoped session storage and explicit close; Pages transport is not a cancellation signal',()=>{
  const client=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
@@ -100,7 +112,7 @@ test('authorized long-running background phases renew only the opaque watchdog i
  await loadBackgroundMatch(env,ticket);assert.equal(renewals,1);
  const refreshed=await readMatchTask(env,ticket);await saveMatchTask(env,ticket,{...refreshed,renewed_at:Date.now()-3600001});
  sql.prepare('UPDATE hhba_auth_sessions SET revoked=1 WHERE token_hash=?').run(s.token_hash);
- await assert.rejects(loadBackgroundMatch(env,ticket),{code:'AI_AGENT_CANCELLED'});assert.equal(renewals,1);
+ await assert.rejects(loadBackgroundMatch(env,ticket),{code:'AI_AUTH_SESSION_EXPIRED'});assert.equal(renewals,1);
 });
 
 
@@ -144,7 +156,7 @@ test('background recovery preserves the original task, generation and private ch
  assert.equal(await scheduleBackgroundMatch(env,s,task),true);assert.equal(calls,2);
  const loaded=await loadBackgroundMatch(env,first.ticket);assert.equal(loaded.task.id,task.id);assert.equal(loaded.task.generation,0);assert.equal(loaded.taskKey,key);
  assert.deepEqual((await readMatchTask(env,key)).checkpoint,{phase:'research',round:3});
- await updateSessionTask(env,s,'cancel',task);await assert.rejects(loadBackgroundMatch(env,first.ticket),{code:'AI_AGENT_CANCELLED'});
+ await updateSessionTask(env,s,'cancel',task);await assert.rejects(loadBackgroundMatch(env,first.ticket),{code:'AI_TASK_USER_CANCELLED'});
  for(const code of ['AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_EDGE_DAILY_LIMIT'])assert.equal(isV4RetryableTaskFailure(code),true);
  for(const code of ['AI_AGENT_CANCELLED','AI_CHECKPOINT_INVALID','AI_CHECKPOINT_EXPIRED','AI_PROVIDER_KEY_REJECTED'])assert.equal(isV4RetryableTaskFailure(code),false);
 });
