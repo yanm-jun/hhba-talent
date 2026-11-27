@@ -117,7 +117,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   if(current?.generation!==generation||current.result||!live||!liveVersion||await revKey(liveVersion)!==claim.revision)throw Object.assign(Error('AI_CHECKPOINT_INVALID'),{code:'AI_CHECKPOINT_INVALID'});
   if(leaseLost||!await renewV4JobWork(db,claim,{leaseMs:300000}))throw Object.assign(Error('AI_CHECKPOINT_LEASE_LOST'),{code:'AI_CHECKPOINT_LEASE_LOST'});
   await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,job_key:claim.job_key,checkpoint:snapshot,job:result,complete:done,source_url:url});
-  await finishV4JobWork(db,claim,{completed:done});
+  await finishV4JobWork(db,claim,{completed:done,continued:!done});
   return {status:done?'DONE':'CONTINUE',lane};
  }catch(e){
   return {status:'RETRY',error:errorCode(e)};
