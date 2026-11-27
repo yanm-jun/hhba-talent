@@ -71,6 +71,6 @@ test('independent JD preserves a transport-specific SSE failure across a durable
  const route=readFileSync(new URL('../functions/_lib/v4-job-executor.js',import.meta.url),'utf8');
  assert.match(route,/provider\.stream=false;/,'provider transport must obey persisted per-job fallback');
  assert.match(route,/transport_mode:'json'/,'SSE fallback must be serialized into encrypted job sidecar');
- assert.match(route,/transportMode=v4IndependentJobTransport\(vettedPrevious\?previous:null,e,provider\.stream\)/);
+ assert.match(route,/transportMode=v4IndependentJobTransport\(vettedPrevious\?previous:null,e,provider\.stream,claim\.attempts\)/);
  assert.match(route,/await saveMatchTask\(env,resultKey,/,'job checkpoint remains persisted for same candidate and revision');
 });
