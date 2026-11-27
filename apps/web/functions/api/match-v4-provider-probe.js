@@ -30,7 +30,7 @@ export async function runOpenAIProbe(provider,phase,{fetcher=fetch,signal}={}){
    const accepted=r.status==='completed'?collectBatchAssessments(v4ParseJson(r),group,resume).size:0;
    const u=r.usage,known=['input_tokens','output_tokens','total_tokens'].every(k=>Number.isSafeInteger(u?.[k])&&u[k]>=0);
    results.push({batch_size:group.length,requested_effort:effort,accepted,usage_present:known,input_tokens:known?u.input_tokens:null,output_tokens:known?u.output_tokens:null,total_tokens:known?u.total_tokens:null});
-   if(effort!=='medium'||accepted!==group.length||!known)return {ok:false,results,scope:'SYNTHETIC_ONLY'};
+   if(effort!==(provider.reasoningEffort||undefined)||accepted!==group.length||!known)return {ok:false,results,scope:'SYNTHETIC_ONLY'};
   }
   return {ok:true,results,single_input:results[0].input_tokens+results[1].input_tokens,batch_input:results[2].input_tokens,single_total:results[0].total_tokens+results[1].total_tokens,batch_total:results[2].total_tokens,scope:'SYNTHETIC_ONLY_NOT_500_TO_50'};
  }
