@@ -121,7 +121,9 @@ test('resumed isolated JD job uses a full safe phase budget instead of repeated 
  assert.ok(full.remainingResearch()>legacy.remainingResearch(),'saved one-job continuation should have more room to finish real JD research');
  for(let i=0;i<28;i++)full.take('fetch');
  assert.equal(full.snapshot().external_subrequests.used,28);
- assert.equal(full.canStart(),false,'phase yields before consuming reserved storage/cleanup capacity');
+ assert.equal(full.canStart(),false,'phase stops admitting new AI work at the soft budget');
+ for(let i=0;i<4;i++)full.take('fetch');
+ assert.equal(full.snapshot().used,40,'hard guard holds four units for persistence');
  assert.throws(()=>full.take('fetch'),e=>e.code==='AI_PHASE_RESOURCE_YIELD');
  const source=readFileSync(new URL('../functions/_lib/v4-job-executor.js',import.meta.url),'utf8');
  assert.match(source,/const budget=v4IndependentJobBudget\(\)/);
