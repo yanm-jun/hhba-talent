@@ -140,7 +140,7 @@ test('each batch eventually admits all 500 verified research candidates without 
  assert.equal(unchanged.createdOrUpdated,0,'fully reconciled jobs never repeat their insert');
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  const entry=route.indexOf('const merged=await mergeIndependentV4Jobs(');
- const sync=route.indexOf('const queue=await reconcileV4JobWork(');
+ const sync=route.indexOf('const queue=await reconcileV4JobWork(',entry);
  const pending=route.indexOf('researchEnv.__v4IndependentPending=await pendingIndependentV4Work(');
  assert.ok(entry>0&&sync>entry&&pending>sync,'queue is incrementally reconciled before any phase decides that independent work is done');
 });
