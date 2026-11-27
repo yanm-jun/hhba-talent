@@ -5,6 +5,7 @@ import {ChevronLeft,ChevronRight,ChevronDown,ArrowUpRight,MapPin,Sparkles} from 
 import '../styles/resume-match-dialog.css';
 import {CuratedJobReport} from './CuratedJobReport';
 import {verifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
+import {discoveryApplyDestination} from '../services/discoveryApplyDestination.mjs';
 import type {MatchProfile,MatchResearchReport,MatchedJob,NativeMatchProgress,NativeMatchActivity,MatchExecution} from '../services/resumeMatch';
 
 const stages=[
@@ -24,13 +25,10 @@ const safeLink=(raw:string)=>{
  }catch{return null}
 };
 const confirmed=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.source_type==='站外官方招聘'&&!!job.evidence_excerpt?.trim();
-// Keep a single customer-facing action. Only independently confirmed employer
-// vacancies may open a destination; a model search citation is not ownership proof.
-const officialApplicationHref=(job:MatchedJob)=>{
- if(job.excluded_board||job.excluded_closed||['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'')||
-    job.source_type!=='站外官方招聘'||!(confirmed(job)||job.reference_vacancy_verified===true))return null;
- return safeLink(job.official_url);
-};
+// A discovered URL can be opened immediately without waiting for JD research.
+// This only validates the outbound URL and known board exclusions; it does
+// not imply the employer or vacancy has been independently verified.
+const officialApplicationHref=(job:MatchedJob)=>discoveryApplyDestination(job);
 const scoreGrounded=(job:MatchedJob)=>job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'&&job.match_score!=null;
 function reportScore(job:MatchedJob){
  const value=job.match_score;
@@ -47,9 +45,8 @@ function JobTitle({job}:{job:MatchedJob}){
 function OfficialApplyAction({job}:{job:MatchedJob}){
  const href=officialApplicationHref(job);
  const label='投递官网';
- // Unverified leads still appear in the live search list, but there is no
- // customer-facing "投递官网" action until a real employer destination is proven.
- // Never render a disabled promise of a link or substitute a guessed domain.
+ // All safe candidate job URLs are clickable immediately. No disabled
+ // placeholders or artificially delayed links while JD analysis proceeds.
  if(!href)return null;
  return <a className="hhba-discovery-apply" href={href} target="_blank" rel="noopener noreferrer" aria-label={label+' · '+job.company+' · '+(job.title_zh||job.title)}>{label}<ArrowUpRight size={13} aria-hidden="true"/></a>;
 }
