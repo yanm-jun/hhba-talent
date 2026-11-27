@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {driveBackgroundMatch,requestPhase,requestIndependentJobPhase} from './runner.mjs';
+import {driveBackgroundMatch,requestPhase,requestIndependentJobPhase,readIndependentJobControlResponse} from './runner.mjs';
 const ticket='a'.repeat(64);
 const event=(kind,value)=>new Response('event: '+kind+'\ndata: '+JSON.stringify(value)+'\n\n',{headers:{'Content-Type':'text/event-stream'}});
 test('independent runner advances persisted phases until terminal success, without browser state',async()=>{
@@ -425,4 +425,43 @@ test('JD retry cooldown tracks resource exhaustion while preserving all queued j
  assert.deepEqual(result,{status:'COMPLETE'});
  assert.deepEqual(sleeps.map(x=>x.value),['90 seconds']);
  assert.ok(calls.every(x=>x.url.endsWith('/background-job-step')&&x.body.lane==='verification'));
+});
+
+
+test('job-step SSE consumes ongoing heartbeat frames and resolves at terminal without EOF',async()=>{
+ const encoder=new TextEncoder();
+ let ctrl;
+ const sse=new ReadableStream({start(c){ctrl=c;c.enqueue(encoder.encode('event: heartbeat\ndata: {"status":"running"}\n\n'));}});
+ const output=requestIndependentJobPhase(async(url,options)=>{
+  assert.equal(url,'https://hhba.work/api/match-v4/background-job-step');
+  assert.deepEqual(JSON.parse(options.body),{ticket,lane:'verification',stream:true});
+  return new Response(sse,{headers:{'Content-Type':'text/event-stream'}});
+ },ticket,'verification');
+ // The HTTP response is already open and can stream keepalives for as long
+ // as genuine provider JD research needs. A terminal response must not
+ // wait for Cloudflare to close the readable stream.
+ ctrl.enqueue(encoder.encode('event: hea'));
+ ctrl.enqueue(encoder.encode('rtbeat\ndata: {"status":"running"}\n\n'));
+ ctrl.enqueue(encoder.encode('event: complete\ndata: {"status":"DONE","lane":"verification"}\n\n'));
+ assert.deepEqual(await output,{status:'DONE'});
+});
+test('streaming independent errors survive a heartbeat-only disconnect and preserve safe stop codes',async()=>{
+ const ctrl=s=>new Response('event: heartbeat\ndata: {}\n\nevent: '+s+'\ndata: {"error":"AI_PROVIDER_NETWORK_ERROR"}\n\n',{headers:{'Content-Type':'text/event-stream'}});
+ assert.deepEqual(await readIndependentJobControlResponse(ctrl('failure')),{status:'DEFERRED',error:'AI_PROVIDER_NETWORK_ERROR'});
+ const terminal=new Response('event: failure\ndata: {"error":"AI_AUTH_SESSION_EXPIRED"}\n\n',{headers:{'Content-Type':'text/event-stream'}});
+ assert.deepEqual(await readIndependentJobControlResponse(terminal),{status:'STOP',error:'AI_AUTH_SESSION_EXPIRED'});
+ const incomplete=new Response('event: heartbeat\ndata: {"status":"running"}\n\n',{headers:{'Content-Type':'text/event-stream'}});
+ assert.deepEqual(await readIndependentJobControlResponse(incomplete),{status:'DEFERRED',error:'AI_BACKGROUND_RESPONSE_INCOMPLETE'});
+ assert.deepEqual(await readIndependentJobControlResponse(Response.json({status:'CONTINUE'})),{status:'CONTINUE'},'legacy JSON clients stay supported');
+});
+test('a durable JD Workflow never acquires main lease while receiving heartbeats',async()=>{
+ const paths=[],step={async waitForEvent(){return {payload:{done:false}};},async do(_n,_cfg,fn){return fn();}};
+ const result=await driveBackgroundMatch(step,ticket,async(url,opts)=>{
+  paths.push(url);
+  assert.equal(JSON.parse(opts.body).stream,true);
+  return new Response('event: heartbeat\ndata: {}\n\nevent: complete\ndata: {"status":"FINISHED"}\n\n',{headers:{'Content-Type':'text/event-stream'}});
+ },{lane:'verification',jobsEnabled:true,maxSteps:2});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.equal(paths.length,2);
+ assert.ok(paths.every(p=>p.endsWith('/background-job-step')));
 });
