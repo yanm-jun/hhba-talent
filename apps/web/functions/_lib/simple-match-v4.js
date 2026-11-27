@@ -1051,7 +1051,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   // Never repeat an unchanged pool indefinitely or discard previously paid scoring work.
   const unresolved=ranked.filter(j=>!eligibleCuratedScore(j)&&j.curated_suitable!==false||j.report_status==='UNAVAILABLE');
   const needsReview=!!globalRankError||final.length<FINAL_TARGET||concreteCount()<CANDIDATE_TARGET||unresolved.length>0||[...sourceLeads].some(u=>!rows.has(u)&&!reviewedSources.has(u)&&!excluded.has(u)&&!rejectedBoards.has(u));
-  if(needsReview&&candidateSetSignature!==backfillSignature&&!reviewedOutcomes.has(candidateSetSignature)&&(!researchError||['AI_RESEARCH_NO_NEW_EVIDENCE','AI_RESEARCH_COMPLETION_UNCONFIRMED','AI_PROVIDER_INCOMPLETE','AI_WEB_SEARCH_NOT_USED'].includes(researchError))){
+  if(!pipelineChild&&needsReview&&candidateSetSignature!==backfillSignature&&!reviewedOutcomes.has(candidateSetSignature)&&(!researchError||['AI_RESEARCH_NO_NEW_EVIDENCE','AI_RESEARCH_COMPLETION_UNCONFIRMED','AI_PROVIDER_INCOMPLETE','AI_WEB_SEARCH_NOT_USED'].includes(researchError))){
    if(final.length<FINAL_TARGET)note('UNDERFILLED_EXPANSION');
    note('AI_FINAL_REVIEW');reviewedOutcomes.add(candidateSetSignature);
    onActivity('searching','AI 正在复盘候选覆盖与未完成核验的岗位，自主补充研究及官方证据。');
