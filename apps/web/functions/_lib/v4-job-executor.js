@@ -79,7 +79,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   if(previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.complete&&previous.job){
    done=true;
    await finishV4JobWork(db,claim,{completed:true});
-   return {status:'DONE',lane};
+   return {status:'DONE',lane,cached:true};
   }
   let child=previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.generation===generation?
    previous.checkpoint:null;
@@ -118,7 +118,10 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   if(leaseLost||!await renewV4JobWork(db,claim,{leaseMs:300000}))throw Object.assign(Error('AI_CHECKPOINT_LEASE_LOST'),{code:'AI_CHECKPOINT_LEASE_LOST'});
   await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,job_key:claim.job_key,checkpoint:snapshot,job:result,complete:done,source_url:url});
   await finishV4JobWork(db,claim,{completed:done,continued:!done});
-  return {status:done?'DONE':'CONTINUE',lane};
+  return {status:done?'DONE':'CONTINUE',lane,
+   ...(done?{evidence:{verified_jd:lane==='verification'&&result?.jd_source_status==='VERIFIED_JD',
+     scored:lane==='verification'&&Number.isInteger(result?.match_score),
+     report:lane==='reporting'&&qualifiedReport(result)}}:{})};
  }catch(e){
   return {status:'RETRY',error:errorCode(e)};
  }finally{

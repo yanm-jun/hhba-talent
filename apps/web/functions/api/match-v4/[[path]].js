@@ -8,6 +8,7 @@ import {redactForModel} from '../../_lib/resume-match-core.js';
 import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
+import {v4JobMetricSample,recordV4JobOps} from '../../_lib/v4-job-ops-metrics.js';
 import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSignal} from '../../_lib/v4-stage-workflows.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {v4JobWorkQueueEnabled,reconcileV4JobWork,clearV4JobWork} from '../../_lib/v4-job-work-queue.js';
@@ -451,9 +452,21 @@ async function backgroundJobStep(env,request){
  if(!v4JobExecutorEnabled(env)||!matchEnabled(env,request))return fail('AI_JOB_EXECUTOR_DISABLED',503);
  let data;try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);data=JSON.parse(raw);}catch{return fail('INVALID_REQUEST',400);}
  if(typeof data?.ticket!=='string'||! /^[a-f0-9]{64}$/.test(data.ticket)||!['verification','reporting'].includes(data.lane))return fail('INVALID_REQUEST',400);
- try{return reply(await runIndependentV4Job(env,data.ticket,data.lane));}
- catch(e){const code=typeof e?.code==='string'&&/^AI_[A-Z0-9_]{4,90}$/.test(e.code)?e.code:'AI_BACKGROUND_EXECUTION_FAILED';
-  console.warn('HHBA_V4_INDEPENDENT_JOB_FAILED',JSON.stringify({error:code}));return fail(code,503);}
+ const started=Date.now();let observed=null;
+ try{
+  const result=await runIndependentV4Job(env,data.ticket,data.lane);
+  observed=v4JobMetricSample({started,lane:data.lane,status:result.status,error:result.error,
+   cached:result.cached,evidence:result.evidence});
+  // The Worker receives only its control result, never private JD evidence.
+  const {evidence,cached,...publicStatus}=result;
+  return reply(publicStatus);
+ }catch(e){
+  const code=typeof e?.code==='string'&&/^AI_[A-Z0-9_]{4,90}$/.test(e.code)?e.code:'AI_BACKGROUND_EXECUTION_FAILED';
+  observed=v4JobMetricSample({started,lane:data.lane,status:'FAILED',error:code});
+  console.warn('HHBA_V4_INDEPENDENT_JOB_FAILED',JSON.stringify({error:code}));return fail(code,503);
+ }finally{
+  if(observed)await recordV4JobOps(env.HHBA_METRICS_DB,observed);
+ }
 }
 async function backgroundStep(env,request,waitUntil){
  if(!backgroundEnabled(env,request)||request.method!=='POST')return fail('NOT_FOUND',404);

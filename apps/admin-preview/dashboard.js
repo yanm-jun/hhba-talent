@@ -91,7 +91,7 @@ function renderDailyOperations(report){
  status.textContent=rows.length+' 天 · '+(report.collectorStartedAt?'运营事件起始于 '+report.collectorStartedAt.slice(0,10):'运营事件采集时间尚未核实');
 }
 function updateGrowth(){
- renderAiUsage();renderV4Operations();renderV4SearchSpeed();
+ renderAiUsage();renderV4Operations();renderV4JobOperations();renderV4SearchSpeed();
  showRealDataStatus();
  const t=growth?.traffic,b=growth?.devices,a=growth?.account,q=growth?.activity;
  setMetric('ov-pv',t?.quality==='collected'?t.pv:null);
@@ -397,6 +397,21 @@ function renderV4Operations(){
   add('v4-ops-details','分类资源采样覆盖',fmt.format(total.resourceSamples)+' 个执行阶段；程序代理计数，非 Cloudflare 账单');
  }else add('v4-ops-details','分类资源调用','尚未采集到支持分类计量的执行阶段，不按 0 次展示');
  for(const e of s.errors||[])add('v4-ops-details',(labels[e.lane]||e.lane)+' · '+e.code,fmt.format(e.count)+' 次');
+}
+function renderV4JobOperations(){
+ const data=growth?.v4IndependentJobs,state=byId('v4-job-ops-state'),root=byId('v4-job-ops-details');
+ if(!state||!root)return;
+ root.replaceChildren();
+ const valid=data?.quality==='collected'&&data.summary;
+ state.textContent=valid?'已采集独立岗位核验调用（UTC）；按执行次数统计，不代表不重复的岗位总数':data?.quality==='no_records'?'独立核验暂无真实记录，不能解释为零失败或零 JD':'独立核验统计尚不可用（请检查数据库迁移）';
+ if(!valid)return;
+ const add=(name,value)=>{const item=document.createElement('div'),a=document.createElement('span'),b=document.createElement('strong');a.textContent=name;b.textContent=value;item.append(a,b);root.append(item);};
+ const t=data.summary;
+ add('独立任务执行','完成 '+fmt.format(t.done)+' · 继续 '+fmt.format(t.continued)+' · 冷却重试 '+fmt.format(t.retries)+' · 缓存命中 '+fmt.format(t.cached));
+ add('确认成果','已验证官网 JD '+fmt.format(t.verifiedJds)+' · 完成评分 '+fmt.format(t.scoredJobs)+' · 完整报告 '+fmt.format(t.completedReports));
+ add('状态异常','失效 '+fmt.format(t.stale)+' · 执行失败 '+fmt.format(t.failed)+' · 单次平均 '+(t.averageMs===null?'—':(t.averageMs/1000).toFixed(1)+' 秒'));
+ for(const x of data.stages||[])add(x.lane==='verification'?'JD 核验独立执行':'报告独立执行','成功 '+fmt.format(x.done)+' · 重试 '+fmt.format(x.retries)+' · 继续 '+fmt.format(x.continued));
+ for(const x of data.errors||[])add((x.lane==='verification'?'JD 核验':'报告生成')+' · '+x.code,fmt.format(x.count)+' 次');
 }
 function renderV4SearchSpeed(){
  const data=growth?.v4SearchSpeed,root=byId('v4-search-speed-milestones'),state=byId('v4-search-speed-state');
