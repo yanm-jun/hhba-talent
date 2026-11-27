@@ -7,9 +7,14 @@ import {sha256Hex} from './real-auth.js';
 export const STAGE_LANES=Object.freeze(['discovery','verification','reporting']);
 export const isV4StageLane=v=>STAGE_LANES.includes(v);
 export const stagedV4WorkflowsEnabled=env=>env?.HHBA_V4_STAGE_WORKFLOWS==='1'&&typeof env?.HHBA_MATCH_BACKGROUND?.fetch==='function';
-export function v4CheckpointLane(cp){
+export function v4CheckpointLane(cp,{independentJobs=false}={}){
  if(cp?.phase==='verification')return 'verification';
  if(cp?.phase==='reporting')return 'reporting';
+ // Independently leased JD/score/report workers consume the job queue without
+ // taking ownership of the research checkpoint. Keep discovery moving across
+ // research rounds instead of parking its Workflow at the first unverified JD.
+ // Legacy single-driver deployments still hand off for in-process verification.
+ if(independentJobs&&cp?.phase==='research')return 'discovery';
  if(cp?.phase==='research'&&!cp.backfillSignature&&cp.liveDeliveryTurn!=='search'){
   const pending=pendingVerification(cp).length>0;
   const earlier=cp.priorState?.matches||[];

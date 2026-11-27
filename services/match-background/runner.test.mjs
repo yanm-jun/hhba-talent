@@ -12,18 +12,31 @@ test('independent runner advances persisted phases until terminal success, witho
  });
  assert.deepEqual(result,{status:'COMPLETE'});assert.equal(calls.length,3);assert.equal(new Set(steps).size,3);
 });
-test('opt-in job worker dispatch starts four separately leased Pages invocations per Workflow phase',async()=>{
+test('independent job dispatch keeps at most two sibling Pages invocations per research phase',async()=>{
  const calls=[],step={async do(_name,_options,fn){return fn();}};
  const result=await driveBackgroundMatch(step,ticket,async(url,options)=>{
   calls.push({url,body:JSON.parse(options.body),redirect:options.redirect});
   return url.endsWith('/background-job-step')?Response.json({status:'DONE'}):event('complete',{status:'COMPLETE'});
  },{jobsEnabled:true});
  assert.deepEqual(result,{status:'COMPLETE'});
- assert.equal(calls.length,5);
- assert.equal(calls.filter(x=>x.url.endsWith('/background-job-step')).length,4);
- assert.equal(calls.filter(x=>x.body.lane==='verification').length,3);
- assert.equal(calls.filter(x=>x.body.lane==='reporting').length,1);
+ assert.equal(calls.length,3);
+ assert.equal(calls.filter(x=>x.url.endsWith('/background-job-step')).length,2);
+ assert.equal(calls.filter(x=>x.body.lane==='verification').length,2);
+ assert.equal(calls.filter(x=>x.body.lane==='reporting').length,0);
  assert.ok(calls.every(x=>x.body.ticket===ticket&&x.redirect==='manual'));
+});
+test('job fan-out preserves reporting and verification across durable follow-up phases',async()=>{
+ const calls=[],values=['CONTINUE','CONTINUE','CONTINUE','COMPLETE'];
+ const step={async do(_name,_options,fn){return fn();}};
+ const result=await driveBackgroundMatch(step,ticket,async(url,options)=>{
+  calls.push({url,body:JSON.parse(options.body)});
+  return url.endsWith('/background-job-step')?Response.json({status:'CONTINUE'}):event('complete',{status:values.shift()});
+ },{jobsEnabled:true});
+ assert.deepEqual(result,{status:'COMPLETE'});
+ assert.equal(calls.filter(x=>x.url.endsWith('/background-step')).length,4);
+ assert.equal(calls.filter(x=>x.url.endsWith('/background-job-step')).length,8);
+ assert.equal(calls.filter(x=>x.url.endsWith('/background-job-step')&&x.body.lane==='verification').length,7);
+ assert.equal(calls.filter(x=>x.url.endsWith('/background-job-step')&&x.body.lane==='reporting').length,1);
 });
 test('edge-compatible manual redirects never send ticket to another destination',async()=>{
  let calls=0;

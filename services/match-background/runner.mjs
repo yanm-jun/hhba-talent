@@ -80,9 +80,13 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
     try{
      const primary=requestPhase(fetcher,ticket,{diagnostic:true,recovery,lane:currentLane,stagedFallback:stagedOrigin&&!currentLane});
      if(!jobsEnabled)return await primary;
-     // One main phase plus four independent job invocations: keep one of the
-     // six Worker outbound connection slots free for recovery and storage.
-     const jobs=['verification','verification','verification','reporting'];
+     // Keep the primary discovery phase moving. Large parallel Pages/model
+     // bursts risk exhausting a Cloudflare Free invocation and delaying the
+     // workflow even when its own research step has already finished. Spread
+     // the *same queued jobs* across future durable phases (no task/job cap).
+     const jobs=currentLane==='reporting'?['reporting','reporting']:
+      currentLane==='verification'?['verification','reporting']:
+      phase%3===2?['verification','reporting']:['verification','verification'];
      const result=await Promise.allSettled([primary,...jobs.map(name=>requestIndependentJobPhase(fetcher,ticket,name))]);
      const main=result[0];
      if(main.status==='rejected')throw main.reason;

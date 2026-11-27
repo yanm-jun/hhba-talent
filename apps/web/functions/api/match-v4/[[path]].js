@@ -139,7 +139,7 @@ function events(env,request,input,waitUntil){
    const stopProgress=()=>publisher.stop();
    const stageCompleteOrHandoff=async checkpoint=>{
     if(input.backgroundLane&&input.backgroundTicket&&stagedV4WorkflowsEnabled(env)){
-     const next=v4CheckpointLane(checkpoint);
+     const next=v4CheckpointLane(checkpoint,{independentJobs:v4JobExecutorEnabled(env)});
      if(next!==input.backgroundLane){
       if(await stageWorkflowSignal(env,input.backgroundTicket,{lane:next})){send('complete',{status:'HANDOFF'});return;}
       // If the new independent consumer cannot be awakened, the owning
@@ -462,7 +462,7 @@ async function backgroundStep(env,request,waitUntil){
   input.resourceRecovery=v4RecoveredResourcePhase(recoveryHint)||v4RecoveredResourcePhase(saved?.failure?.error);
   if(input.resourceRecovery&&input.checkpoint?.phase==='research'&&input.checkpoint.rows?.length)input.checkpoint={...input.checkpoint,liveDeliveryTurn:'verification'};
   if(input.backgroundLane&&!input.cachedResult){
-   const next=v4CheckpointLane(input.checkpoint);
+   const next=v4CheckpointLane(input.checkpoint,{independentJobs:v4JobExecutorEnabled(env)});
    if(next!==input.backgroundLane){
     // A resource-recovery lane preference can differ from the persisted
     // checkpoint. Commit it under the current D1 lease before waking the
