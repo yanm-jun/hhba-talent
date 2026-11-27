@@ -107,7 +107,8 @@ test('queue remains disabled unless Cloudflare explicitly enables the migration-
  assert.match(route,/await enqueueEarlyVerification\(result\.checkpoint,\{force:true\}\)/);
  assert.match(route,/await enqueueEarlyVerification\(state\.checkpoint\)/);
  assert.match(route,/await reconcileV4JobWork\(env\.HHBA_PNVS_AUTH_DB,input\.taskKey,input\.generation\|\|0,checkpoint\)/);
- assert.match(route,/stageWorkflowSignal\(env,input\.backgroundTicket,\{lane:'verification'\}\)/);
+ assert.match(route,/const lane=checkpoint\.phase==='reporting'\?'reporting':'verification'/);
+ assert.match(route,/stageWorkflowSignal\(env,input\.backgroundTicket,\{lane\}\)/);
 });
 
 test('report queue cannot launch 500 long reports before global AI ranking confirms the top fifty',async()=>{

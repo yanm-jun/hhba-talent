@@ -45,6 +45,9 @@ export default {async scheduled(event,env){
  // registered. Pages may fall back to the same leased checkpoint driver.
  if(!env.MATCH_REGISTRY||!env.MATCH_WORKFLOW)return Response.json({ok:false},{status:503});
  if(body.mode==='staged'){
+  // A misconfigured staging rollout must not create verification/reporting
+  // instances which would fall back to the discovery/master-checkpoint lock.
+  if(body.job_executor!==true)return Response.json({ok:false,error:'AI_JOB_EXECUTOR_DISABLED'},{status:503});
    try{const status=await startStageWorkflows(env.MATCH_WORKFLOW,env.MATCH_REGISTRY,body.instance,body.ticket,{register:registerWatchdogInstance,jobsEnabled:body.job_executor===true,schedule:async (workflow,id,ticket,opts)=>{
      const result=await scheduleWorkflowInstance(workflow,id,ticket,opts);
      if(result?.status==='RECOVERING')await restartRecoveredWorkflowOnAuthorizedStart(env.MATCH_REGISTRY,workflow,id);

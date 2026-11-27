@@ -157,14 +157,23 @@ function events(env,request,input,waitUntil){
     if(!input.background||!input.taskKey||!v4JobWorkQueueEnabled(env)||!Array.isArray(checkpoint?.rows)||!checkpoint.rows.length||!force&&checkpoint.rows.length<=lastQueuedRowCount)return null;
     const queue=await reconcileV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0,checkpoint);
     let awakened=true;
-    if(queue.work>0&&checkpoint.phase==='research'&&input.backgroundTicket&&stagedV4WorkflowsEnabled(env)){
-     awakened=await stageWorkflowSignal(env,input.backgroundTicket,{lane:'verification'});
-     if(!awakened)console.warn('HHBA_V4_EARLY_VERIFICATION_WAKE_DEFERRED');
+    if(queue.work>0&&input.backgroundTicket&&stagedV4WorkflowsEnabled(env)){
+     // Verification starts with the first saved candidate; reporting starts
+     // when global ranking has selected which reports are actually needed.
+     const lane=checkpoint.phase==='reporting'?'reporting':'verification';
+     awakened=await stageWorkflowSignal(env,input.backgroundTicket,{lane});
+     if(!awakened)console.warn('HHBA_V4_INDEPENDENT_LANE_WAKE_DEFERRED',lane);
     }
     if(queue.available&&queue.remaining===0&&awakened)lastQueuedRowCount=Math.max(lastQueuedRowCount,checkpoint.rows.length);
     return queue;
    };
    const stageCompleteOrHandoff=async checkpoint=>{
+    // Staged JD and report workflows are consumers only. The discovery
+    // Workflow MUST retain ownership of all master-checkpoint phases and
+    // cannot hand off to a worker that no longer sends a discovery wake.
+    if(input.backgroundLane==='discovery'&&v4JobExecutorEnabled(env)){
+     send('complete',{status:'CONTINUE'});return;
+    }
     if(input.backgroundLane&&input.backgroundTicket&&stagedV4WorkflowsEnabled(env)){
      const next=v4CheckpointLane(checkpoint,{independentJobs:v4JobExecutorEnabled(env)});
      if(next!==input.backgroundLane){
@@ -536,6 +545,10 @@ async function backgroundStep(env,request,waitUntil){
  if(!matchEnabled(env,request))return fail('MATCH_NOT_ENABLED',503);
  let ticket,recoveryHint,lane,stagedFallback;
  try{const raw=await request.text();if(raw.length>256)return fail('INVALID_REQUEST',400);const data=JSON.parse(raw);ticket=data?.ticket;recoveryHint=data?.recovery;lane=data?.lane;stagedFallback=data?.staged_fallback===true;}catch{return fail('INVALID_REQUEST',400);}
+ // Defence in depth: a misconfigured or old stage driver cannot acquire the
+ // single master lease through /background-step. Only independent job workers
+ // may execute verification/reporting when the job executor is enabled.
+ if(v4JobExecutorEnabled(env)&&['verification','reporting'].includes(lane))return fail('AI_JOB_LANE_REQUIRES_JOB_STEP',409);
  let input;
  try{
   const {session,task,taskKey}=await loadBackgroundMatch(env,ticket);
@@ -554,7 +567,7 @@ async function backgroundStep(env,request,waitUntil){
   }else if(task.generation>0){await input.lease.release();return fail('AI_CHECKPOINT_EXPIRED',409);}
   input.resourceRecovery=v4RecoveredResourcePhase(recoveryHint)||v4RecoveredResourcePhase(saved?.failure?.error);
   if(input.resourceRecovery&&input.checkpoint?.phase==='research'&&input.checkpoint.rows?.length)input.checkpoint={...input.checkpoint,liveDeliveryTurn:'verification'};
-  if(input.backgroundLane&&!input.cachedResult){
+  if(input.backgroundLane&&!input.cachedResult&&!(input.backgroundLane==='discovery'&&v4JobExecutorEnabled(env))){
    const next=v4CheckpointLane(input.checkpoint,{independentJobs:v4JobExecutorEnabled(env)});
    if(next!==input.backgroundLane){
     // A resource-recovery lane preference can differ from the persisted

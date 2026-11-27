@@ -11,8 +11,8 @@ test('autonomous discovery, JD/score and reporting use independent durable stage
  // discovery Workflow keeps searching beyond its first research wave.
  assert.equal(v4CheckpointLane({phase:'research',rows:[candidate('https://company.invalid/job/1')],liveDeliveryTurn:'verification'},{independentJobs:true}),'discovery');
  assert.equal(v4CheckpointLane({phase:'research',rows:[candidate('https://company.invalid/job/1')],liveDeliveryTurn:'verification',priorState:{matches:[]}},{independentJobs:true}),'discovery');
- assert.equal(v4CheckpointLane({phase:'verification'},{independentJobs:true}),'verification');
- assert.equal(v4CheckpointLane({phase:'reporting'},{independentJobs:true}),'reporting');
+ assert.equal(v4CheckpointLane({phase:'verification'},{independentJobs:true}),'discovery');
+ assert.equal(v4CheckpointLane({phase:'reporting'},{independentJobs:true}),'discovery');
  assert.equal(v4CheckpointLane({phase:'verification'}),'verification');
  assert.equal(v4CheckpointLane({phase:'reporting'}),'reporting');
  assert.equal(v4CheckpointLane({phase:'research',backfillSignature:'active',rows:[candidate('https://company.invalid/job/1')],liveDeliveryTurn:'verification'}),'discovery');
@@ -38,7 +38,7 @@ test('staged handoff always happens after encrypted checkpoint save and task lea
   'normal saved continuation still releases its lease and signals the next stage');
  assert.ok(route.includes("if(!result.waitingIndependentJobs||mergedIndependentJobs>0)"),
   'the authoritative checkpoint is persisted on every real advance and merged JD result');
- assert.match(route,/if\(input\.backgroundLane&&!input\.cachedResult\)/);
+ assert.match(route,/if\(input\.backgroundLane&&!input\.cachedResult&&\!\(input\.backgroundLane==='discovery'&&v4JobExecutorEnabled\(env\)\)\)/);
  assert.match(route,/if\(next!==input\.backgroundLane\)/);
  assert.equal(route.split('v4CheckpointLane(checkpoint,{independentJobs:v4JobExecutorEnabled(env)})').length-1,1);
  assert.equal(route.split('v4CheckpointLane(input.checkpoint,{independentJobs:v4JobExecutorEnabled(env)})').length-1,1);
@@ -69,4 +69,22 @@ test('explicit user cancel/close finishes sleeping stages after invalidating the
  assert.match(route,/previous\.id===entry\.id&&previous\.generation===entry\.generation/);
  assert.match(route,/const task=await updateSessionTask\(env,session,action,entry\)/);
  assert.match(route,/await stageWorkflowSignal\(env,ticket,\{finish:true\}\)/);
+});
+
+
+test('independent staged work cannot hand off the master research lease or enter main endpoint',async()=>{
+ const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
+ const worker=readFileSync(new URL('../../../services/match-background/runner.mjs',import.meta.url),'utf8');
+ const orchestrator=readFileSync(new URL('../functions/_lib/v4-background-match.js',import.meta.url),'utf8');
+ assert.match(route,/input\.backgroundLane==='discovery'&&v4JobExecutorEnabled\(env\)/);
+ assert.match(route,/if\(v4JobExecutorEnabled\(env\)&&\['verification','reporting'\]\.includes\(lane\)\)return fail\('AI_JOB_LANE_REQUIRES_JOB_STEP',409\)/);
+ assert.match(route,/const lane=checkpoint\.phase==='reporting'\?'reporting':'verification'/);
+ assert.match(worker,/if\(!jobsEnabled\)return \{status:'FAILED',error:'AI_JOB_EXECUTOR_DISABLED'\}/);
+ assert.match(orchestrator,/independentStagedMatchingEnabled\(env\)\?\{mode:'staged'\}/);
+ const {independentStagedMatchingEnabled}=await import('../functions/_lib/v4-background-match.js');
+ const env={HHBA_V4_STAGE_WORKFLOWS:'1',HHBA_MATCH_BACKGROUND:{fetch(){}},HHBA_V4_JOB_QUEUE_ENABLED:'1',HHBA_V4_JOB_EXECUTOR_ENABLED:'1'};
+ assert.equal(independentStagedMatchingEnabled(env),true);
+ assert.equal(independentStagedMatchingEnabled({...env,HHBA_V4_JOB_EXECUTOR_ENABLED:'0'}),false);
+ assert.equal(independentStagedMatchingEnabled({...env,HHBA_V4_JOB_QUEUE_ENABLED:'0'}),false);
+ assert.equal(independentStagedMatchingEnabled({...env,HHBA_V4_STAGE_WORKFLOWS:'0'}),false);
 });

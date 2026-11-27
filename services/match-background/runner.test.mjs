@@ -231,18 +231,20 @@ test('stage Workflow IDs are deterministic, isolated and opaque',async()=>{
  assert.equal(await stageWorkflowId(instance,'verification'),ids[1]);
  await assert.rejects(stageWorkflowId(instance,'untrusted'),/INVALID_STAGE_INSTANCE/);
 });
-test('three staged durable cloud instances remain asleep until their real saved checkpoint needs work',async()=>{
- const lane='verification',payloads=[],waits=[];
- const step={async do(n,conf,fn){return fn()},async waitForEvent(n,options){waits.push([n,options.type]);return undefined;}};
- const statuses=['CONTINUE','HANDOFF','COMPLETE'];
- const result=await driveBackgroundMatch(step,ticket,async(_url,init)=>{
+test('staged JD worker starts only after wake and never touches master research API',async()=>{
+ const lane='verification',payloads=[],waits=[],stepNames=[];
+ const step={async do(name,_conf,fn){stepNames.push(name);return fn()},async waitForEvent(name,options){waits.push([name,options.type]);return {payload:{done:false}}}};
+ const statuses=['DONE','FINISHED'];
+ const result=await driveBackgroundMatch(step,ticket,async(url,init)=>{
+  assert.ok(url.endsWith('/background-job-step'),'JD must not call global background-step');
   const body=JSON.parse(init.body);payloads.push(body);
   assert.equal(body.lane,lane);assert.equal(body.ticket,ticket);
-  return event('complete',{status:statuses.shift()});
- },{lane});
+  return Response.json({status:statuses.shift()});
+ },{lane,jobsEnabled:true});
  assert.deepEqual(result,{status:'COMPLETE'});
- assert.deepEqual(waits.map(x=>x[1]),['wake_verification','wake_verification']);
- assert.equal(payloads.length,3);
+ assert.deepEqual(waits.map(x=>x[1]),['wake_verification']);
+ assert.deepEqual(stepNames,['independent-verification-0']);
+ assert.equal(payloads.length,2);
 });
 test('one failed stage wake safely returns to the single-owner legacy driver',async()=>{
  const bodies=[],step={async do(_n,_c,fn){return fn()},async waitForEvent(){throw Error('must not park after failed wake')}};
@@ -394,4 +396,13 @@ test('incomplete second-round response retries the original ticket and preserves
  assert.ok(calls.every(x=>x.ticket===ticket));
  assert.equal(calls[2].recovery,'AI_BACKGROUND_RESPONSE_INCOMPLETE');
  assert.deepEqual(sleeps,['15 seconds']);
+});
+
+
+test('misconfigured staged verifier fails closed instead of taking discovery master lease',async()=>{
+ let mainCalls=0,jobCalls=0;
+ const step={async waitForEvent(){return {payload:{done:false}};},async do(){throw Error('no execution should occur');}};
+ const result=await driveBackgroundMatch(step,ticket,async url=>{if(url.endsWith('/background-step'))mainCalls++;else jobCalls++;return event('complete',{status:'COMPLETE'});},{lane:'verification',jobsEnabled:false});
+ assert.deepEqual(result,{status:'FAILED',error:'AI_JOB_EXECUTOR_DISABLED'});
+ assert.equal(mainCalls,0);assert.equal(jobCalls,0);
 });
