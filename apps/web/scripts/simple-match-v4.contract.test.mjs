@@ -36,7 +36,7 @@ test('V4 holds model requests server-side, refuses redirects, sets store=false',
 });
 test('V4 detects silent provider SSE, preserving earlier live events for checkpoint recovery',async()=>{
  let eventCount=0,idleCount=0,cancelled=false;
- const payload='data: '+JSON.stringify({type:'response.web_search_call.searching'})+'\\n\\n';
+ const payload='data: '+JSON.stringify({type:'response.web_search_call.searching'})+'\n\n';
  const body=new ReadableStream({
   start(controller){controller.enqueue(new TextEncoder().encode(payload));},
   cancel(){cancelled=true;}
@@ -56,7 +56,7 @@ test('V4 detects silent provider SSE, preserving earlier live events for checkpo
 });
 
 test('V4 active streamed research can exceed the idle window across multiple chunks',async()=>{
- const emit=(type,response)=>'data: '+JSON.stringify({type,...(response?{response}:{})})+'\\n\\n';
+ const emit=(type,response)=>'data: '+JSON.stringify({type,...(response?{response}:{})})+'\n\n';
  const events=[
   emit('response.web_search_call.searching'),
   emit('response.web_search_call.completed'),
@@ -64,13 +64,13 @@ test('V4 active streamed research can exceed the idle window across multiple chu
  ];
  const body=new ReadableStream({
   async start(controller){
-   for(const event of events){controller.enqueue(new TextEncoder().encode(event));await new Promise(r=>setTimeout(r,12));}
-   controller.close();
+   for(const event of events){controller.enqueue(new TextEncoder().encode(event));await new Promise(r=>setTimeout(r,45));}
+   try{controller.close()}catch{}
   }
  });
  const response=new Response(body,{headers:{'content-type':'text/event-stream'}});
  let timedOut=false;
- const completed=await v4ReadProviderResponse(response,{streamIdleMs:100,onStreamIdle:()=>{timedOut=true;}});
+ const completed=await v4ReadProviderResponse(response,{streamIdleMs:80,onStreamIdle:()=>{timedOut=true;}});
  assert.equal(completed.status,'completed');
  assert.equal(timedOut,false);
 });
