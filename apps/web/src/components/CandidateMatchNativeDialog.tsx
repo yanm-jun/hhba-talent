@@ -3,7 +3,7 @@ import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,X,LoaderCircle} from 'lucide-react';
 import {MatchResearchPanels,matchStageIndex} from './MatchResearchPanels';
 import {isVerifiedMatchReport,verifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
-import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
+import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress,MatchExecution} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
 import type {CandidateProfile,JobMatch} from '../services/resumeMatching';
 import {capturePriorMatchAnalysis} from '../services/jobJdArchive';
@@ -31,11 +31,11 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 const archivedHistoryJob=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.reference_jd_kind!=='AI_GENERATED_REFERENCE'&&/^jd_[a-f0-9]{32}$/.test(job.jd_version_id||'')&&/^[a-f0-9]{64}$/.test(job.jd_sha256||'');
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false,taskStartedAt}:{
+export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,execution,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false,taskStartedAt}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
  onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
- progressActivity?:NativeMatchActivity|null;
+ progressActivity?:NativeMatchActivity|null;execution?:MatchExecution|null;
  researchReport?:MatchResearchReport;researchJobs?:MatchedJob[];
  notice?:string;resumeStorage?:ResumeStorageAction;
  sourceText?:string;sourceResume?:PrivateResume;accountScope?:string;
@@ -197,7 +197,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice}{result.matches.length>0?' 已显示本次收到的岗位；请核对招聘原始页面。':''}</p>}
-     {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} provisional={taskFailed} progressStage={progressStage} activity={progressActivity} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
+     {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} provisional={taskFailed} progressStage={progressStage} activity={progressActivity} execution={execution} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
      {pending&&!optimizedJobUrl&&selectedStage!==1&&<><div className="hhba-research-now" role="status">
       <LoaderCircle size={18} className="spin" aria-hidden="true"/>
       <div className="hhba-match-progress-copy">
