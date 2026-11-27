@@ -91,10 +91,15 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    checkpoint=latest.checkpoint;
    const located=await locateV4ClaimCandidate(checkpoint,taskKey,claim.job_key);
    url=located?.url;source=located?.source;
-   if(!url||!source)return {status:'STALE'};
-   activeScore=sourceFor(checkpoint,url);
-   const version=lane==='reporting'?reportWorkRevision(source,activeScore):candidateRevision(source);
-   if(!version||await revKey(version)!==claim.revision)return {status:'STALE'};
+   activeScore=url?sourceFor(checkpoint,url):null;
+   const version=source?(lane==='reporting'?reportWorkRevision(source,activeScore):candidateRevision(source)):null;
+   if(!url||!source||!version||await revKey(version)!==claim.revision){
+    // Once the authoritative checkpoint no longer contains this revision,
+    // retire the obsolete queue row. Otherwise the 500-job incremental
+    // reconciler could repeatedly lease the same invalid row forever.
+    done=await finishV4JobWork(db,claim,{completed:true});
+    return {status:'STALE'};
+   }
   }
   // Legacy saved per-job checkpoints predate the original-source seed.
   // After the authoritative checkpoint validated this job revision, these
