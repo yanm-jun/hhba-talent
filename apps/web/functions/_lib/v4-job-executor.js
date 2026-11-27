@@ -62,26 +62,36 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
  const generation=task.generation,db=env.HHBA_PNVS_AUTH_DB;
  const claim=await claimV4JobWork(db,taskKey,generation,lane,{leaseMs:300000});
  if(!claim)return {status:'EMPTY'};
- let heartbeat=null,leaseLost=false,done=false;
+ let heartbeat=null,leaseLost=false,done=false,retryError=null;
  try{
-  const latest=await readMatchTask(env,taskKey);
-  if(latest?.generation!==generation||latest.result||!latest.checkpoint)return {status:'STALE'};
-  const checkpoint=latest.checkpoint;
-  const located=await locateV4ClaimCandidate(checkpoint,taskKey,claim.job_key);
-  const url=located?.url,source=located?.source;
-  if(!url||!source)return {status:'STALE'};
-  const activeScore=sourceFor(checkpoint,url);
-  const currentVersion=lane==='reporting'?reportWorkRevision(source,activeScore):candidateRevision(source);
-  if(!currentVersion||await revKey(currentVersion)!==claim.revision)return {status:'STALE'};
+  // Reuse an encrypted one-job continuation, fenced to this exact D1
+  // generation, claim, original job URL and source revision. Fall back to the
+  // authoritative full research checkpoint for first attempts/legacy state.
   const resultKey=await independentJobKey(taskKey,generation,lane,claim.job_key,claim.revision);
   const previous=await readMatchTask(env,resultKey);
-  if(previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.complete&&previous.job){
-   done=true;
-   await finishV4JobWork(db,claim,{completed:true});
+  const seedUrl=previous?.source_url,seedSource=previous?.seed_source,seedScore=previous?.seed_score;
+  const exactSeed=previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.generation===generation&&
+   previous.lane===lane&&previous.job_key===claim.job_key&&previous.revision===claim.revision&&
+   typeof seedUrl==='string'&&seedSource&&previous.checkpoint&&
+   await workKey(taskKey,seedUrl)===claim.job_key&&
+   await revKey(lane==='reporting'?reportWorkRevision(seedSource,seedScore):candidateRevision(seedSource))===claim.revision;
+  let checkpoint=null,url=seedUrl,source=seedSource,activeScore=seedScore;
+  if(!exactSeed){
+   const latest=await readMatchTask(env,taskKey);
+   if(latest?.generation!==generation||latest.result||!latest.checkpoint)return {status:'STALE'};
+   checkpoint=latest.checkpoint;
+   const located=await locateV4ClaimCandidate(checkpoint,taskKey,claim.job_key);
+   url=located?.url;source=located?.source;
+   if(!url||!source)return {status:'STALE'};
+   activeScore=sourceFor(checkpoint,url);
+   const version=lane==='reporting'?reportWorkRevision(source,activeScore):candidateRevision(source);
+   if(!version||await revKey(version)!==claim.revision)return {status:'STALE'};
+  }
+  if(previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.complete&&previous.job&&exactSeed){
+   done=true;await finishV4JobWork(db,claim,{completed:true});
    return {status:'DONE',lane,cached:true};
   }
-  let child=previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.generation===generation?
-   previous.checkpoint:null;
+  let child=exactSeed?previous.checkpoint:null;
   if(!child)child=oneJobCheckpoint(checkpoint,url,source,lane);
   const budget=v4ManagedResourceBudget({background:true,recovering:!!previous});
   const scoped=budget.env(env),provider=v4JobProvider(scoped);
@@ -100,32 +110,33 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    if(e?.code==='AI_AGENT_CANCELLED')throw e;
    const snapshot=recovery();
    if(snapshot&&!leaseLost&&await renewV4JobWork(db,claim,{leaseMs:300000})){
-    await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,job_key:claim.job_key,checkpoint:snapshot,complete:false});
+    await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
+     job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,checkpoint:snapshot,complete:false});
    }
-   return {status:'RETRY',error:errorCode(e)};
+   retryError=errorCode(e);return {status:'RETRY',error:retryError};
   }
   const snapshot=run.status==='CONTINUE'?run.checkpoint:run.resume_checkpoint||recovery();
   const result=jobFromCheckpoint(snapshot,url,source)||run.matches?.find(x=>itemUrl(x)===url)||null;
   done=lane==='verification'?!!result&&(snapshot?.phase==='reporting'||run.status==='COMPLETE'):
    !!result&&doneReport(result);
   await assertSessionTaskActive(env,session,task.id,generation);
-  // Fence against a changed candidate, canceled task or reclaimed lease.
-  const current=await readMatchTask(env,taskKey);
-  const live=eligibleJob(current?.checkpoint,url);
-  const liveVersion=lane==='reporting'?reportWorkRevision(live,sourceFor(current?.checkpoint,url)):live&&candidateRevision(live);
-  if(current?.generation!==generation||current.result||!live||!liveVersion||await revKey(liveVersion)!==claim.revision)throw Object.assign(Error('AI_CHECKPOINT_INVALID'),{code:'AI_CHECKPOINT_INVALID'});
+  // The active session plus exact D1 lease authorize tentative job storage.
+  // The authoritative master snapshot is verified later by both merge and
+  // browser delta readers; a stale sidecar can never become deliverable JD.
+  // Avoid decrypting a 500-job master checkpoint again after the AI call.
   if(leaseLost||!await renewV4JobWork(db,claim,{leaseMs:300000}))throw Object.assign(Error('AI_CHECKPOINT_LEASE_LOST'),{code:'AI_CHECKPOINT_LEASE_LOST'});
-  await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,job_key:claim.job_key,checkpoint:snapshot,job:result,complete:done,source_url:url});
+  await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
+   job_key:claim.job_key,checkpoint:snapshot,job:result,complete:done,source_url:url,seed_source:source,seed_score:activeScore});
   await finishV4JobWork(db,claim,{completed:done,continued:!done});
   return {status:done?'DONE':'CONTINUE',lane,
    ...(done?{evidence:{verified_jd:lane==='verification'&&result?.jd_source_status==='VERIFIED_JD',
      scored:lane==='verification'&&Number.isInteger(result?.match_score),
      report:lane==='reporting'&&qualifiedReport(result)}}:{})};
  }catch(e){
-  return {status:'RETRY',error:errorCode(e)};
+  retryError=errorCode(e);return {status:'RETRY',error:retryError};
  }finally{
   if(heartbeat)clearInterval(heartbeat);
-  if(!done)await finishV4JobWork(db,claim,{completed:false}).catch(()=>{});
+  if(!done)await finishV4JobWork(db,claim,{completed:false,error:retryError}).catch(()=>{});
  }
 }
 
