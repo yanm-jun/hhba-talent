@@ -36,8 +36,17 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
   if(recoverableCodes.has(code)||response.status===408||response.status===425||response.status===429||response.status>=500)throw retry(code);
   return terminal('FAILED',code);
  }
- let text;try{text=await response.text();}catch{throw retry('AI_BACKGROUND_TRANSPORT_INTERRUPTED');}
- for(const event of text.replace(/\r\n/g,'\n').split('\n\n')){
+ // Consume SSE incrementally: a committed terminal event is authoritative even
+ // if the connection subsequently drops during metrics or cleanup.
+ const reader=response.body?.getReader();if(!reader)throw retry('AI_BACKGROUND_RESPONSE_INCOMPLETE');
+ const decoder=new TextDecoder();let buffer='';
+ try{while(true){
+  let chunk;try{chunk=await reader.read();}catch{throw retry('AI_BACKGROUND_TRANSPORT_INTERRUPTED');}
+  buffer+=(chunk.done?decoder.decode():decoder.decode(chunk.value,{stream:true}));
+  buffer=buffer.replace(/\r\n/g,'\n');
+  const frames=buffer.split('\n\n');buffer=frames.pop()||'';
+  if(chunk.done&&buffer.trim())frames.push(buffer);
+  for(const event of frames){
   const kind=event.split('\n').find(x=>x.startsWith('event: '))?.slice(7);
   if(kind!=='complete'&&kind!=='failure')continue;
   const line=event.split('\n').find(x=>x.startsWith('data: '));
@@ -54,7 +63,9 @@ export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lan
   if(value?.status==='HANDOFF')return terminal('HANDOFF');
    if(value?.status==='CONTINUE'&&value?.waiting_for_jobs===true)return terminal('WAIT_JOBS');
    if(value?.status==='CONTINUE')return value?.fallback===true&&diagnostic?{status:'CONTINUE',fallback:true}:terminal('CONTINUE');
- }
+  }
+  if(chunk.done)break;
+ }}finally{try{reader.releaseLock();}catch{}}
  throw retry('AI_BACKGROUND_RESPONSE_INCOMPLETE');
 }
 // Each job-step is a distinct Pages invocation with its own resource budget,
