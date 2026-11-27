@@ -136,7 +136,9 @@ test('each batch eventually admits all 500 verified research candidates without 
  const unchanged=await reconcileV4JobWork(db,taskKey,0,cp,{now:2000});
  assert.equal(unchanged.createdOrUpdated,0,'fully reconciled jobs never repeat their insert');
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
- const entry=route.indexOf('const merged=await mergeIndependentV4Jobs('),sync=route.indexOf('const queue=await reconcileV4JobWork(',pending=route.indexOf('researchEnv.__v4IndependentPending=await pendingIndependentV4Work(');
+ const entry=route.indexOf('const merged=await mergeIndependentV4Jobs(');
+ const sync=route.indexOf('const queue=await reconcileV4JobWork(');
+ const pending=route.indexOf('researchEnv.__v4IndependentPending=await pendingIndependentV4Work(');
  assert.ok(entry>0&&sync>entry&&pending>sync,'queue is incrementally reconciled before any phase decides that independent work is done');
 });
 test('failed verification jobs cool down durably instead of permanently disappearing at three errors',async()=>{
