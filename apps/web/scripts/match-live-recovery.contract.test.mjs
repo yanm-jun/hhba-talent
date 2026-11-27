@@ -60,7 +60,9 @@ test('managed polling retains the complete report and uses the same report gate 
  assert.ok(publisher.includes('routine:20000,candidate:3000,report:1000'),'ordinary heartbeat throttling must not delay new results');
  assert.ok(route.includes('budget?.canPublishProgress(kind)'),'publication checks the dedicated progress allowance');
  assert.ok(route.includes('budget?.tryProgress(kind)'),'actual writes atomically reserve counted capacity');
- assert.ok(route.includes('progressReserve:input.background?4:0'),'managed background progress has explicit reserved capacity');
+ const budgetSource=readFileSync(new URL('../functions/_lib/v4-phase-budget.js',import.meta.url),'utf8');
+ assert.ok(route.includes('v4ManagedResourceBudget({background:input.background,recovering:input.resourceRecovery})')&&
+  budgetSource.includes('progressReserve:background?4:0'),'managed background progress has explicit reserved capacity');
  assert.ok(/const reports=verifiedMatchReports\(liveCandidates\.jobs\(\)\);\s*onPartial\?\.\(reports\)/.test(service),'polling must feed the report pager, not just search results');
  assert.ok(dialog.includes('hasCompleteReport?2:'),'the first available report is shown without waiting for all candidates');
  assert.ok(panels.includes("pending||provisional?'已完成报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
