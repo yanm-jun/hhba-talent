@@ -552,7 +552,7 @@ export async function onRequest(context){
  if(suffix==='/status'&&request.method==='GET'){
   // Expose only coarse readiness flags, never credentials or user information.
   const readiness={host:allowedHost(request),service:env?.HHBA_MATCH_V4_READY==='1',provider:Boolean(v4Provider(env)),job_provider:Boolean(v4JobProvider(env)),database:typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function',checkpoint_key:!!checkpointEnv(env),checkpoint_storage:checkpointStorageReady(env)};
-  return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:matchEnabled(env,request),
+  return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',release_id:'20261127-p0-p1-reliability',enabled:matchEnabled(env,request),
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:readiness.checkpoint_key,encrypted_checkpoint_storage:readiness.checkpoint_storage,dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'||typeof env.BROWSER?.script==='function',readiness});
  }
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
