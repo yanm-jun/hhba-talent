@@ -112,6 +112,11 @@ export const resumeMatchFileLimit=(format:string|null)=>MATCH_V4_PREVIEW&&format
 const errorMap:Record<string,string>={
   AI_BACKGROUND_SCHEDULE_UNAVAILABLE:'独立后台调度暂时不可用，已保留原研究任务。',
   AI_AGENT_CANCELLED:'该研究任务已经终止或当前会话已失效。',
+  AI_TASK_USER_CANCELLED:'已按用户要求终止本次岗位匹配。',
+  AI_AUTH_SESSION_EXPIRED:'登录状态已失效，后台已停止调用 AI；请重新登录。',
+  AI_TASK_SUPERSEDED:'检测到不同研究任务版本，已拒绝旧任务继续执行。',
+  AI_TASK_CLOSED:'该次岗位匹配已经正常关闭。',
+  AI_TASK_NOT_ACTIVE:'当前登录会话中没有可继续的研究任务。',
   AI_CHECKPOINT_INVALID:'原研究任务状态已变化，请重新查看任务。',
   AI_CHECKPOINT_DB_UNAVAILABLE:'任务恢复存储暂时不可用，正在保留原任务。',
   MATCH_NOT_ENABLED:'智能匹配服务尚未开放，请稍后再试。',

@@ -9,6 +9,7 @@ import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
 import {v4JobMetricSample,recordV4JobOps} from '../../_lib/v4-job-ops-metrics.js';
+import {recordV4MinuteOps} from '../../_lib/v4-minute-performance.js';
 import {v4CheckpointLane,isV4StageLane,stagedV4WorkflowsEnabled,stageWorkflowSignal} from '../../_lib/v4-stage-workflows.js';
 import {mergeLiveJobProgress,createV4JobEventJournal} from '../../_lib/v4-job-progress.js';
 import {v4JobWorkQueueEnabled,reconcileV4JobWork,clearV4JobWork} from '../../_lib/v4-job-work-queue.js';
@@ -375,12 +376,13 @@ function events(env,request,input,waitUntil){
      const reason=leaseAbort.signal.reason;
      const rawCode=typeof reason?.code==='string'?reason.code:typeof e?.code==='string'?e.code:leaseAbort.signal.aborted?'AI_CHECKPOINT_LEASE_LOST':/^[A-Z][A-Z0-9_]{5,80}$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
      const code=rawCode==='PIPELINE_DISCOVERY_PHASE_INVALID'?'AI_PIPELINE_STATE_INVALID':rawCode;
+      const taskStopped=['AI_AGENT_CANCELLED','AI_TASK_USER_CANCELLED','AI_AUTH_SESSION_EXPIRED','AI_TASK_SUPERSEDED','AI_TASK_CLOSED','AI_TASK_NOT_ACTIVE'].includes(code);
      // A later history/progress failure must not replace an already committed
      // completed result with an old checkpoint and repeat paid model calls.
      if(committedResult){
       metricOutcome='COMPLETE';
       await releaseTask();await finishWorkflowStages();
-      if(code==='AI_AGENT_CANCELLED'){send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:false});return;}
+      if(taskStopped){send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:false});return;}
       await publishProgress('COMPLETE');await finishWorkflowStages();sendFinal(committedResult);succeeded=true;return;
      }
      if((code===PHASE_YIELD||budget?.denied)&&input.taskKey&&input.lease&&!leaseAbort.signal.aborted){
@@ -407,8 +409,8 @@ function events(env,request,input,waitUntil){
       metricError=code==='AI_PROVIDER_UPSTREAM_ERROR'&&/^(?:HTTP_5[0-9]{2}|SSE_FAILED)$/.test(upstreamKind)?'AI_PROVIDER_'+upstreamKind:code;
      const retryable=!isV4TerminalTaskFailure(code)&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
       if(retryable)runtimeState='recovering';
-      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null),generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable,...(e?.upstreamKind==='SSE_FAILED'?{upstream_kind:'SSE_FAILED'}:{})}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
-      if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
+      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&!taskStopped){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null),generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable,...(e?.upstreamKind==='SSE_FAILED'?{upstream_kind:'SSE_FAILED'}:{})}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
+      if(!taskStopped&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,upstream_kind:metricError!==code?upstreamKind:null,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
       if(!retryable)await finishWorkflowStages();
       send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
@@ -419,11 +421,13 @@ function events(env,request,input,waitUntil){
      if(input.claim&&(!succeeded||closed))await input.claim.release().catch(()=>console.warn('HHBA_CHECKPOINT_RELEASE_FAILED'));
      if(succeeded&&!closed&&input.pointer)await deleteMatchCheckpoint(env,input.pointer).catch(()=>console.warn('HHBA_CHECKPOINT_CLEANUP_FAILED'));
      await usageBuffer?.flush();
-     if(input.managed){const snapshot=delivery.snapshot();await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,resources:budget?.snapshot(),events:jobJournal.snapshot().filter(e=>e.seq>initialEventSequence)}));
-      // Privacy-preserving cross-invocation measurements; never part of a research admission gate.
-      await recordV4SearchSpeed(env.HHBA_METRICS_DB,searchSpeed.snapshot(),metricOutcome);
-     }
-     if(!closed){closed=true;try{controller.close()}catch{}}
+     if(input.managed){const snapshot=delivery.snapshot(),newEvidence=jobJournal.snapshot().filter(e=>e.seq>initialEventSequence);
+       await recordV4PhaseOps(env.HHBA_METRICS_DB,v4PhaseMetricSample({started,lane:input.backgroundLane||'mixed',outcome:metricOutcome,error:metricError,recovering:!!input.recovering,first:snapshot.first,resources:budget?.snapshot(),events:newEvidence}));
+       // Minute observations must remain separate from paid AI admission.
+       await recordV4MinuteOps(env.HHBA_METRICS_DB,newEvidence,{source:'phase'});
+       await recordV4SearchSpeed(env.HHBA_METRICS_DB,searchSpeed.snapshot(),metricOutcome);
+      }
+      if(!closed){closed=true;try{controller.close()}catch{}}
     }
    })();
    if(input.managed&&typeof waitUntil==='function')waitUntil(execution);
@@ -478,7 +482,14 @@ async function backgroundJobStep(env,request){
   observed=v4JobMetricSample({started,lane:data.lane,status:'FAILED',error:code});
   console.warn('HHBA_V4_INDEPENDENT_JOB_FAILED',JSON.stringify({error:code}));return fail(code,503);
  }finally{
-  if(observed)await recordV4JobOps(env.HHBA_METRICS_DB,observed);
+  if(observed){
+   await recordV4JobOps(env.HHBA_METRICS_DB,observed);
+   const stamp=Date.now(),events=[];
+   if(observed.verified_jds)events.push({at:stamp,kind:'jd'});
+   if(observed.scored_jobs)events.push({at:stamp,kind:'score'});
+   if(observed.completed_reports)events.push({at:stamp,kind:'report'});
+   if(events.length)await recordV4MinuteOps(env.HHBA_METRICS_DB,events,{source:'independent'});
+  }
  }
 }
 // Only the already authenticated and generation-fenced managed match request
@@ -541,7 +552,7 @@ export async function onRequest(context){
  if(suffix==='/status'&&request.method==='GET'){
   // Expose only coarse readiness flags, never credentials or user information.
   const readiness={host:allowedHost(request),service:env?.HHBA_MATCH_V4_READY==='1',provider:Boolean(v4Provider(env)),job_provider:Boolean(v4JobProvider(env)),database:typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function',checkpoint_key:!!checkpointEnv(env),checkpoint_storage:checkpointStorageReady(env)};
-  return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',enabled:matchEnabled(env,request),
+  return reply({kind:KIND,engine:'HHBA_SIMPLE_AI_V4',release_id:'20261127-p0-p1-reliability',enabled:matchEnabled(env,request),
    scope:'CN_MAINLAND_ONLY',formats:['pdf','docx'],resumable:readiness.checkpoint_key,encrypted_checkpoint_storage:readiness.checkpoint_storage,dynamic_page_reader:typeof env.BROWSER?.quickAction==='function'||typeof env.BROWSER?.script==='function',readiness});
  }
  if(suffix==='/background-step')return backgroundStep(env,request,waitUntil);
@@ -596,7 +607,7 @@ export async function onRequest(context){
    return pendingManagedView(env,{managed:true,taskKey},body.generation,
     {job_delta:body.job_delta,job_cursor:body.job_cursor,progress_stamp:body.progress_stamp},
     view.progress,view.failure);
-  }catch(e){return fail(e?.code==='AI_AGENT_CANCELLED'?'AI_AGENT_CANCELLED':'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
+  }catch(e){return fail(/^AI_(?:AGENT_CANCELLED|TASK_USER_CANCELLED|AUTH_SESSION_EXPIRED|TASK_SUPERSEDED|TASK_CLOSED|TASK_NOT_ACTIVE)$/.test(e?.code||'')?e.code:'AI_CHECKPOINT_DB_UNAVAILABLE',e?.status||503);}
  }
  if(activeTaskRoute){
   if(!checkpointStorageReady(env))return fail('AI_CHECKPOINT_DB_UNAVAILABLE',503);

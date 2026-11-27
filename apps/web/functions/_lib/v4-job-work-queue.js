@@ -72,7 +72,16 @@ export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=D
 // PENDING rows also use lease_until_ms as an eligible-after timestamp after
 // failed attempts. They remain visible in the queue and are retried later;
 // unlike the old attempts<3 guard, no job silently becomes unclaimable.
-export const v4JobRetryDelayMs=attempt=>Math.min(1800000,30000*2**Math.min(6,Math.max(0,(Number(attempt)||1)-1)));
+export const v4JobRetryDelayMs=(attempt,error='')=>{
+ // The failure countdown controls only *when* a job may retry, never how many
+ // jobs or AI research attempts the system may perform. Transient errors
+ // recover in <=5m. Respect longer provider rate-limit and daily-cap recovery.
+ const maximum=error==='AI_EDGE_DAILY_LIMIT'?3600000:
+  error==='AI_PROVIDER_RATE_LIMITED'?600000:300000;
+ const minimum=error==='AI_PROVIDER_RATE_LIMITED'?60000:
+  error==='AI_EDGE_DAILY_LIMIT'?3600000:30000;
+ return Math.min(maximum,Math.max(minimum,30000*2**Math.min(8,Math.max(0,(Number(attempt)||1)-1))));
+};
 // Atomic D1 UPDATE ... RETURNING fences duplicate lease owners. The worker
 // must independently re-read encrypted checkpoint, verify revision, and check
 // task authorization before doing any AI research.
@@ -105,13 +114,13 @@ export async function renewV4JobWork(db,claim,{now=Date.now(),leaseMs=120000}={}
  .bind(until,now,claim.task_key,claim.generation,claim.lane,claim.job_key,claim.revision,claim.owner,now).run();
  return r?.meta?.changes===1;
 }
-export async function finishV4JobWork(db,claim,{now=Date.now(),completed=true,continued=false}={}){
+export async function finishV4JobWork(db,claim,{now=Date.now(),completed=true,continued=false,error=''}={}){
  if(!db?.prepare||!valid(claim?.task_key,claim?.generation)||!laneOk(claim?.lane))return false;
  const state=completed?'COMPLETED':'PENDING';
  // Each real failure receives an increasing durable cooldown, not an
  // artificial maximum number of research attempts. A successful continuation
  // clears the cooldown and restores normal queue scheduling.
- const eligibleAt=completed||continued?0:now+v4JobRetryDelayMs(claim.attempts);
+ const eligibleAt=completed||continued?0:now+v4JobRetryDelayMs(claim.attempts,error);
  const r=await db.prepare(`UPDATE hhba_v4_job_work_queue SET
  state=?,lease_owner=NULL,lease_until_ms=?,updated_at_ms=?,attempts=CASE WHEN ?=1 THEN MAX(0,attempts-1) ELSE attempts END
  WHERE task_key=? AND generation=? AND lane=? AND job_key=?

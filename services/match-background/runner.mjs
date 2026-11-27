@@ -4,7 +4,7 @@ import {validStageLane} from './stages.mjs';
 const safeCode=(v,fallback)=>typeof v==='string'&&/^(?:AI_[A-Z0-9_]{3,90}|BACKGROUND_[A-Z0-9_]{3,90})$/.test(v)?v:fallback;
 const retry=code=>Object.assign(Error('BACKGROUND_PHASE_RETRY:'+code),{code});
 const retryCode=e=>safeCode(e?.code||String(e?.message||'').match(/^BACKGROUND_PHASE_RETRY:([A-Z0-9_]+)$/)?.[1],'AI_BACKGROUND_TRANSPORT_INTERRUPTED');
-const stopCodes=new Set(['AI_AGENT_CANCELLED','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED']);
+const stopCodes=new Set(['AI_AGENT_CANCELLED','AI_TASK_USER_CANCELLED','AI_AUTH_SESSION_EXPIRED','AI_TASK_SUPERSEDED','AI_TASK_CLOSED','AI_TASK_NOT_ACTIVE','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED']);
 const permanentCodes=new Set(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT','AI_PROVIDER_NOT_CONFIGURED','AI_PROVIDER_UNSUPPORTED','AI_PROVIDER_REQUEST_REJECTED','AI_PROVIDER_REDIRECT_BLOCKED','AI_BACKGROUND_REQUEST_INVALID','AI_BACKGROUND_REDIRECT_BLOCKED','AI_CHECKPOINT_INVALID','AI_BACKGROUND_TASK_PAUSED','AI_CHECKPOINT_ALREADY_USED']);
 const recoverableCodes=new Set(['AI_PHASE_RESOURCE_YIELD','AI_PIPELINE_STATE_INVALID','AI_BACKGROUND_EXECUTION_FAILED','AI_BACKGROUND_HTTP_408','AI_BACKGROUND_HTTP_425','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UNAVAILABLE','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_EMPTY','AI_PROVIDER_INCOMPLETE','AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT','AI_BACKGROUND_RESPONSE_INVALID','AI_BACKGROUND_TRANSPORT_INTERRUPTED','AI_BACKGROUND_RESPONSE_INCOMPLETE','AI_TASK_IN_PROGRESS']);
 const pending=(error)=>({status:'RECOVERING',error});
@@ -12,9 +12,14 @@ export function recoveryDelaySeconds(code,streak=1){
  // A lease is released by its owner or expires after a few minutes. Do not
  // turn temporary ownership contention into a half-hour research delay.
  if(code==='AI_TASK_IN_PROGRESS')return Math.min(60,15*Math.max(1,streak));
+ // Transient network, provider or Cloudflare resource trouble must not park
+ // the matching workflow for a half hour. The sleep is durable and does not
+ // consume paid AI calls while waiting; there is no task-wide attempt cap.
  const ordinary=[15,30,60,120,300,600,1800][Math.min(6,Math.max(0,streak-1))];
- const minimum=code==='AI_EDGE_DAILY_LIMIT'?3600:code==='AI_EDGE_RESOURCE_EXHAUSTED'?180:code==='AI_PROVIDER_RATE_LIMITED'?60:15;
- return Math.max(minimum,ordinary);
+ if(code==='AI_EDGE_DAILY_LIMIT')return 3600;
+ if(code==='AI_PROVIDER_RATE_LIMITED')return Math.min(600,Math.max(60,ordinary));
+ if(code==='AI_EDGE_RESOURCE_EXHAUSTED')return Math.min(300,Math.max(180,ordinary));
+ return Math.min(300,ordinary);
 }
 export async function requestPhase(fetcher,ticket,{diagnostic=false,recovery,lane,stagedFallback=false}={}){
  const terminal=(status,error)=>diagnostic?{status,...(error?{error}: {})}:status;

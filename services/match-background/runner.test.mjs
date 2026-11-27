@@ -68,10 +68,19 @@ test('edge-compatible manual redirects never send ticket to another destination'
  assert.equal(calls,5);
 });
 test('explicit termination, revocation or expired ticket never starts another phase',async()=>{
- for(const error of ['AI_AGENT_CANCELLED','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED']){
+ for(const error of ['AI_AGENT_CANCELLED','AI_TASK_USER_CANCELLED','AI_AUTH_SESSION_EXPIRED','AI_TASK_SUPERSEDED','AI_TASK_CLOSED','AI_TASK_NOT_ACTIVE','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED']){
   assert.equal(await requestPhase(async()=>Response.json({error},{status:409}),ticket),'STOP');
  }
  assert.equal(await requestPhase(async()=>event('failure',{error:'AI_AGENT_CANCELLED'}),ticket),'STOP');
+});
+test('temporary failure backoff is short and stable, rate/daily caps remain protected',async()=>{
+ const {recoveryDelaySeconds}=await import('./runner.mjs');
+ for(const code of ['AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_EDGE_RESOURCE_EXHAUSTED']){
+  assert.ok(recoveryDelaySeconds(code,50)<=300);
+  assert.ok(recoveryDelaySeconds(code,50)>=15);
+ }
+ assert.equal(recoveryDelaySeconds('AI_PROVIDER_RATE_LIMITED',50),600);
+ assert.equal(recoveryDelaySeconds('AI_EDGE_DAILY_LIMIT',50),3600);
 });
 test('lease conflict and interrupted response are retried, not treated as completed',async()=>{
  await assert.rejects(requestPhase(async()=>Response.json({error:'AI_TASK_IN_PROGRESS'},{status:409}),ticket),/BACKGROUND_PHASE_RETRY/);
@@ -162,7 +171,7 @@ test('temporary failures beyond five attempts still recover the original task wi
   return next==='retry'?new Response(null,{status:503}):event('complete',{status:next});
  });
  assert.deepEqual(result,{status:'COMPLETE'});assert.equal(calls.length,11);assert.ok(calls.every(t=>t===ticket));assert.equal(new Set(names).size,names.length);
- assert.deepEqual(sleeps,['15 seconds','30 seconds','60 seconds','120 seconds','300 seconds','600 seconds','1800 seconds','1800 seconds','15 seconds']);
+ assert.deepEqual(sleeps,['15 seconds','30 seconds','60 seconds','120 seconds','300 seconds','300 seconds','300 seconds','300 seconds','15 seconds']);
 });
 test('daily resource exhaustion waits, then an explicitly cancelled task does not call another paid phase',async()=>{
  const sleeps=[],calls=[];const values=[new Response('<h1>Error 1027</h1>',{status:429}),Response.json({error:'AI_AGENT_CANCELLED'},{status:401})];
