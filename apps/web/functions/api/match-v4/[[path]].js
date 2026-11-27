@@ -576,6 +576,7 @@ export async function onRequest(context){
  try{
   const text=await request.text();
   if(text.length>8000000)return fail('INVALID_RESUME_TEXT',413);
+  if(suffix==='/progress'&&text.length>4096)return fail('INVALID_REQUEST',413);
   body=JSON.parse(text);
  }catch{return fail('INVALID_REQUEST',400)}
  if(suffix==='/progress'){
