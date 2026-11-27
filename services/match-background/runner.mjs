@@ -5,7 +5,7 @@ const safeCode=(v,fallback)=>typeof v==='string'&&/^(?:AI_[A-Z0-9_]{3,90}|BACKGR
 const retry=code=>Object.assign(Error('BACKGROUND_PHASE_RETRY:'+code),{code});
 const retryCode=e=>safeCode(e?.code||String(e?.message||'').match(/^BACKGROUND_PHASE_RETRY:([A-Z0-9_]+)$/)?.[1],'AI_BACKGROUND_TRANSPORT_INTERRUPTED');
 const stopCodes=new Set(['AI_AGENT_CANCELLED','AI_TASK_USER_CANCELLED','AI_AUTH_SESSION_EXPIRED','AI_TASK_SUPERSEDED','AI_TASK_CLOSED','AI_TASK_NOT_ACTIVE','AI_BACKGROUND_TICKET_INVALID','AI_CHECKPOINT_EXPIRED']);
-const permanentCodes=new Set(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT','AI_PROVIDER_NOT_CONFIGURED','AI_PROVIDER_UNSUPPORTED','AI_PROVIDER_REQUEST_REJECTED','AI_PROVIDER_REDIRECT_BLOCKED','AI_BACKGROUND_REQUEST_INVALID','AI_BACKGROUND_REDIRECT_BLOCKED','AI_CHECKPOINT_INVALID','AI_BACKGROUND_TASK_PAUSED','AI_CHECKPOINT_ALREADY_USED']);
+const permanentCodes=new Set(['AI_PROVIDER_KEY_REJECTED','AI_PROVIDER_BALANCE_INSUFFICIENT','AI_PROVIDER_NOT_CONFIGURED','AI_PROVIDER_UNSUPPORTED','AI_PROVIDER_REQUEST_REJECTED','AI_PROVIDER_REDIRECT_BLOCKED','AI_BACKGROUND_REQUEST_INVALID','AI_BACKGROUND_REDIRECT_BLOCKED','AI_CHECKPOINT_INVALID','AI_BACKGROUND_TASK_PAUSED','AI_CHECKPOINT_ALREADY_USED','AI_JOB_LANE_REQUIRES_JOB_STEP','AI_JOB_EXECUTOR_DISABLED']);
 const recoverableCodes=new Set(['AI_PHASE_RESOURCE_YIELD','AI_PIPELINE_STATE_INVALID','AI_BACKGROUND_EXECUTION_FAILED','AI_BACKGROUND_HTTP_408','AI_BACKGROUND_HTTP_425','AI_PROVIDER_NETWORK_ERROR','AI_PROVIDER_UPSTREAM_ERROR','AI_PROVIDER_TIMEOUT','AI_PROVIDER_RATE_LIMITED','AI_PROVIDER_UNAVAILABLE','AI_PROVIDER_RESPONSE_INVALID','AI_PROVIDER_RESPONSE_EMPTY','AI_PROVIDER_INCOMPLETE','AI_CHECKPOINT_DB_UNAVAILABLE','AI_CHECKPOINT_LEASE_LOST','AI_CHECKPOINT_STORAGE_UNAVAILABLE','AI_BACKGROUND_SCHEDULE_UNAVAILABLE','AI_EDGE_RESOURCE_EXHAUSTED','AI_EDGE_DAILY_LIMIT','AI_BACKGROUND_RESPONSE_INVALID','AI_BACKGROUND_TRANSPORT_INTERRUPTED','AI_BACKGROUND_RESPONSE_INCOMPLETE','AI_TASK_IN_PROGRESS']);
 const pending=(error)=>({status:'RECOVERING',error});
 export function recoveryDelaySeconds(code,streak=1){
@@ -135,7 +135,10 @@ export async function driveBackgroundMatch(step,ticket,fetcher,{maxSteps=400,lan
  if(currentLane&&currentLane!=='discovery'){
   const wake=await step.waitForEvent('initial-'+currentLane,{type:'wake_'+currentLane,timeout:'24 hours'});
   if(wake?.done||wake?.payload?.done)return {status:'COMPLETE'};
-  if(jobsEnabled)return driveIndependentJobLane(step,ticket,fetcher,{lane:currentLane,maxSteps});
+  // Hard fence: stage Workflows are NEVER allowed to become master-phase
+  // drivers, even when a rollout accidentally omits jobsEnabled.
+  if(!jobsEnabled)return {status:'FAILED',error:'AI_JOB_EXECUTOR_DISABLED'};
+  return driveIndependentJobLane(step,ticket,fetcher,{lane:currentLane,maxSteps});
  }
  for(let phase=0;phase<maxSteps;phase++){
   let state;
