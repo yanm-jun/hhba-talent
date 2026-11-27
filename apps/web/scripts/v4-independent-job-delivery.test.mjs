@@ -35,7 +35,6 @@ test('authenticated independent result reads are paginated by lossless composite
  const entries=sqlite.prepare("SELECT lane,job_key,revision FROM hhba_v4_job_work_queue ORDER BY job_key").all(),reads=new Map();
  reads.set(taskKey,{generation:0,checkpoint});
  for(const entry of entries){
-  const i=rows.findIndex(([u])=>entry.job_key===undefined||false);
   const row=await Promise.all(rows.map(async ([u])=>({url:u,key:await sha256Hex('HHBA_V4_JOB_WORK:'+taskKey+':'+u)})));
   const ix=row.findIndex(x=>x.key===entry.job_key);
   assert.ok(ix>=0);
