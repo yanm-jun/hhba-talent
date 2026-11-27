@@ -254,10 +254,14 @@ test('V4 has no per-model-call timeout and respects explicit cancellation',async
  const controller=new AbortController();let options;
  const fetcher=async(u,opts)=>{options=opts;return model({ok:true})};
  await v4Call(fetcher,provider,{input:'test'},{signal:controller.signal});
- assert.equal(options.signal,controller.signal);
+ assert.ok(options.signal instanceof AbortSignal);
+ assert.equal(options.signal.aborted,false);
+ controller.abort();
+ assert.equal(options.signal.aborted,true,'caller cancellation reaches the composed transport signal');
  const direct=async(u,opts)=>{options=opts;return model({ok:true})};
  await v4Call(direct,provider,{input:'test'});
- assert.equal(options.signal,undefined);
+ assert.ok(options.signal instanceof AbortSignal);
+ assert.equal(options.signal.aborted,false,'transport owns its recovery signal without a wall-clock deadline');
 });
 test('V4 frontend never rejects more than ten posts or cancels at the legacy five-minute deadline',async()=>{
  const {readFile}=await import('node:fs/promises');
