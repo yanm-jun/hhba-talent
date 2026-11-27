@@ -1287,3 +1287,82 @@ test('V4 stream interruption retains emitted lead without accepting a truncated 
  const result=await v4Call(async()=>Response.json(full),provider,{input:'synthetic'},{stage:'discovery',onDiscoveryJob:()=>{throw Error('observer failure');}});
  assert.deepEqual(result,full);
 });
+
+
+test('V4 no-cost acceptance: SSE error -> encrypted durable checkpoint -> JSON resume -> finished matching',async()=>{
+ // This exercises the real model adapter and V4 research checkpoint logic with
+ // a deterministic synthetic relay, never a real AI key or network request.
+ const {saveMatchTask,readMatchTask}=await import('../functions/_lib/v4-match-checkpoint-storage.js');
+ const {v4RecoveredTransportMode,v4StampTransport}=await import('../functions/_lib/v4-task-failure-policy.js');
+ const objects=new Map();
+ const bucket={
+  async put(key,bytes){objects.set(key,new Uint8Array(bytes).slice());},
+  async get(key){const bytes=objects.get(key);return bytes?{arrayBuffer:async()=>bytes.slice().buffer}:null;}
+ };
+ const env={HHBA_V4_MATCH_CHECKPOINT_STORAGE:'1',
+  HHBA_MATCH_V4_CHECKPOINT_SECRET:'synthetic-acceptance-test-secret-never-production',
+  HHBA_PRIVATE_RESUMES:bucket};
+ const taskKey='e'.repeat(64);
+ const jobs=[1,2,3].map(i=>({...row,company:'自动验收汽车企业',title:'区域渠道岗位 '+i,
+  url:'https://careers.synthetic-auto.cn/openings/'+i}));
+ let requests=0,htmlReads=0,seedRequest;
+ const seedFetch=async(u,opts)=>{
+  if(!u.endsWith('/responses')){htmlReads++;return new Response('not found',{status:404});}
+  requests++;seedRequest=JSON.parse(opts.body);
+  return model({research_complete:false,jobs:jobs.slice(0,2)},jobs.slice(0,2).map(x=>x.url));
+ };
+ const seed=await v4Match(seedFetch,provider,resume,'全国',{stepMode:true,checkpoint:null});
+ assert.equal(seed.status,'CONTINUE','first phase persists candidates, not a false completion');
+ assert.ok(seed.checkpoint.rows.length>=2,'synthetic first wave has real checkpointed leads');
+ assert.equal(seedRequest.store,false);
+ await saveMatchTask(env,taskKey,{generation:0,checkpoint:seed.checkpoint});
+ const before=await readMatchTask(env,taskKey);
+ assert.ok(before.checkpoint.rows.length>=2);
+ const hasRawContent=[...objects.values()].some(bytes=>new TextDecoder().decode(bytes).includes(jobs[0].url));
+ assert.equal(hasRawContent,false,'research checkpoint remains AES-GCM encrypted in R2');
+ let failedTransport;
+ const failSse=async(u,opts)=>{
+  assert.ok(u.endsWith('/responses'),'provider requests only the expected model endpoint');
+  failedTransport=JSON.parse(opts.body).stream;
+  return new Response('data: '+JSON.stringify({type:'response.failed',response:{status:'failed'}})+'\n\n',
+   {headers:{'content-type':'text/event-stream'}});
+ };
+ let observedFailure;
+ try{await v4Call(failSse,{...provider,stream:true},{input:'synthetic-resume'},{stage:'discovery'});}
+ catch(e){observedFailure=e;}
+ assert.equal(failedTransport,true);
+ assert.equal(observedFailure?.code,'AI_PROVIDER_UPSTREAM_ERROR');
+ assert.equal(observedFailure?.upstreamKind,'SSE_FAILED');
+ await saveMatchTask(env,taskKey,{generation:0,checkpoint:before.checkpoint,
+  failure:{error:observedFailure.code,upstream_kind:observedFailure.upstreamKind,retryable:true}});
+ const recovery=await readMatchTask(env,taskKey);
+ const transport=v4RecoveredTransportMode(recovery.checkpoint,recovery.failure);
+ assert.equal(transport,'json');
+ let checkpoint=v4StampTransport(recovery.checkpoint,transport);
+ assert.deepEqual(checkpoint.rows,recovery.checkpoint.rows,'failed transport cannot delete discovered jobs');
+ assert.equal(checkpoint.transport_mode,'json');
+ let resumedRequests=0,completed;
+ const resumedFetch=async(u,opts)=>{
+  if(!u.endsWith('/responses')){htmlReads++;return new Response('unavailable',{status:403});}
+  const body=JSON.parse(opts.body);resumedRequests++;
+  assert.equal(body.stream,false,'every resumed request uses the alternate JSON transport');
+  assert.equal(body.model,provider.model,'same model after failover');
+  assert.equal(body.store,false,'never enable provider data retention');
+  return model({research_complete:true,jobs:jobs.slice(2)},jobs.slice(2).map(x=>x.url));
+ };
+ for(let attempt=0;attempt<20;attempt++){
+  completed=await v4Match(resumedFetch,{...provider,stream:false},resume,'全国',{stepMode:true,checkpoint});
+  if(completed.status==='COMPLETE')break;
+  assert.equal(completed.status,'CONTINUE');
+  checkpoint=v4StampTransport(completed.checkpoint,transport);
+  await saveMatchTask(env,taskKey,{generation:0,checkpoint});
+  assert.equal((await readMatchTask(env,taskKey)).checkpoint.transport_mode,'json',
+   'transport mode persists through further model and evidence phases');
+ }
+ assert.equal(completed?.status,'COMPLETE','mocked recovery must reach real V4 terminal result');
+ const found=new Set(completed.matches.map(job=>job.official_url));
+ for(const job of jobs)assert.ok(found.has(job.url),'preserves earlier jobs and newly researched results');
+ assert.ok(resumedRequests>=1);
+ assert.equal(requests,1,'no restart or repetition of completed first-phase model call');
+ assert.ok(htmlReads>=0);
+});
