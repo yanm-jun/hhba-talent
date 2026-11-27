@@ -70,7 +70,7 @@ test('batch scoring shares one resume and preserves independent fallback',async(
 test('protected synthetic probe uses medium and reports observed usage, never accepts missing evidence',async()=>{
  const {runOpenAIProbe,onRequest}=await import('../functions/api/match-v4-provider-probe.js');
  let calls=0;
- const provider={model:'gpt-6.2-sol',key:'synthetic-key',baseUrl:'https://relay.example/v1'};
+ const provider={model:'gpt-6.2-sol',key:'synthetic-key',baseUrl:'https://relay.example/v1',reasoningEffort:'medium'};
  const fetcher=async(_url,opts)=>{
   calls++;
   const p=JSON.parse(opts.body),input=JSON.parse(p.input);
