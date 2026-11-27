@@ -87,11 +87,11 @@ function events(env,request,input,waitUntil){
    let lastWorkerSeenAt=Date.now(),lastEvidenceAt=Number(input.savedProgress?.execution?.last_result_at)||0;
    let inFlightAi=0,runtimeState='processing';
    // A live worker heartbeat is separate from actual research progress.
-   const execution=()=>({state:runtimeState==='recovering'?'recovering':inFlightAi>0?'awaiting_ai':'processing',
+   const workerSnapshot=()=>({state:runtimeState==='recovering'?'recovering':inFlightAi>0?'awaiting_ai':'processing',
     worker_seen_at:lastWorkerSeenAt,last_result_at:lastEvidenceAt,phase_started_at:started});
    const heart=setInterval(()=>{
     lastWorkerSeenAt=Date.now();
-    send('heartbeat',{stage:phase,elapsed_ms:lastWorkerSeenAt-started,execution:execution()});
+    send('heartbeat',{stage:phase,elapsed_ms:lastWorkerSeenAt-started,execution:workerSnapshot()});
     if(input.background)queueProgress('routine');
    },12000);
    const progress=stage=>{phase=stage;send('progress',{stage});queueProgress();};
@@ -109,7 +109,7 @@ function events(env,request,input,waitUntil){
    const searchSpeed=createV4SearchSpeedTracker({previous:input.savedProgress?.search_speed,savedJobs:lastJobs});
    const initialEventSequence=Math.max(0,...(input.savedProgress?.job_events||[]).map(e=>Number.isSafeInteger(e?.seq)?e.seq:0));
    const snapshotProgress=()=>({stage:phase,activity:latestActivity,report:lastReport,jobs:[...lastJobs],
-    job_events:jobJournal.snapshot(),search_speed:searchSpeed.snapshot(),execution:execution()});
+    job_events:jobJournal.snapshot(),search_speed:searchSpeed.snapshot(),execution:workerSnapshot()});
     let reportRecovery;
     const captureTime=()=>Date.now();
    const seenResults={candidate:new Set(lastJobs.map(j=>j.official_url)),jd:new Set(lastJobs.filter(j=>j.jd_source_status==='VERIFIED_JD').map(j=>j.official_url)),score:new Set(lastJobs.filter(j=>Number.isInteger(j.match_score)).map(j=>j.official_url)),report:new Set(lastJobs.filter(officialJob).map(j=>j.official_url))};
