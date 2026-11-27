@@ -4,7 +4,7 @@
 import {sha256Hex} from './real-auth.js';
 import {candidateRevision} from './v4-research-pipeline.js';
 import {eligibleCuratedScore,qualifiedReport} from './v4-curated-reports.js';
-import {claimV4JobWork,renewV4JobWork,finishV4JobWork,v4JobWorkQueueEnabled} from './v4-job-work-queue.js';
+import {claimV4JobWork,renewV4JobWork,finishV4JobWork,v4JobWorkQueueEnabled,reportWorkRevision} from './v4-job-work-queue.js';
 import {readMatchTask,saveMatchTask} from './v4-match-checkpoint-storage.js';
 import {loadBackgroundMatch} from './v4-background-match.js';
 import {assertSessionTaskActive} from './v4-session-match-task.js';
@@ -70,7 +70,10 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   for(const [u,j] of checkpoint.rows||[]){
    if(await workKey(taskKey,u)===claim.job_key){url=u;source=j;break;}
   }
-  if(!url||!source||await revKey(candidateRevision(source))!==claim.revision)return {status:'STALE'};
+  if(!url||!source)return {status:'STALE'};
+  const activeScore=sourceFor(checkpoint,url);
+  const currentVersion=lane==='reporting'?reportWorkRevision(source,activeScore):candidateRevision(source);
+  if(!currentVersion||await revKey(currentVersion)!==claim.revision)return {status:'STALE'};
   const resultKey=await independentJobKey(taskKey,generation,lane,claim.job_key,claim.revision);
   const previous=await readMatchTask(env,resultKey);
   if(previous?.kind==='V4_INDEPENDENT_JOB_V1'&&previous.complete&&previous.job){
@@ -110,7 +113,8 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   // Fence against a changed candidate, canceled task or reclaimed lease.
   const current=await readMatchTask(env,taskKey);
   const live=eligibleJob(current?.checkpoint,url);
-  if(current?.generation!==generation||current.result||!live||await revKey(candidateRevision(live))!==claim.revision)throw Object.assign(Error('AI_CHECKPOINT_INVALID'),{code:'AI_CHECKPOINT_INVALID'});
+  const liveVersion=lane==='reporting'?reportWorkRevision(live,sourceFor(current?.checkpoint,url)):live&&candidateRevision(live);
+  if(current?.generation!==generation||current.result||!live||!liveVersion||await revKey(liveVersion)!==claim.revision)throw Object.assign(Error('AI_CHECKPOINT_INVALID'),{code:'AI_CHECKPOINT_INVALID'});
   if(leaseLost||!await renewV4JobWork(db,claim,{leaseMs:300000}))throw Object.assign(Error('AI_CHECKPOINT_LEASE_LOST'),{code:'AI_CHECKPOINT_LEASE_LOST'});
   await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,job_key:claim.job_key,checkpoint:snapshot,job:result,complete:done,source_url:url});
   await finishV4JobWork(db,claim,{completed:done});
@@ -132,12 +136,14 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
  const entries=result?.results||[];
  if(!entries.length)return {checkpoint,count:0};
  const byKey=new Map();
- for(const [url,job] of checkpoint.rows||[])byKey.set(await workKey(taskKey,url),{url,job,revision:await revKey(candidateRevision(job))});
+ for(const [url,job] of checkpoint.rows||[]){const scored=sourceFor(checkpoint,url),rr=reportWorkRevision(job,scored);
+  byKey.set(await workKey(taskKey,url),{url,job,revision:await revKey(candidateRevision(job)),reportRevision:rr?await revKey(rr):null});
+ }
  const next=structuredClone(checkpoint),done=new Set(next.processedEarlier||[]),revisions=new Map(next.processedEvidence||[]);
  let count=0;
  for(const record of entries){
   const current=byKey.get(record.job_key);
-  if(!current||current.revision!==record.revision)continue;
+  if(!current||(record.lane==='reporting'?current.reportRevision:current.revision)!==record.revision)continue;
   if(record.lane==='verification'&&done.has(current.url)&&revisions.get(current.url)===candidateRevision(current.job))continue;
   const resultKey=await independentJobKey(taskKey,generation,record.lane,record.job_key,record.revision);
   const saved=await read(env,resultKey);
