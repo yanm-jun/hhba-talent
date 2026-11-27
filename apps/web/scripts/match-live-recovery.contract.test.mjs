@@ -160,21 +160,31 @@ test('independently complete JD report can open optimizer without cancelling ong
  assert.ok(page.includes('sourceText={optimizationSource||undefined}'));
 });
 
-test('discovered vacancies present one official application action without customer-facing verification labels',()=>{
+test('live candidate application link opens immediately without waiting for JD verification',async()=>{
  const panel=readFileSync(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
- const css=readFileSync(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
- assert.match(panel,/function OfficialApplyAction\(/);
+ const {discoveryApplyDestination}=await import('../src/services/discoveryApplyDestination.mjs');
+ const employer='https://careers.real-employer.cn/jobs/123';
+ const raw={company:'示例企业',title:'岗位',official_url:employer,source_type:'站外招聘职位',
+  evidence_status:'RESEARCH_PENDING',match_score:null};
+ assert.equal(discoveryApplyDestination(raw),employer,'discovery-only source is immediately navigable');
+ assert.equal(discoveryApplyDestination({...raw,jd_source_status:'VERIFIED_JD'}),employer,'later JD result does not change the destination');
+ assert.equal(discoveryApplyDestination({...raw,source_type:undefined}),employer,'SSE early candidate does not need source_type');
+ assert.equal(discoveryApplyDestination({...raw,excluded_board:true}),null);
+ assert.equal(discoveryApplyDestination({...raw,excluded_closed:true}),null);
+ assert.equal(discoveryApplyDestination({...raw,availability_status:'POSSIBLY_CLOSED'}),null);
+ assert.equal(discoveryApplyDestination({...raw,official_url:'https://www.zhipin.com/job_detail/1'}),null);
+ assert.equal(discoveryApplyDestination({...raw,official_url:'https://www.indeed.com/viewjob?jk=123'}),null);
+ assert.equal(discoveryApplyDestination({...raw,official_url:'https://university.edu.cn/companies/brand/jobs/7'}),null);
+ for(const unsafe of ['http://careers.real-employer.cn/jobs/123','https://localhost/jobs/12','https://user:pass@careers.real-employer.cn/job/12','javascript:alert(1)'])
+  assert.equal(discoveryApplyDestination({...raw,official_url:unsafe}),null);
+ assert.match(panel,/function OfficialApplyAction\\(/);
  assert.match(panel,/const label='投递官网'/);
- assert.match(panel,/const href=officialApplicationHref\(job\)/);
- assert.match(panel,/href=\{href\} target="_blank" rel="noopener noreferrer"/);
- assert.match(panel,/<button type="button" className="hhba-discovery-apply" disabled/);
- assert.match(panel,/recent\.map\(job=>[\s\S]*?<OfficialApplyAction job=\{job\}\/>/);
- assert.match(panel,/visible\.map\(job=>[\s\S]*?<OfficialApplyAction job=\{job\}\/>/);
- assert.doesNotMatch(panel,/liveResearchLabel\(job\)/,'discovery rows must not show technical verification statuses');
- assert.doesNotMatch(panel,/查看招聘来源|查看官方招聘页面/,'discovery must have one action label');
- assert.match(panel,/job\.source_type!=='站外官方招聘'/);
- assert.match(panel,/job\.reference_vacancy_verified===true/);
- assert.match(panel,/POSSIBLY_CLOSED/);
- assert.match(panel,/job\.excluded_board\|\|job\.excluded_closed/);
- assert.match(css,/\.hhba-discovery-apply:disabled/);
+ assert.match(panel,/const href=officialApplicationHref\\(job\\)/);
+ assert.match(panel,/discoveryApplyDestination\\(job\\)/);
+ assert.match(panel,/href=\\{href\\} target="_blank" rel="noopener noreferrer"/);
+ assert.match(panel,/if\\(!href\\)return null/);
+ assert.doesNotMatch(panel,/<button type="button" className="hhba-discovery-apply" disabled/);
+ assert.match(panel,/recent\\.map\\(job=>[\\s\\S]*?<OfficialApplyAction job=\\{job\\}\\/>/);
+ assert.match(panel,/visible\\.map\\(job=>[\\s\\S]*?<OfficialApplyAction job=\\{job\\}\\/>/);
+ assert.doesNotMatch(panel,/查看招聘来源|查看官方招聘页面|待核验/,'customer link action stays simple');
 });
