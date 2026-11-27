@@ -375,12 +375,13 @@ function events(env,request,input,waitUntil){
      const reason=leaseAbort.signal.reason;
      const rawCode=typeof reason?.code==='string'?reason.code:typeof e?.code==='string'?e.code:leaseAbort.signal.aborted?'AI_CHECKPOINT_LEASE_LOST':/^[A-Z][A-Z0-9_]{5,80}$/.test(e?.message||'')?e.message:'AI_PROVIDER_UNAVAILABLE';
      const code=rawCode==='PIPELINE_DISCOVERY_PHASE_INVALID'?'AI_PIPELINE_STATE_INVALID':rawCode;
+      const taskStopped=['AI_AGENT_CANCELLED','AI_TASK_USER_CANCELLED','AI_AUTH_SESSION_EXPIRED','AI_TASK_SUPERSEDED','AI_TASK_CLOSED','AI_TASK_NOT_ACTIVE'].includes(code);
      // A later history/progress failure must not replace an already committed
      // completed result with an old checkpoint and repeat paid model calls.
      if(committedResult){
       metricOutcome='COMPLETE';
       await releaseTask();await finishWorkflowStages();
-      if(code==='AI_AGENT_CANCELLED'){send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:false});return;}
+      if(taskStopped){send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable:false});return;}
       await publishProgress('COMPLETE');await finishWorkflowStages();sendFinal(committedResult);succeeded=true;return;
      }
      if((code===PHASE_YIELD||budget?.denied)&&input.taskKey&&input.lease&&!leaseAbort.signal.aborted){
@@ -407,8 +408,8 @@ function events(env,request,input,waitUntil){
       metricError=code==='AI_PROVIDER_UPSTREAM_ERROR'&&/^(?:HTTP_5[0-9]{2}|SSE_FAILED)$/.test(upstreamKind)?'AI_PROVIDER_'+upstreamKind:code;
      const retryable=!isV4TerminalTaskFailure(code)&&!!input.taskKey&&(isV4RetryableProviderError(code)||isV4RetryableTaskFailure(code)||leaseAbort.signal.aborted&&!request.signal.aborted);
       if(retryable)runtimeState='recovering';
-      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&code!=='AI_AGENT_CANCELLED'){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null),generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable,...(e?.upstreamKind==='SSE_FAILED'?{upstream_kind:'SSE_FAILED'}:{})}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
-      if(code!=='AI_AGENT_CANCELLED'&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
+      if(input.taskKey&&input.lease&&!leaseAbort.signal.aborted&&!taskStopped){try{await guard();await input.lease.renew();await saveMatchTask(env,input.taskKey,{checkpoint:stampTransport(input.recoveryState?.()||input.checkpoint||null),generation:input.generation||0,progress:snapshotProgress(),phaseReplay:replay?.snapshot(),checkpoint_captured_at:captureTime(),failure:{error:code,phase,elapsed_ms:Date.now()-started,retryable,...(e?.upstreamKind==='SSE_FAILED'?{upstream_kind:'SSE_FAILED'}:{})}});}catch{console.warn('HHBA_V4_RECOVERY_SAVE_FAILED');}}
+      if(!taskStopped&&!leaseAbort.signal.aborted)await publishProgress(retryable?'PENDING':'FAILED',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
        console.warn('HHBA_V4_MATCH_ERROR',JSON.stringify({trace,error:code,upstream_kind:metricError!==code?upstreamKind:null,stage:phase,elapsed_ms:Date.now()-started,resources:budget?.snapshot()}));
       if(!retryable)await finishWorkflowStages();
       send('failure',{error:code,phase,elapsed_ms:Date.now()-started,retryable});
