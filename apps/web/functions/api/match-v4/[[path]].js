@@ -267,12 +267,22 @@ function events(env,request,input,waitUntil){
        const id=await matchProfileCacheKey(env,input.phone,input.session.token_hash,{resume_id:input.resume_id,text:input.text,role:input.role_hint,model:provider.model,base:provider.baseUrl,effort:provider.reasoningEffort||'medium'}).catch(()=>null);
        if(id)profileCache={load:async()=>{if(!budget.canPublish())return null;budget.observe('profile_cache');return readMatchProfileCache(env,id);},save:async profile=>{if(!budget.canPublish()||executionSignal.aborted)return;budget.observe('profile_cache');await saveMatchProfileCache(env,id,profile);}};
       }
-      // Merge only revision-verified, independently completed job results.
+      // The authoritative encrypted research checkpoint can hold hundreds of
+      // candidates. One safe D1 batch admits only a portion, so resume queue
+      // reconciliation on *every* phase (including idle WAIT_JOBS) until all
+      // expected jobs have been enqueued. Never equate an empty partial batch
+      // with completed JD research.
       if(input.background&&input.taskKey&&input.checkpoint&&v4JobExecutorEnabled(env)){
-       try{const merged=await mergeIndependentV4Jobs(env,input.taskKey,input.generation||0,input.checkpoint);
+       try{
+        const merged=await mergeIndependentV4Jobs(env,input.taskKey,input.generation||0,input.checkpoint);
         if(merged.count){input.checkpoint=merged.checkpoint;mergedIndependentJobs=merged.count;console.info('HHBA_V4_INDEPENDENT_JOB_MERGED',JSON.stringify({count:merged.count}));}
+        const queue=await reconcileV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0,input.checkpoint);
+        console.info('HHBA_V4_JOB_QUEUE_SYNC',JSON.stringify({pendingOrDone:queue.work,changed:queue.createdOrUpdated,remaining:queue.remaining}));
         researchEnv.__v4IndependentPending=await pendingIndependentV4Work(env,input.taskKey,input.generation||0);
-       }catch{console.warn('HHBA_V4_INDEPENDENT_JOB_MERGE_DEFERRED');}
+       }catch(e){
+        console.warn('HHBA_V4_INDEPENDENT_JOB_RECOVERY_DEFERRED',JSON.stringify({error:e?.code||'AI_CHECKPOINT_DB_UNAVAILABLE'}));
+        throw Object.assign(Error('AI_CHECKPOINT_DB_UNAVAILABLE'),{code:'AI_CHECKPOINT_DB_UNAVAILABLE'});
+       }
       }
       const result=await v4Match(budget?budget.fetch(fetch):fetch,provider,input.text,input.role_hint,{
       signal:executionSignal,onProgress:progress,onActivity:activity,env:researchEnv,resourceBudget:budget,profileCache,excludeUrls:input.excludeUrls,
