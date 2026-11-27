@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {runDiscoveryWave,nextDiscoveryWidth,combineDiscovery,discoveryLaneContext} from '../functions/_lib/v4-parallel-discovery.js';
+import {runDiscoveryWave,nextDiscoveryWidth,admittedDiscoveryWidth,combineDiscovery,discoveryLaneContext} from '../functions/_lib/v4-parallel-discovery.js';
 import {v4Match,renderCandidatePreview} from '../functions/_lib/simple-match-v4.js';
 const resume='本人负责汽车经销商渠道运营，区域销售督导、团队培训、销售数据分析、项目管理和客户服务。';
 const profile={summary:'汽车经销商渠道运营',roles:['区域销售督导','运营管理'],skills:[],facts:[{kind:'work',quote:'汽车经销商渠道运营'}],education:null};
@@ -26,6 +26,14 @@ test('actual V4 discovery overlaps three provider calls, deduplicates and preser
  assert.equal(wave.checkpoint.diagnostics.PARALLEL_AI_PROVIDER_RATE_LIMITED,1);
  assert.ok(wave.checkpoint.rows.every(([,j])=>!j.match_score));
  assert.equal(wave.checkpoint.toolUrls.length,4);
+});
+test('discovery capacity grows with available hosting headroom instead of fixed three lanes',()=>{
+ const roomy={remainingResearch:()=>36,availableFor:()=>32};
+ const tight={remainingResearch:()=>9,availableFor:()=>2};
+ assert.equal(admittedDiscoveryWidth(6,roomy),6);
+ assert.equal(admittedDiscoveryWidth(6,tight),1);
+ assert.equal(admittedDiscoveryWidth(6,roomy,{inFlight:2}),4);
+ assert.equal(admittedDiscoveryWidth(4,null),4);
 });
 test('coordinator failure retains authentic independent search data and does not mark completion',async()=>{
  const p=await runDiscoveryWave(async()=>{throw Object.assign(Error(),{code:'AI_PROVIDER_UPSTREAM_ERROR'})},async()=>({data:{jobs:[job(1)],research_complete:true,reviewed_sources:[{url:'untrusted'}]},sources:[job(1).url],response:{status:'completed',output:[{type:'web_search_call'}]}}),3);
