@@ -453,7 +453,7 @@ async function backgroundStep(env,request,waitUntil){
   const durable=await readMatchTask(env,taskKey,Date.now(),{renewGeneration:task.generation});
    const saved=await recoverSavedDiscovery(env,input,durable);
   if(saved?.generation===task.generation){input.recovering=!!saved.failure;input.savedProgress=saved.progress;input.phaseReplay=saved.phaseReplay;
-    input.transportMode=v4RecoveredTransportMode(saved.checkpoint,saved.failure);if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
+    input.transportMode=v4RecoveredTransportMode(saved.checkpoint,saved.failure,recoveryHint);if(terminalV4SavedFailure(saved.failure)){await input.lease.release();return fail(saved.failure.error,422);}}
   if(saved?.generation===task.generation&&saved?.result?.status==='COMPLETE')input.cachedResult=saved.result;
   else if(saved?.generation===task.generation&&saved?.checkpoint)input.checkpoint=saved.checkpoint;
   else if(saved?.result?.status==='COMPLETE'&&saved.checkpoint&&saved.generation+1===task.generation){
