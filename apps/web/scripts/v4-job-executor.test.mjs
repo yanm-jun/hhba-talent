@@ -4,7 +4,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import {candidateRevision} from '../functions/_lib/v4-research-pipeline.js';
 import {reconcileV4JobWork,claimV4JobWork,finishV4JobWork} from '../functions/_lib/v4-job-work-queue.js';
-import {independentJobKey,v4JobExecutorEnabled,mergeIndependentV4Jobs,runIndependentV4Job} from '../functions/_lib/v4-job-executor.js';
+import {independentJobKey,v4JobExecutorEnabled,mergeIndependentV4Jobs,runIndependentV4Job,v4IndependentJobTransport} from '../functions/_lib/v4-job-executor.js';
 const schema=readFileSync(new URL('../d1/20261126_v4_job_work_queue.sql',import.meta.url),'utf8');
 const taskKey='b'.repeat(64),url='https://careers.real.test/job/22';
 const candidate=()=>({company:'真实雇主',title:'区域督导',location:'上海',requirements:'销售运营经验',employer_proof_url:url});
@@ -53,4 +53,19 @@ test('independent report result can replace only the selected ranked job',async(
  const result=await mergeIndependentV4Jobs(env,taskKey,1,cp,{read});
  assert.equal(result.count,1,JSON.stringify({records:records.results,original:cp.matches,merged:result.checkpoint.matches}));assert.equal(result.checkpoint.matches[0].report_status,'UNAVAILABLE');
  assert.equal((await mergeIndependentV4Jobs(env,taskKey,1,result.checkpoint,{read})).count,0);
+});
+
+test('independent JD preserves a transport-specific SSE failure across a durable per-job continuation',async()=>{
+ const sseError={code:'AI_PROVIDER_UPSTREAM_ERROR',upstreamKind:'SSE_FAILED'};
+ assert.equal(v4IndependentJobTransport(null,null,true),'configured');
+ assert.equal(v4IndependentJobTransport(null,sseError,true),'json','SSE failure must switch next step to JSON');
+ assert.equal(v4IndependentJobTransport({transport_mode:'json'},null,true),'json','retries must not re-enter broken SSE path');
+ assert.equal(v4IndependentJobTransport(null,sseError,false),'configured','do not switch an already JSON-only provider');
+ assert.equal(v4IndependentJobTransport(null,{code:'AI_PROVIDER_UPSTREAM_ERROR',upstreamKind:'HTTP_503'},true),'configured','a 503 must not be mistaken for SSE transport rejection');
+ assert.equal(v4IndependentJobTransport(null,{code:'AI_PROVIDER_NETWORK_ERROR'},true),'configured');
+ const route=readFileSync(new URL('../functions/_lib/v4-job-executor.js',import.meta.url),'utf8');
+ assert.match(route,/provider\.stream=false;/,'provider transport must obey persisted per-job fallback');
+ assert.match(route,/transport_mode:'json'/,'SSE fallback must be serialized into encrypted job sidecar');
+ assert.match(route,/transportMode=v4IndependentJobTransport\(vettedPrevious\?previous:null,e,provider\.stream\)/);
+ assert.match(route,/await saveMatchTask\(env,resultKey,/,'job checkpoint remains persisted for same candidate and revision');
 });
