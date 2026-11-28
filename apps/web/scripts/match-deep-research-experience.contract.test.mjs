@@ -26,7 +26,7 @@ test('the matcher shows its current step and preserves original Word optimizatio
  const css=readFileSync(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
  assert.match(modal,/stageTitle\[progressStage\]/);
  const reportFirst=readFileSync(new URL('../src/components/ReportFirstMatchExperience.tsx',import.meta.url),'utf8');
- assert.match(reportFirst,/activity\?\.message\|\|stageText\[progressStage\]/,'report-first view must preserve meaningful live AI updates');
+ assert.match(reportFirst,/safePlainText\(activity\?\.message\)\|\|stageText\[progressStage\]/,'report-first view must preserve validated, meaningful live AI updates');
  assert.doesNotMatch(modal,/progressStage==='parsing'&&progressActivity/,'do not hide search/research/analysis messages');
  assert.match(modal,/activeJob&&parsedProfile/);
  assert.doesNotMatch(modal,/DeepSeek|researchTrail\.map/);

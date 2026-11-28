@@ -148,9 +148,32 @@ def duplicate_resume_choice(browser,viewport):
     print('HHBA_DUPLICATE_CHOICE_BROWSER_PASS',json.dumps({'viewport':viewport,**page.evaluate('window.qaDuplicateAudit()')}))
     page.close()
 
+def malformed_report_view(browser,viewport):
+    page=browser.new_page(viewport=viewport)
+    errors=[]
+    page.on('pageerror',lambda error:errors.append(str(error)))
+    page.goto('http://127.0.0.1:4173/scripts/qa-global-match-workspace.html')
+    page.evaluate('window.qaShowMalformedReport()')
+    report=page.get_by_test_id('qa-malformed-report')
+    expect(report.get_by_text('仅用于验收的 AI 参考岗位详情')).to_be_visible(timeout=15000)
+    expect(report.get_by_text('准备真实运营案例')).to_be_visible()
+    expect(report.get_by_text('不应显示')).to_have_count(0)
+    expect(report.get_by_text('这份报告有有效的分析摘要',exact=False)).to_be_visible()
+    expect(report.get_by_text('未命名岗位')).to_have_count(0)
+    report.get_by_role('tab',name='机会探索').click()
+    expect(report.get_by_text('数据助理')).to_be_visible()
+    report.get_by_role('tab',name='职业画像').click()
+    expect(report.get_by_text('职业转型')).to_be_visible()
+    expect(report.get_by_text('已读取简历信息，正在整理职业背景。')).to_be_visible()
+    assert not errors,errors
+    print('HHBA_MALFORMED_REPORT_BROWSER_PASS',json.dumps({'viewport':viewport}))
+    page.close()
+
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
     prestart_failure(browser)
+    malformed_report_view(browser,{'width':1440,'height':900})
+    malformed_report_view(browser,{'width':390,'height':844})
     duplicate_resume_choice(browser,{'width':1440,'height':900})
     duplicate_resume_choice(browser,{'width':390,'height':844})
     exercise(browser,{'width':1440,'height':900})

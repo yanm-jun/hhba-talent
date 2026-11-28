@@ -1,18 +1,41 @@
-import {useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
+import {Component,useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
 import {ArrowLeft,ArrowRight,ArrowUpRight,BookOpen,BriefcaseBusiness,CheckCircle2,ChevronRight,FileCheck2,Globe2,LoaderCircle,MapPin,ShieldCheck,Sparkles,UserRound} from 'lucide-react';
 import {isVerifiedMatchReport} from '../services/verifiedMatchPresentation.mjs';
 import {discoveryApplyDestination} from '../services/discoveryApplyDestination.mjs';
 import type {MatchProfile,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/report-first-experience.css';
 
+/** Contain unexpected report rendering errors without unmounting the
+ * parent match dialog, cancelling the paid AI request or discarding polling.
+ * Error messages and resume content are never sent to console telemetry. */
+export class ReportFirstErrorBoundary extends Component<{children:ReactNode},{failed:boolean}>{
+ state={failed:false};
+ static getDerivedStateFromError(){return {failed:true};}
+ componentDidCatch(){console.warn('HHBA_REPORT_VIEW_RENDER_RECOVERABLE');}
+ render(){
+  if(!this.state.failed)return this.props.children;
+  return <section className="hhba-rf-fallback" role="alert">
+   <h2>研究报告暂时无法展示</h2>
+   <p>这是一处报告页面显示异常，不代表后台研究已停止。已有成果不会因关闭这个提示而被删除。</p>
+   <button type="button" onClick={()=>this.setState({failed:false})}>重新尝试显示报告</button>
+  </section>;
+ }
+}
 type View='reports'|'explore'|'profile';
 type Props={
  profile?:MatchProfile;report?:MatchResearchReport;jobs:MatchedJob[];officialJobs:MatchedJob[];
  pending?:boolean;failed?:boolean;progressStage?:NativeMatchProgress;activity?:NativeMatchActivity|null;
  elapsed?:number;onOptimize?:(job:MatchedJob)=>void;optimizationAvailable?:boolean;
 };
+// Untrusted model data must never break rendering or cancel an active task.
+const safeText=(v:unknown):string=>typeof v==='string'?v:'';
+const safeList=(v:unknown):unknown[]=>Array.isArray(v)?v:[];
+const safePlainText=(v:unknown)=>safeText(v).trim();
 const safeScore=(job:MatchedJob)=>{const score=job.match_score;return typeof score==='number'&&Number.isInteger(score)&&score>=0&&score<=100?score:null;};
-const fullReport=(job:MatchedJob)=>job.report_status==='COMPLETE'&&!!job.research_detail?.score_explanation?.trim()&&Array.isArray(job.research_detail.comparisons)&&!!(job.reference_jd?.trim()||job.evidence_excerpt?.trim())&&!job.excluded_board&&!job.excluded_closed&&!['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'UNKNOWN');
+const fullReport=(job:MatchedJob)=>!!job&&job.report_status==='COMPLETE'&&
+ !!safePlainText(job.research_detail?.score_explanation)&&Array.isArray(job.research_detail?.comparisons)&&
+ !!(safePlainText(job.reference_jd)||safePlainText(job.evidence_excerpt))&&
+ !job.excluded_board&&!job.excluded_closed&&!['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'UNKNOWN');
 // Preserve a completed AI reference while a separate worker verifies the JD.
 const readableReportJob=(job:MatchedJob):MatchedJob|null=>{
  if(fullReport(job))return job;
@@ -21,8 +44,8 @@ const readableReportJob=(job:MatchedJob):MatchedJob|null=>{
  const combined={...job,...reference,reference_report:reference} as MatchedJob;
  return fullReport(combined)?combined:null;
 };
-const completeness=(job:MatchedJob)=>(readableReportJob(job)?100:0)+(job.reference_jd?20:0)+(job.research_detail?20:0)+(job.jd_research?.facts?.length||0)+(Number.isInteger(job.match_score)?5:0);
-const validJob=(job:MatchedJob)=>!!job.official_url&&!job.excluded_board&&!job.excluded_closed&&!['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'UNKNOWN');
+const completeness=(job:MatchedJob)=>(readableReportJob(job)?100:0)+(safePlainText(job.reference_jd)?20:0)+(job.research_detail?20:0)+(Array.isArray(job.jd_research?.facts)?job.jd_research.facts.length:0)+(Number.isInteger(job.match_score)?5:0);
+const validJob=(job:MatchedJob)=>!!job&&typeof job==='object'&&typeof job.official_url==='string'&&!!job.official_url.trim()&&!job.excluded_board&&!job.excluded_closed&&!['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'UNKNOWN');
 const stageText:Record<NativeMatchProgress,string>={
  preparing:'正在准备职业研究',parsing:'正在理解你的简历',connected:'正在连接研究服务',
  planning:'正在规划职业方向',searching:'正在发现新的职业机会',reading:'正在整理岗位公开资料',
@@ -34,12 +57,15 @@ function Section({title,children}:{title:string;children:ReactNode}){
  return <section className="hhba-rf-section"><h3>{title}</h3><div className="hhba-rf-text">{children}</div></section>;
 }
 function EvidenceRows({job}:{job:MatchedJob}){
- const items=job.research_detail?.comparisons||[];
+ const items=safeList(job.research_detail?.comparisons)
+  .filter((entry):entry is Record<string,unknown>=>!!entry&&typeof entry==='object'&&!Array.isArray(entry))
+  .map(entry=>({status:['supported','partial','missing'].includes(safeText(entry.status))?safeText(entry.status):'missing',
+   requirement:safePlainText(entry.requirement),analysis:safePlainText(entry.analysis),resume_evidence:safePlainText(entry.resume_evidence)}))
+  .filter(entry=>entry.requirement&&entry.analysis);
  if(!items.length)return null;
  return <div className="hhba-rf-comparisons">{items.map((item,i)=><article key={i} className="hhba-rf-comparison">
   <span className={'hhba-rf-evidence-kind hhba-rf-evidence-'+item.status}>{item.status==='supported'?'已有证据':item.status==='partial'?'部分相关':'需要补充'}</span>
-  <strong>{item.requirement}</strong>
-  <p>{item.analysis}</p>
+  <strong>{item.requirement}</strong><p>{item.analysis}</p>
   {item.resume_evidence&&<small>简历依据：{item.resume_evidence}</small>}
  </article>)}</div>;
 }
@@ -52,7 +78,7 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
  // A late poll must never erase an already completed report.
  const all=useMemo(()=>{
   const result=new Map<string,MatchedJob>();
-  for(const incoming of [...jobs,...officialJobs]){
+  for(const incoming of [...(Array.isArray(jobs)?jobs:[]),...(Array.isArray(officialJobs)?officialJobs:[])]){
    if(!validJob(incoming))continue;
    const previous=result.get(incoming.official_url);
    if(!previous){result.set(incoming.official_url,incoming);continue;}
@@ -89,8 +115,8 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
  const discovered=Math.max(report?.discovered||0,all.length);
  const profileData=report?.profile||profile;
  const sourceCount=report?.search_source_count||0;
- const officialReady=officialJobs.filter(isVerifiedMatchReport).length;
- const progressMessage=activity?.message||stageText[progressStage];
+ const officialReady=(Array.isArray(officialJobs)?officialJobs:[]).filter(isVerifiedMatchReport).length;
+ const progressMessage=safePlainText(activity?.message)||stageText[progressStage]||stageText.waiting;
  const choose=(index:number)=>{if(index<0||index>=order.length)return;setSelectedUrl(order[index].official_url);};
  return <div className="hhba-report-first" data-hhba-report-first="true">
   <div className="hhba-rf-topline">
@@ -125,22 +151,25 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
     <article key={current.official_url} className="hhba-rf-report">
      <div className="hhba-rf-report-head">
       <div className="hhba-rf-report-identity"><span className="hhba-rf-report-label">PERSONALIZED CAREER REPORT</span>
-       <h2>{current.title_zh||current.title}</h2><p><BriefcaseBusiness size={14}/>{current.company}<span className="hhba-rf-mid-dot">·</span><MapPin size={14}/>{current.location}</p>
+       <h2>{safeText(current.title_zh)||safeText(current.title)||'未命名岗位'}</h2><p><BriefcaseBusiness size={14}/>{safeText(current.company)}<span className="hhba-rf-mid-dot">·</span><MapPin size={14}/>{safeText(current.location)}</p>
        <span className={isVerifiedMatchReport(current)&&current.reference_jd_kind!=='AI_GENERATED_REFERENCE'?'hhba-rf-source-tag hhba-rf-source-official':'hhba-rf-source-tag'}>{current.reference_jd_kind==='AI_GENERATED_REFERENCE'?'AI 参考研究 · 招聘详情以来源为准':isVerifiedMatchReport(current)?'岗位资料已核实':'招聘信息待核实'}</span>
       </div>
       <div className="hhba-rf-score"><strong>{safeScore(current)??'—'}{safeScore(current)!==null&&<small>/100</small>}</strong><span>匹配参考分</span></div>
      </div>
      <div className="hhba-rf-report-content">
-      <Section title="岗位详情">{current.reference_jd||current.evidence_excerpt||'暂无可用的岗位详情。'}</Section>
-      <Section title="岗位详情整理依据">{current.reference_jd_basis||'所述岗位详情以本次实际获得的公开资料为依据。'}</Section>
-      <Section title="匹配分析"><p>{current.research_detail?.score_explanation}</p><EvidenceRows job={current}/></Section>
+      <Section title="岗位详情">{safeText(current.reference_jd)||safeText(current.evidence_excerpt)||'暂无可用的岗位详情。'}</Section>
+      <Section title="岗位详情整理依据">{safeText(current.reference_jd_basis)||'所述岗位详情以本次实际获得的公开资料为依据。'}</Section>
+      <Section title="匹配分析"><p>{safeText(current.research_detail?.score_explanation)}</p><EvidenceRows job={current}/></Section>
       <div className="hhba-rf-pair">
-       <Section title="你的竞争优势">{current.research_detail?.strengths||'尚未形成可靠结论。'}</Section>
-       <Section title="需要关注的差距">{current.research_detail?.risks||'尚未形成可靠结论。'}</Section>
+       <Section title="你的竞争优势">{safeText(current.research_detail?.strengths)||'尚未形成可靠结论。'}</Section>
+       <Section title="需要关注的差距">{safeText(current.research_detail?.risks)||'尚未形成可靠结论。'}</Section>
       </div>
-      <Section title="职业发展与竞争力">{[current.research_detail?.career_development,current.research_detail?.competition].filter(Boolean).join('\n\n')}</Section>
-      <Section title="求职行动与简历优化">{current.research_detail?.optimization_advice||'尚未形成具体建议。'}</Section>
-      {(current.research_detail?.extra_sections||[]).map((section,i)=><Section key={i} title={section.title}>{section.content}</Section>)}
+      <Section title="职业发展与竞争力">{[safeText(current.research_detail?.career_development),safeText(current.research_detail?.competition)].filter(Boolean).join('\n\n')}</Section>
+      <Section title="求职行动与简历优化">{safeText(current.research_detail?.optimization_advice)||'尚未形成具体建议。'}</Section>
+      {safeList(current.research_detail?.extra_sections)
+       .filter((section):section is Record<string,unknown>=>!!section&&typeof section==='object'&&!Array.isArray(section))
+       .map((section,i)=>safePlainText(section.title)&&safePlainText(section.content)?
+        <Section key={i} title={safePlainText(section.title)}>{safePlainText(section.content)}</Section>:null)}
      </div>
      <div className="hhba-rf-report-footer">
       <div className="hhba-rf-trust"><ShieldCheck size={16}/><span>{current.reference_jd_kind==='AI_GENERATED_REFERENCE'?'岗位详情为 AI 编写的参考研究，并非企业发布的原文要求。':'以可核实的岗位资料为依据；申请条件以招聘页面为准。'} 匹配分不代表录用概率。</span></div>
@@ -163,21 +192,21 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
    <p className="hhba-rf-explore-note">{progressMessage}{sourceCount>0?' · 已研究 '+sourceCount+' 条公开检索来源':''}。候选数量不等于报告数量。</p>
    <h3>最新发现的岗位</h3>
    {all.length?<div className="hhba-rf-leads">{[...all].reverse().slice(0,12).map(job=><div key={job.official_url} className="hhba-rf-lead">
-    <div><strong>{job.title_zh||job.title}</strong><small>{job.company} · {job.location}</small></div>
-    {fullReport(job)?<span className="hhba-rf-lead-ready"><CheckCircle2 size={14}/>报告完成</span>:<span className="hhba-rf-lead-working">研究中</span>}
-    {fullReport(job)&&<button type="button" onClick={()=>{setSelectedUrl(job.official_url);setView('reports')}} aria-label={'查看 '+(job.title_zh||job.title)+' 完整报告'}><ChevronRight size={18}/></button>}
+    <div><strong>{safeText(job.title_zh)||safeText(job.title)||'未命名岗位'}</strong><small>{safeText(job.company)} · {safeText(job.location)}</small></div>
+    {readableReportJob(job)?<span className="hhba-rf-lead-ready"><CheckCircle2 size={14}/>报告完成</span>:<span className="hhba-rf-lead-working">研究中</span>}
+    {readableReportJob(job)&&<button type="button" onClick={()=>{setSelectedUrl(job.official_url);setView('reports')}} aria-label={'查看 '+(job.title_zh||job.title)+' 完整报告'}><ChevronRight size={18}/></button>}
    </div>)}</div>:<p className="hhba-rf-none">暂未收到具体岗位。AI 正在研究真实招聘机会。</p>}
   </div>}
   {view==='profile'&&<div className="hhba-rf-body" role="tabpanel" aria-label="职业画像">
    <span className="hhba-rf-kicker">PERSONAL CAREER PROFILE</span><h2 className="hhba-rf-subtitle">AI 对你的职业背景的理解</h2>
    {!profileData?<p className="hhba-rf-none">简历分析正在进行，完成后会展示职业画像。</p>:<>
-    <Section title="职业概况">{profileData.summary||'已读取简历信息，正在整理职业背景。'}</Section>
+    <Section title="职业概况">{safeText(profileData.summary)||'已读取简历信息，正在整理职业背景。'}</Section>
     <div className="hhba-rf-pair">
-     <Section title="工作经验">{profileData.experience_evidence||'尚未取得可独立确认的工作年限。'}</Section>
-     <Section title="教育背景">{profileData.education_evidence||profileData.education||'简历中未发现明确的教育信息。'}</Section>
+     <Section title="工作经验">{safeText(profileData.experience_evidence)||'尚未取得可独立确认的工作年限。'}</Section>
+     <Section title="教育背景">{safeText(profileData.education_evidence)||safeText(profileData.education)||'简历中未发现明确的教育信息。'}</Section>
     </div>
-    {!!profileData.skills?.length&&<section className="hhba-rf-section"><h3>核心能力</h3><div className="hhba-rf-skill-list">{profileData.skills.map((skill,i)=><span key={i} title={skill.evidence}>{skill.name}</span>)}</div></section>}
-    {!!profileData.target_roles?.length&&<section className="hhba-rf-section"><h3>AI 探索方向</h3><div className="hhba-rf-skill-list">{profileData.target_roles.map((role,i)=><span key={i}>{role}</span>)}</div></section>}
+    {Array.isArray(profileData.skills)&&profileData.skills.length>0&&<section className="hhba-rf-section"><h3>核心能力</h3><div className="hhba-rf-skill-list">{profileData.skills.filter(skill=>!!skill&&typeof skill==='object'&&typeof skill.name==='string').map((skill,i)=><span key={i} title={safeText(skill.evidence)}>{safeText(skill.name)}</span>)}</div></section>}
+    {Array.isArray(profileData.target_roles)&&profileData.target_roles.length>0&&<section className="hhba-rf-section"><h3>AI 探索方向</h3><div className="hhba-rf-skill-list">{profileData.target_roles.filter((role):role is string=>typeof role==='string').map((role,i)=><span key={i}>{role}</span>)}</div></section>}
    </>}
   </div>}
  </div>;

@@ -709,7 +709,8 @@ test('new report-first workspace is independent of old stage panels and model ex
  const {readFile}=await import('node:fs/promises');
  const experience=await readFile(new URL('../src/components/ReportFirstMatchExperience.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- assert.match(dialog,/!optimizedJobUrl&&<ReportFirstMatchExperience/);
+ assert.match(dialog,/!optimizedJobUrl&&<ReportFirstErrorBoundary>/,'report view faults must be contained by an error boundary');
+ assert.match(dialog,/<ReportFirstMatchExperience/);
  assert.match(experience,/role="tablist"/);
  for(const name of ['研究报告','机会探索','职业画像','岗位详情'])assert.ok(experience.includes(name));
  assert.match(experience,/firstDelivered\.current=true;setView\('reports'\)/);

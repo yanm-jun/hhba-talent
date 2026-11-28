@@ -4,6 +4,8 @@ import {createRoot} from 'react-dom/client';
 import {useState} from 'react';
 import {MatchWorkspaceHost,MatchWorkspaceSlot,isMatchWorkspaceRoute} from '../src/components/MatchWorkspaceHost';
 import {CandidateMatchPage} from '../src/pages/CandidateMatchPage';
+import {ReportFirstMatchExperience} from '../src/components/ReportFirstMatchExperience';
+import type {MatchedJob,MatchProfile} from '../src/services/resumeMatch';
 import {navigate,useRoute,Link} from '../src/router';
 import type {User} from '../src/services/api';
 import '../src/styles.css';
@@ -64,11 +66,36 @@ window.fetch=async (input,init)=>{
 history.replaceState({},'', '/candidate/match');
 localStorage.setItem('hhba_real_auth_token','SYNTHETIC_QA_ONLY');
 const user={id:'synthetic-a',display_name:'测试',account_types:['candidate']} as unknown as User;
+const malformedCompleteJob={
+ official_url:'https://careers.example.test/job/1',company:'虚拟验收企业',title:'区域督导',location:'北京',
+ report_status:'COMPLETE',reference_jd:'仅用于验收的 AI 参考岗位详情',
+ reference_jd_basis:'根据岗位名称推断，非企业原文',reference_jd_kind:'AI_GENERATED_REFERENCE',
+ match_score:82,research_detail:{
+  score_explanation:'这份报告有有效的分析摘要，但其他字段可能被模型污染。',
+  comparisons:[null,{status:'supported',requirement:'经营分析',analysis:'简历里有运营实例',resume_evidence:'区域督导'},
+   {status:'supported',requirement:{object:'invalid'},analysis:'无效要求需忽略'},false],
+  extra_sections:[null,{title:'面试准备',content:'准备真实运营案例'},{title:'不应显示',content:{bad:'object'}}],
+  strengths:{bad:'object'},risks:['bad']
+ }
+} as unknown as MatchedJob;
+const malformedIncompleteJob={
+ official_url:'https://careers.example.test/job/2',company:'虚拟验收企业',title:'数据助理',location:'上海',
+ report_status:'COMPLETE',reference_jd:{bad:'object'},
+ research_detail:{score_explanation:{bad:'object'},comparisons:null}
+} as unknown as MatchedJob;
+const malformedProfile={summary:{invalid:'object'},skills:'unexpected-string',
+ target_roles:[null,{not:'a role'},'职业转型']} as unknown as MatchProfile;
 function Harness(){
  const route=useRoute();const [session,setSession]=useState('a');
+ const [showMalformed,setShowMalformed]=useState(false);
+ Object.assign(window,{qaShowMalformedReport:()=>setShowMalformed(true)});
  return <MatchWorkspaceHost key={session} route={route} workspace={<CandidateMatchPage user={user} embedded={route!=='/candidate/match'} hosted hostRoute={route}/>}>
   <nav aria-label="QA navigation"><Link to="/">测试首页</Link> · <Link to="/companies/library">测试行业馆</Link> · <Link to="/candidate/account/match">测试工作台匹配</Link> · <Link to="/candidate/match">测试独立匹配</Link> · <button onClick={()=>{setSession('b');navigate('/');}}>模拟切换账户</button></nav>
   {isMatchWorkspaceRoute(route)?<main><MatchWorkspaceSlot/></main>:<main data-testid="current-route">{route}</main>}
+  {showMalformed&&<section data-testid="qa-malformed-report">
+   <ReportFirstMatchExperience profile={malformedProfile} jobs={[malformedCompleteJob,malformedIncompleteJob]}
+    officialJobs={[]} pending={true} progressStage="researching"/>
+  </section>}
  </MatchWorkspaceHost>;
 }
 createRoot(document.getElementById('root')!).render(<Harness/>);

@@ -60,7 +60,9 @@ test('report-first workspace only presents complete reports while retaining rese
  assert.match(first,/job\.report_status==='COMPLETE'/);
  assert.match(first,/firstDelivered\.current=true;setView\('reports'\)/);
  assert.match(first,/岗位详情/);
- assert.match(first,/reference_jd\|\|current\.evidence_excerpt/);
+ assert.match(first,/safeText\(current\.reference_jd\)\|\|safeText\(current\.evidence_excerpt\)/,'reference and official excerpts remain available only after string validation');
+ assert.match(modal,/<ReportFirstErrorBoundary>/,'unexpected view render errors must not unmount the research dialog');
+ assert.match(first,/Array\.isArray\(job\.research_detail\?\.comparisons\)/,'only complete, structurally valid comparison lists qualify as reports');
  assert.match(first,/isVerifiedMatchReport\(current\)/,'unverified references may be read but must not unlock formal optimization');
  assert.match(first,/招聘信息待核实/);
  assert.match(dossier,/data-research-stage=\{stage\.id\}/);
