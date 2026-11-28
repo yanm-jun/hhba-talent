@@ -441,6 +441,11 @@
 .hhba-search-hero .hhba-search-number-label{margin:10px 0 20px;color:#798a9b;font-size:12px}
 .hhba-search-progress{height:4px;max-width:340px;background:#e8edf3;margin:0 auto;border-radius:3px;overflow:hidden}
 .hhba-search-progress>div{height:100%;background:linear-gradient(90deg,#9ab3d4,#346ca9);transition:width .9s cubic-bezier(.22,.8,.2,1);border-radius:3px}
+/* Source-driven research has no numeric denominator; display activity rather
+   than inventing a misleading percentage or 300-source completion bar. */
+.hhba-search-progress-unbounded>div{width:30%;animation:hhba-source-research-flow 2.6s ease-in-out infinite;transition:none}
+@keyframes hhba-source-research-flow{0%{transform:translateX(-100%)}50%{transform:translateX(115%)}100%{transform:translateX(335%)}}
+@media(prefers-reduced-motion:reduce){.hhba-search-progress-unbounded>div{animation:none;transform:none;width:45%}}
 .hhba-search-activity{min-height:42px;display:flex;align-items:center;justify-content:center;padding:8px 0;color:#60758b;font-size:12px;overflow-wrap:anywhere}
 .hhba-search-activity span{animation:hhba-research-fade .45s ease-out both}
 .hhba-search-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 19px;color:#8190a0;font-size:11px;font-variant-numeric:tabular-nums}
