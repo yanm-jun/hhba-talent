@@ -1,7 +1,7 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,X,LoaderCircle} from 'lucide-react';
-import {MatchResearchPanels,matchStageIndex} from './MatchResearchPanels';
+import {ReportFirstMatchExperience} from './ReportFirstMatchExperience';
 import {isVerifiedMatchReport,verifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
 import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress,MatchExecution} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
@@ -70,30 +70,13 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
  const stageTitle:Record<NativeMatchProgress,string>={
   preparing:'准备匹配',parsing:'识别简历经历和技能',connected:'准备搜索',
   planning:'研究职业方向',searching:'搜索企业岗位',
-  reading:'核验完整岗位 JD',researching:'核对招聘资料',
-  writing:'整理岗位',scoring:'对照简历和岗位 JD',
+  reading:'整理岗位公开资料',researching:'核对招聘资料',
+  writing:'编写完整岗位报告',scoring:'分析岗位与简历',
   waiting:'正在匹配岗位'
  };
 
- const [selectedJobUrl,setSelectedJobUrl]=useState<string|null>(optimizedJobUrl);
- const [manualStage,setManualStage]=useState<number|null>(null);
- // Keep the initial career report in view while background search advances.
- const [followProgress,setFollowProgress]=useState(false);
- const [furthestStage,setFurthestStage]=useState(0);
- const currentStage=matchStageIndex(progressStage);
- useEffect(()=>{
-  if(pending&&currentStage>=0)setFurthestStage(old=>Math.max(old,currentStage));
- },[pending,currentStage]);
- const hasLiveCandidate=researchJobs.length>0||result.matches.length>0;
- // Enter the job dossier as soon as the FIRST real candidate is received.
- // Manual tab selection always wins; switching tabs never cancels background work.
- const selectedStage=manualStage??(pending||taskFailed?(hasLiveCandidate?2:followProgress?Math.max(furthestStage,currentStage):0):2);
- const showResults=selectedStage===2;
- const selectStage=(next:number|null)=>{
-  setManualStage(next);if(next===null)setFollowProgress(true);
-  const viewport=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content');
-  if(viewport)viewport.scrollTop=0;
- };
+ const [,setSelectedJobUrl]=useState<string|null>(optimizedJobUrl);
+ const showResults=!optimizedJobUrl;
  const matchListScroll=useRef(0);
  const activeJob=verifiedMatchReports(result.matches).find(job=>job.official_url===optimizedJobUrl)||result.matches.find(job=>job.official_url===optimizedJobUrl&&job.id===initialOptimizedJobId&&archivedHistoryJob(job));
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
@@ -167,7 +150,7 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
  }
  return createPortal(<>
   <div className="hhba-match-overlay" role="presentation" hidden={minimized} style={minimized?{display:'none'}:undefined} onMouseDown={e=>{if(e.target===e.currentTarget)e.preventDefault()}} onClick={e=>{if(e.target===e.currentTarget&&pending)minimizeSearch()}}>
-   <div className={'hhba-match-modal'+(optimizedJobUrl?' hhba-match-modal-editor':'')} role="dialog" aria-modal="true" tabIndex={-1}
+   <div className={'hhba-match-modal'+(optimizedJobUrl?' hhba-match-modal-editor':' hhba-report-first-dialog')} role="dialog" aria-modal="true" tabIndex={-1}
     ref={ref} onKeyDown={handleKey} aria-label={optimizedJobUrl?'岗位专属简历优化':'岗位匹配'}>
     <header className={'hhba-match-modal-head'+(optimizedJobUrl&&sourceResume?' hhba-word-editor-head':'')}>
      {optimizedJobUrl&&sourceResume&&activeJob?
@@ -197,20 +180,9 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice}{result.matches.length>0?' 已显示本次收到的岗位；请核对招聘原始页面。':''}</p>}
-     {!optimizedJobUrl&&<MatchResearchPanels profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches} pending={pending} provisional={taskFailed} progressStage={progressStage} activity={progressActivity} execution={execution} elapsed={elapsed} selection={selectedStage} onSelectionChange={selectStage} onFollow={()=>selectStage(null)} selectedJobUrl={selectedJobUrl} onJobChange={setSelectedJobUrl} onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
-     {pending&&!optimizedJobUrl&&selectedStage!==1&&<><div className="hhba-research-now" role="status">
-      <LoaderCircle size={18} className="spin" aria-hidden="true"/>
-      <div className="hhba-match-progress-copy">
-       <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
-       {progressActivity?.message&&<span>{progressActivity.message}</span>}
-       {progressActivity?.candidate_links!==undefined&&<span>
-        已收录 {progressActivity.candidate_links} 条招聘线索 · 已读取 {progressActivity.pages_read??0} 份岗位资料 · 逐岗位进行来源核对及适配研究
-       </span>}
-       {researchReport&&<span>已收到 {researchReport.search_source_count??0} 条公开检索来源 · 已发现 {Math.max(researchReport.discovered,researchJobs.length)} 个候选岗位 · 已排除 {researchReport.excluded_count} 条商业平台链接</span>}
-       {verifiedMatchReports(result.matches).length>0&&<span>已完成 {verifiedMatchReports(result.matches).length} 份可核验报告，最终排名待确认</span>}
-      </div>
-      <span className="hhba-match-progress-time" aria-hidden="true">已用时 {elapsed} 秒</span>
-     </div></>}
+     {!optimizedJobUrl&&<ReportFirstMatchExperience profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches}
+      pending={pending} failed={taskFailed} progressStage={progressStage} activity={progressActivity} elapsed={elapsed}
+      onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
      {activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
        {pending&&<p className="hhba-refined-note" role="status">其他岗位仍在后台搜索与研究，当前这份已完成可靠报告的岗位可以单独优化简历。</p>}
@@ -247,52 +219,10 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
        <a className="hhba-native-apply" href={activeJob.official_url} target="_blank" rel="noopener noreferrer"
         data-hhba-recruitment-outbound="true">前往企业官网投递 <ArrowUpRight size={15}/></a>
       </section>:<>
-     {showResults&&<>
-     {!pending&&result.native_search?.mode==='V4_SIMPLE_AI'&&<div className="hhba-match-disclaimer" role="status">本次发现 {result.native_search.candidate_links??0} 个候选，已核验 JD {result.native_search.jd_verification?.verified??0} 个，完成官方JD证据评分 {result.native_search.jd_verification?.scored??0} 个，AI参考评分 {result.native_search.jd_verification?.reference_scored??0} 个。{result.native_search.stage==='partial'?'研究未达到完整交付目标；未核验或证据不足的候选保留在研究记录，不代表没有适合的工作。':''}{result.native_search.research_error?' 研究中断原因：'+result.native_search.research_error:''}{result.native_search.diagnostics&&Object.keys(result.native_search.diagnostics).length>0?<details><summary>查看实际核验诊断</summary>{Object.entries(result.native_search.diagnostics).map(([code,count])=><span key={code}>{code}：{count}；</span>)}</details>:null}</div>}
-     {!pending&&result.native_search?.mode==='HHBA_MATCH_CLEAN_V2'&&<p className="hhba-match-disclaimer" role="status">
-      新版独立求职研究：搜索 {result.native_search.queries??0} 组关键词，
-      取得 {result.native_search.candidate_links??0} 条企业职位来源，
-      尝试打开 {result.native_search.fetch_attempted??0} 个网页，
-      成功读取 {result.native_search.page_reads??0} 个，
-      有明确工作城市原文的网页 {result.native_search.city_evidence_count??0} 个，
-      最终识别 {result.native_search.extracted_jobs??0} 条具体职位。
-      {(result.native_search.search_failures??0)>0?
-       ' 搜索服务异常 '+(result.native_search.search_failures??0)+' 组；':''}
-      {(result.native_search.fetch_failures??0)>0?
-       ' 网页读取失败 '+(result.native_search.fetch_failures??0)+' 次；':''}
-      {(result.native_search.model_failures??0)>0?
-       ' 岗位信息提取模型失败 '+(result.native_search.model_failures??0)+' 批；':''}
-      {result.native_search.score_provider_error?' 本次评分模型异常：'+result.native_search.score_provider_error+'；':''}
-      {result.native_search.planning_error?' 搜索规划异常：'+result.native_search.planning_error+'；':''}
-      {result.native_search.provider_error_codes?.length?
-       ' 搜索错误：'+result.native_search.provider_error_codes.join('、')+'；':''}
-      {result.native_search.fetch_error_codes?.length?
-       ' 网页错误：'+result.native_search.fetch_error_codes.join('、')+'；':''}
-      {result.native_search.stage!=='complete'?
-       ' 本轮没有充分取得真实职位证据（阶段：'+result.native_search.stage+'），不代表没有适合的工作。':''}
-     </p>}
-     {!pending&&result.native_search?.hybrid_fallback&&<p className="hhba-match-disclaimer" role="status">
-      本轮国内企业补充搜索 {result.native_search.hybrid_fallback.queries??0} 组查询，
-      发现 {result.native_search.hybrid_fallback.candidate_links??0} 条合规招聘来源，
-      已尝试打开 {result.native_search.hybrid_fallback.fetch_attempted??0} 个网页，
-      实际读取成功 {result.native_search.hybrid_fallback.fetched_job_pages??0} 个，
-      找到 {result.native_search.hybrid_fallback.explicit_work_city_sources??0} 条明确工作城市证据；
-      目前形成 {result.native_search.hybrid_fallback.source_previews??0} 条有职位与地点依据的待核实职位。
-      {result.native_search.native_error?' 主搜索未完整成功（'+result.native_search.native_error+'），已独立核对取得的来源。':''}
-      {(result.native_search.hybrid_fallback.native_source_salvage_attempted??0)>0?
-       ' 主搜索中断前保留 '+(result.native_search.hybrid_fallback.native_source_salvage_attempted??0)+
-       ' 条真实网页来源，补充核实 '+(result.native_search.hybrid_fallback.native_source_salvage_jobs??0)+' 条具体职位。':''}
-      {(result.native_search.hybrid_fallback.candidate_links??0)>0&&(result.native_search.hybrid_fallback.source_previews??0)===0?
-       '本轮仍未完成职位信息核实，不代表没有适合的岗位。':''}
-     </p>}
      {!pending&&result.history_status==='SAVED'&&<div className="hhba-match-history-confirm">
-      <span>这次的真实推荐结果已保存到你账户的「匹配历史」，下次登录可以继续查看。</span>
-      <Link to="/candidate/account/applications" onClick={onClose}>查看匹配历史</Link>
-      {Number(result.new_job_count||0)>0&&<small>相较之前的记录，新发现 {result.new_job_count} 个未推荐过的岗位。</small>}
+      <span>已保存本次正式推荐记录。</span><Link to="/candidate/account/applications" onClick={onClose}>查看匹配历史</Link>
      </div>}
-     {!pending&&result.history_status==='UNAVAILABLE'&&
-      <p className="hhba-match-history-warning" role="status">本次岗位推荐已完成，但账户匹配历史暂未保存成功，请保留当前结果并稍后重试。</p>}
-     </>}
+     {!pending&&result.history_status==='UNAVAILABLE'&&<p className="hhba-match-history-warning" role="status">本次研究成果已展示，但正式推荐历史尚未保存成功。</p>}
      {!pending&&resumeStorage?.available&&<div className="hhba-match-save-resume">
        <strong>把这份简历保存到「我的简历」</strong>
        <p>原文件仅写入你的私有简历库，方便下次复用；不会因保存而再次调用 AI 或向企业投递。</p>

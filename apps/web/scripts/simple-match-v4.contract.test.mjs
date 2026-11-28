@@ -137,7 +137,7 @@ test('V4 backend heartbeat reaches frontend without inventing new candidate coun
  assert.match(service,/onExecution\?\.\(matchExecutionFromServer\(data\.progress\?\.execution\)\)/);
  assert.match(service,/if\(event==='heartbeat'\)/);
  assert.match(page,/execution=\{execution\}/);
- assert.match(dialog,/execution=\{execution\}/);
+ assert.match(dialog,/activity=\{progressActivity\}/);
  assert.match(panel,/workerAge>90/);
  assert.match(panel,/最近新增研究成果/);
  assert.doesNotMatch(panel,/execution\?\.state==='processing'\?'已发现/);
@@ -705,16 +705,16 @@ test('history research profile retains derived outcomes but not original resume 
  assert.ok(!JSON.stringify(report).includes('ORIGINAL_RESUME_QUOTE'));assert.equal(report.rounds[0].added,3);
  assert.equal(report.search_source_count,435);assert.equal(report.search_mode,'source_pool');assert.equal(report.final_target,30);assert.equal(report.candidate_target,undefined);
 });
-test('three stage buttons show real reports without changing AI execution',async()=>{
+test('new report-first workspace is independent of old stage panels and model execution',async()=>{
  const {readFile}=await import('node:fs/promises');
- const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+ const experience=await readFile(new URL('../src/components/ReportFirstMatchExperience.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- for(const label of ['识别简历','搜索企业岗位','岗位研究与匹配'])assert.ok(panels.includes(label));
- assert.match(panels,/stages:\['reading','researching','writing','scoring'\]/);
- assert.doesNotMatch(panels,/active===3|externalScore/);
- assert.match(panels,/onClick=\{\(\)=>\{setSelected\(i\);onSelectionChange\?\.\(i\)\}\}/);assert.match(panels,/report\?\.rounds/);
- assert.match(dialog,/!optimizedJobUrl&&<MatchResearchPanels/);
- assert.doesNotMatch(panels,/AbortController|fetch\(/);
+ assert.match(dialog,/!optimizedJobUrl&&<ReportFirstMatchExperience/);
+ assert.match(experience,/role="tablist"/);
+ for(const name of ['研究报告','机会探索','职业画像','岗位详情'])assert.ok(experience.includes(name));
+ assert.match(experience,/firstDelivered\.current=true;setView\('reports'\)/);
+ assert.match(experience,/const fullReport=/);
+ assert.doesNotMatch(experience,/AbortController|fetch\(/);
 });
 
 test('V4 accepts a separate authorized recruitment system with independently read employer link',async()=>{
@@ -817,10 +817,11 @@ test('research overview is driven by observed evidence, not animated provider-ca
  assert.match(panels,/activity\?\.message/);
  assert.match(panels,/setArrival\(old=>/);
  assert.doesNotMatch(panels,/setInterval|setTimeout|Math\.random|fetch\(/);
- assert.match(dialog,/selection=\{selectedStage\}/);
- assert.match(dialog,/onFollow=\{\(\)=>selectStage\(null\)\}/);
- assert.match(dialog,/hasLiveCandidate\?2/);
- assert.match(dialog,/showResults&&<>/);
+ const experience=await readFile(new URL('../src/components/ReportFirstMatchExperience.tsx',import.meta.url),'utf8');
+ assert.match(dialog,/<ReportFirstMatchExperience/);
+ assert.match(experience,/const sourceCount=report\?\.search_source_count\|\|0/);
+ assert.match(experience,/const ready=useMemo\(\(\)=>all\.filter\(fullReport\)/);
+ assert.match(experience,/firstDelivered\.current=true;setView\('reports'\)/);
  assert.match(panels,/全部已收到候选岗位/);
  assert.match(css,/max-width:640px/);
  assert.match(css,/hhba-job-dossier-milestones/);
@@ -1121,9 +1122,9 @@ test('the report separates verified JD from all candidate records even when form
  assert.doesNotMatch(panels,/all\.filter\(j=>!confirmed\(j\)\)\.map/);
  assert.match(panels,/reportScore\(jdJob\)\?\?'—'/);
  assert.match(panels,/onOptimize\(jdJob\)/);
- assert.match(dialog,/const showResults=selectedStage===2/);
+ assert.match(dialog,/<ReportFirstMatchExperience/);
  assert.doesNotMatch(dialog,/result\.matches\.map\(\(job,i\)/);
- assert.match(dialog,/selectedJobUrl=\{selectedJobUrl\}/);
+ assert.match(dialog,/onOptimize=\{optimizeJob\}/);
 });
 
 test('only complete grounded official reports enter the formal UI and preserve server rank order',async()=>{
