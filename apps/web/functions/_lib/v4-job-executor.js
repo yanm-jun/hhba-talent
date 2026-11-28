@@ -263,8 +263,10 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   const idx=matches.findIndex(x=>itemUrl(x)===current.url);
   const row=structuredClone(saved.job);
   if(idx<0)matches.push(row);
-  else matches[idx]=isReferenceResult?preserveJobEvidence(matches[idx],row):
-   preserveJobEvidence(matches[idx],{...matches[idx],...row});
+  else matches[idx]=preserveJobEvidence(matches[idx],row);
+  // Do not spread an AI reference COMPLETE flag into new official evidence.
+  // preserveJobEvidence keeps the finished reference as a separately labelled
+  // fallback and only lets independently validated official reports qualify.
   if(record.lane==='verification'){
    done.add(current.url);revisions.set(current.url,candidateRevision(current.job));
    for(const field of ['read','scored','archived','scoreFailures']){
