@@ -27,10 +27,10 @@ function sameSiteMutation(request){
  const url=new URL(request.url);
  return origin===url.origin&&request.headers.get('Sec-Fetch-Site')!=='cross-site';
 }
-async function boundedBytes(request){
+async function boundedBytes(request,limit=RESUME_LIMIT_BYTES){
  if(!request.body)throw new ResumeValidationError('INVALID_RESUME_SIZE');
  const declared=request.headers.get('Content-Length');
- if(declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>RESUME_LIMIT_BYTES))
+ if(declared!==null&&(!/^\d+$/.test(declared)||Number(declared)>limit))
   throw new ResumeValidationError('INVALID_RESUME_SIZE');
  const chunks=[],reader=request.body.getReader();let total=0;
  try{
@@ -38,7 +38,7 @@ async function boundedBytes(request){
    const next=await reader.read();
    if(next.done)break;
    total+=next.value.byteLength;
-   if(total>RESUME_LIMIT_BYTES){await reader.cancel();throw new ResumeValidationError('INVALID_RESUME_SIZE');}
+   if(total>limit){await reader.cancel();throw new ResumeValidationError('INVALID_RESUME_SIZE');}
    chunks.push(next.value);
   }
  }finally{reader.releaseLock();}
@@ -81,7 +81,9 @@ export async function onRequest({request,env}){
    const length=request.headers.get('Content-Length');
    if(length!==null&&(!/^\d+$/.test(length)||Number(length)>256))
     return err('INVALID_CHECK_REQUEST',400);
-   const body=await request.text();
+   let body;
+   try{body=new TextDecoder().decode(await boundedBytes(request,256));}
+   catch{return err('INVALID_CHECK_REQUEST',400);}
    if(body.length>256)return err('INVALID_CHECK_REQUEST',400);
    let input;
    try{input=JSON.parse(body);}catch{return err('INVALID_CHECK_REQUEST',400);}
