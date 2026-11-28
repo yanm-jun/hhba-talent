@@ -45,9 +45,13 @@ export function validateCuratedReport(value,resume,jd){
  const comparisons=Array.isArray(value.comparisons)?value.comparisons:[];
  // Optional report structure is not an eligibility gate; validate any supplied claims.
  const has=(source,quote)=>!!str(quote)&&norm(source).includes(norm(quote));
+ const compared=new Map();
 
  for(const c of comparisons){
   if(!['supported','partial','missing'].includes(c?.status)||!has(jd,c?.jd_quote)||!str(c?.analysis)){errors.push('comparison_jd_or_analysis');continue;}
+  const requirement=norm(c.jd_quote),prior=compared.get(requirement);
+  if(prior&&prior!==c.status)errors.push('comparison_conflicting_status');
+  compared.set(requirement,c.status);
   if(c.status!=='missing'){if(!has(resume,c.resume_quote))errors.push('comparison_resume');}
   else if(str(c.resume_quote)&&!has(resume,c.resume_quote))errors.push('comparison_resume');
  }
