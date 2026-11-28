@@ -5,7 +5,7 @@
  */
 import {sessionOfBearer,getUserByPhone} from '../../_lib/real-auth.js';
 import {redactForModel} from '../../_lib/resume-match-core.js';
-import {qualifiedReport} from '../../_lib/v4-curated-reports.js';
+import {qualifiedReport,completedReferenceReport,v4ReportFirstTask} from '../../_lib/v4-curated-reports.js';
 import {createAiUsageBuffer} from '../../_lib/ai-token-usage.js';
 import {v4PhaseMetricSample,recordV4PhaseOps} from '../../_lib/v4-phase-ops-metrics.js';
 import {v4JobMetricSample,recordV4JobOps} from '../../_lib/v4-job-ops-metrics.js';
@@ -120,6 +120,7 @@ function events(env,request,input,waitUntil){
    };
    const allowedJob=j=>j&&!j.excluded_board&&!isCommercialRecruitmentBoard(j.official_url,j);
    const officialJob=j=>allowedJob(j)&&qualifiedReport(j);
+   const readableReport=j=>allowedJob(j)&&(officialJob(j)||completedReferenceReport(j)||completedReferenceReport(j?.reference_report));
    let lastReport=input.savedProgress?.report,latestActivity=input.savedProgress?.activity,lastJobs=input.savedProgress?.jobs||[];
    const jobJournal=createV4JobEventJournal(input.savedProgress?.job_events);
    const searchSpeed=createV4SearchSpeedTracker({previous:input.savedProgress?.search_speed,savedJobs:lastJobs});
@@ -128,7 +129,7 @@ function events(env,request,input,waitUntil){
     job_events:jobJournal.snapshot(),search_speed:searchSpeed.snapshot(),execution:workerSnapshot()});
     let reportRecovery;
     const captureTime=()=>Date.now();
-   const seenResults={candidate:new Set(lastJobs.map(j=>j.official_url)),jd:new Set(lastJobs.filter(j=>j.jd_source_status==='VERIFIED_JD').map(j=>j.official_url)),score:new Set(lastJobs.filter(j=>Number.isInteger(j.match_score)).map(j=>j.official_url)),report:new Set(lastJobs.filter(officialJob).map(j=>j.official_url))};
+   const seenResults={candidate:new Set(lastJobs.map(j=>j.official_url)),jd:new Set(lastJobs.filter(j=>j.jd_source_status==='VERIFIED_JD').map(j=>j.official_url)),score:new Set(lastJobs.filter(j=>Number.isInteger(j.match_score)).map(j=>j.official_url)),report:new Set(lastJobs.filter(readableReport).map(j=>j.official_url))};
    const observeResult=(kind,url)=>{if(url&&!seenResults[kind].has(url)){seenResults[kind].add(url);jobJournal.record(kind,url);delivery.result(kind);}};
    async function publishProgress(status='PENDING',failure=null,kind=null){
      if(!input.background||!input.taskKey)return false;
@@ -136,7 +137,7 @@ function events(env,request,input,waitUntil){
      // phase-end/terminal write uses the existing mandatory recovery headroom.
      if(kind){if(leaseAbort.signal.aborted||!budget?.tryProgress(kind)){delivery.blocked(kind);return false;}}
      else budget?.observe('progress');
-     const write=delivery.write(kind||'terminal',{candidateCount:lastJobs.length,reportCount:lastJobs.filter(officialJob).length});
+     const write=delivery.write(kind||'terminal',{candidateCount:lastJobs.length,reportCount:lastJobs.filter(readableReport).length});
      try{
       // The recovery supplement is private: polling exposes only .progress.
       const discovery_recovery=status==='PENDING'?discoveryRecoverySnapshot(input.checkpoint,input.recoveryState?.()):undefined;
@@ -159,11 +160,18 @@ function events(env,request,input,waitUntil){
     const queue=await reconcileV4JobWork(env.HHBA_PNVS_AUTH_DB,input.taskKey,input.generation||0,checkpoint);
     let awakened=true;
     if(queue.work>0&&input.backgroundTicket&&stagedV4WorkflowsEnabled(env)){
-     // Verification starts with the first saved candidate; reporting starts
-     // when global ranking has selected which reports are actually needed.
+     // New source-driven tasks prioritize a reference report as soon as one
+     // concrete candidate is saved; official verification continues on its own
+     // lane and does not block the report.
+     if(v4ReportFirstTask(checkpoint)){
+      const reportWake=await stageWorkflowSignal(env,input.backgroundTicket,{lane:'reporting'});
+      if(!reportWake)console.warn('HHBA_V4_REFERENCE_FIRST_WAKE_DEFERRED');
+      awakened=awakened&&reportWake;
+     }
      const lane=checkpoint.phase==='reporting'?'reporting':'verification';
-     awakened=await stageWorkflowSignal(env,input.backgroundTicket,{lane});
-     if(!awakened)console.warn('HHBA_V4_INDEPENDENT_LANE_WAKE_DEFERRED',lane);
+     const verificationWake=await stageWorkflowSignal(env,input.backgroundTicket,{lane});
+     awakened=awakened&&verificationWake;
+     if(!verificationWake)console.warn('HHBA_V4_INDEPENDENT_LANE_WAKE_DEFERRED',lane);
     }
     if(queue.available&&queue.remaining===0&&awakened)lastQueuedRowCount=Math.max(lastQueuedRowCount,checkpoint.rows.length);
     return queue;
@@ -193,15 +201,15 @@ function events(env,request,input,waitUntil){
    const rememberDiscoveryStats=stats=>{if(!lastReport)return;
     if((stats.discovered||0)>(lastReport.discovered||0)||(stats.search_source_count||0)>(lastReport.search_source_count||0))lastEvidenceAt=Date.now();
     lastReport={...lastReport,discovered:Math.max(lastReport.discovered||0,stats.discovered||0),excluded_count:Math.max(lastReport.excluded_count||0,stats.excluded_count||0),search_source_count:Math.max(lastReport.search_source_count||0,stats.search_source_count||0)};if(!input.background)send('research_report',lastReport);queueProgress('candidate');};
-   const reportSignature=jobs=>JSON.stringify(jobs.filter(officialJob).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd]));
+   const reportSignature=jobs=>JSON.stringify(jobs.filter(readableReport).map(j=>[j.official_url,j.match_score,j.jd_sha256,j.research_detail,j.reference_jd,j.reference_report]));
    let lastReportSignature=reportSignature(lastJobs);
-   const researchEvidence=j=>officialJob(j)||!!(j.evidence_excerpt||j.reference_jd||j.jd_research?.facts?.length||j.jd_research?.inference||j.reference_vacancy_verified||j.jd_source_status==='VERIFIED_JD'||Number.isInteger(j.match_score));
-   const evidenceSignature=jobs=>JSON.stringify(jobs.filter(researchEvidence).map(j=>[j.official_url,j.jd_source_status,j.evidence_excerpt,j.reference_vacancy_verified,j.reference_jd,j.jd_research,j.match_score,j.score_basis,j.report_status]));
+   const researchEvidence=j=>officialJob(j)||!!(j.evidence_excerpt||j.reference_jd||j.jd_research?.facts?.length||j.jd_research?.inference||j.reference_vacancy_verified||j.jd_source_status==='VERIFIED_JD'||Number.isInteger(j.match_score)||completedReferenceReport(j?.reference_report));
+   const evidenceSignature=jobs=>JSON.stringify(jobs.filter(researchEvidence).map(j=>[j.official_url,j.jd_source_status,j.evidence_excerpt,j.reference_vacancy_verified,j.reference_jd,j.jd_research,j.match_score,j.score_basis,j.report_status,j.reference_report]));
    let lastEvidenceSignature=evidenceSignature(lastJobs);
    const publishedCandidateKeys=new Set(lastJobs.map(j=>v4DiscoveryCandidateKey(j.official_url)).filter(Boolean));
    let currentCandidateKeys=new Set(publishedCandidateKeys);
    const rememberJobs=matches=>{
-    for(const j of matches.filter(j=>allowedJob(j)&&!j.excluded_closed)){searchSpeed.observe(j);const u=j.official_url;observeResult('candidate',u);if(j.jd_source_status==='VERIFIED_JD')observeResult('jd',u);if(Number.isInteger(j.match_score))observeResult('score',u);if(officialJob(j))observeResult('report',u);}
+    for(const j of matches.filter(j=>allowedJob(j)&&!j.excluded_closed)){searchSpeed.observe(j);const u=j.official_url;observeResult('candidate',u);if(j.jd_source_status==='VERIFIED_JD')observeResult('jd',u);if(Number.isInteger(j.match_score))observeResult('score',u);if(readableReport(j))observeResult('report',u);}
     // The progress object is encrypted and bound to this authorized task.
     // Keep independently researched intermediate results as well as reports.
     // Merge same-task evidence only for a currently present identity; absent or
