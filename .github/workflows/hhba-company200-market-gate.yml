@@ -5,6 +5,17 @@ on:
     paths:
       - 'apps/web/scripts/company200-integration.contract.test.mjs'
       - 'apps/web/src/components/UnifiedJobMarket.tsx'
+      - 'apps/web/scripts/hhba-unified-static.contract.test.mjs'
+      - 'apps/web/scripts/official-recruitment-gate-photos.contract.test.mjs'
+      - 'apps/web/scripts/strict-auth-no-photo-outlinks.behavior.test.mjs'
+      - 'apps/web/src/pages/JoinUsPage.tsx'
+      - 'apps/web/src/pages/PhoneAuthPage.tsx'
+      - 'apps/web/src/pages/AuthPage.tsx'
+      - 'apps/web/src/pages/OfficialRecruitmentContinuePage.tsx'
+      - 'apps/web/src/components/Shell.tsx'
+      - 'apps/web/src/components/MatchResearchPanels.tsx'
+      - 'apps/web/src/services/recruitmentOutbound.ts'
+      - 'apps/web/public/images/hhba-founder-signature*'
       - '.github/workflows/hhba-company200-market-gate.yml'
   workflow_dispatch:
 permissions:
@@ -21,3 +32,7 @@ jobs:
       - name: Ensure 200-company and recruitment routes coexist
         working-directory: apps/web
         run: node scripts/company200-integration.contract.test.mjs
+
+      - name: Validate current static deployment contracts before merge
+        working-directory: apps/web
+        run: node --test scripts/hhba-unified-static.contract.test.mjs scripts/official-recruitment-gate-photos.contract.test.mjs scripts/strict-auth-no-photo-outlinks.behavior.test.mjs
