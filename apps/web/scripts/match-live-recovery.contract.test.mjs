@@ -39,7 +39,7 @@ test('the modal shows current progress while SSE retains search metrics',()=>{
  const service=readFileSync(new URL('../src/services/resumeMatch.ts',import.meta.url),'utf8');
  const route=readFileSync(new URL('../functions/api/match-v4/[[path]].js',import.meta.url),'utf8');
  assert.match(app,/stageTitle\[progressStage\]/);
- assert.match(app,/已完成 \{verifiedMatchReports\(result\.matches\)\.length\} 份可核验报告，最终排名待确认/);
+ assert.match(app,/<ReportFirstMatchExperience/);
  assert.doesNotMatch(app,/DeepSeek|候选来源/);
  assert.match(service,/event==='activity'/);
  assert.match(service,/onActivity\?\.\(/);
@@ -64,7 +64,8 @@ test('managed polling retains the complete report and uses the same report gate 
  assert.ok(route.includes('v4ManagedResourceBudget({background:input.background,recovering:input.resourceRecovery})')&&
   budgetSource.includes('progressReserve:background?4:0'),'managed background progress has explicit reserved capacity');
  assert.ok(/const reports=verifiedMatchReports\(liveCandidates\.jobs\(\)\);\s*onPartial\?\.\(reports\)/.test(service),'polling must feed the report pager, not just search results');
- assert.ok(dialog.includes('hasLiveCandidate?2:'),'the first real candidate opens its evolving research card before a complete report');
+ const experience=readFileSync(new URL('../src/components/ReportFirstMatchExperience.tsx',import.meta.url),'utf8');
+ assert.ok(experience.includes("firstDelivered.current=true;setView('reports')"),'the first completed report automatically becomes the active workspace');
  assert.ok(panels.includes("pending||provisional?'完整研究报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
 });
 
