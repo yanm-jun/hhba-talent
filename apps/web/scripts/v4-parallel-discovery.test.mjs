@@ -1590,3 +1590,17 @@ test('live search source and commercial exclusion counts are published before an
   const result=await run;assert.equal(result.checkpoint.observedSearchSources.length,2);assert.equal(result.checkpoint.rejectedBoards.length,1);
  }finally{clearTimeout(timeout);try{controller.close();}catch{}await run.catch(()=>{});}
 });
+
+
+test('new parallel research lanes see actual sources and desired reports, never a 300-candidate quota',()=>{
+ const input=discoveryLaneContext({profile,roleHint:'全国',round:2,lane:1,width:3,previousJobs:[job(1)],sourceDriven:true,sourceCount:435,finalTarget:30});
+ assert.equal(input.search_mode,'source_pool');
+ assert.equal(input.search_source_count,435);
+ assert.equal(input.final_target,30);
+ assert.equal(input.candidate_target,undefined);
+ assert.equal(input.remaining_candidates,undefined);
+ const historic=discoveryLaneContext({profile,roleHint:'全国',round:2,lane:1,width:3,previousJobs:[],candidateTarget:300,remainingCandidates:278});
+ assert.equal(historic.candidate_target,300);
+ assert.equal(historic.remaining_candidates,278);
+ assert.equal(historic.search_mode,undefined);
+});

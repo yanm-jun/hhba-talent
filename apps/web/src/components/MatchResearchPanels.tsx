@@ -123,7 +123,12 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  // The candidate event can precede the aggregate report. Count actual received
  // candidate rows immediately; final history still uses the authoritative total.
  const discovered=pending?Math.max(report?.discovered??0,jobs.length):report?.discovered??all.length;
- const target=report?.candidate_target;
+ // New tasks count actual search sources, not a synthetic 300-candidate quota.
+ // Existing 300→30 and 500→50 checkpoints keep their original targets.
+ const sourceDriven=report?.search_mode==='source_pool'||!report;
+ const sourceCount=report?.search_source_count??0;
+ const mainCount=sourceDriven?sourceCount:discovered;
+ const target=sourceDriven?undefined:report?.candidate_target;
  const searching=pending&&actual===1;
  const ratio=target?Math.max(0,Math.min(100,discovered/target*100)):0;
  const companies=new Set(all.map(j=>j.company.trim()).filter(x=>x&&!/待核实|未知/.test(x))).size;
@@ -189,11 +194,11 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     <div className="hhba-search-live"><span aria-hidden="true" className="hhba-search-dot"/>{searching?'RESEARCH IN PROGRESS':pending?'RESEARCH RECORD':'RESEARCH RESULTS'}</div>
     <h2>{searching?'正在寻找你的下一份机会。':'你的职业机会研究'}</h2>
     <p className="hhba-search-subtitle">基于真实经历，探索更适合你的职业可能。</p>
-    <div className="hhba-search-number" aria-live="polite"><span key={discovered}>{discovered}</span>{target&&<small> / {target}</small>}</div>
-    <p className="hhba-search-number-label">已发现候选岗位 · 尚需核验</p>
-    {target&&<div className="hhba-search-progress" role="progressbar" aria-label="候选岗位收集进度" aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(discovered,target)}><div style={{width:ratio+'%'}}/></div>}
+    <div className="hhba-search-number" aria-live="polite"><span key={mainCount}>{mainCount}</span>{target&&<small> / {target}</small>}</div>
+    <p className="hhba-search-number-label">{sourceDriven?'已收到检索来源 · 数量不设上限':'已发现候选岗位 · 尚需核验'}</p>
+    {target?<div className="hhba-search-progress" role="progressbar" aria-label="候选岗位收集进度" aria-valuemin={0} aria-valuemax={target} aria-valuenow={Math.min(discovered,target)}><div style={{width:ratio+'%'}}/></div>:pending?<div className="hhba-search-progress hhba-search-progress-unbounded" role="status" aria-label="AI 正在持续搜索，无固定来源数量目标"><div/></div>:null}
     <div className="hhba-search-activity" role="status"><span key={searching?activity?.message||'正在等待联网研究成果':pending?'正在处理后续研究阶段':'本次搜索记录已整理'}>{searching?activity?.message||'正在等待联网研究成果':pending?'正在处理后续研究阶段':'本次搜索记录已整理'}</span></div>
-    <div className="hhba-search-meta"><span>研究轮次 <b>{report?.rounds.length??0}</b></span><span>已发现企业 <b>{companies}</b></span><span>已收到检索来源 <b>{report?.search_source_count??0}</b></span><span>排除商业来源 <b>{report?.excluded_count??0}</b></span>{pending&&elapsed!==undefined&&<span>已用时 <b>{elapsed}</b> 秒</span>}</div>
+    <div className="hhba-search-meta"><span>研究轮次 <b>{report?.rounds.length??0}</b></span><span>已发现企业 <b>{companies}</b></span><span>{sourceDriven?'已识别候选岗位':'已收到检索来源'} <b>{sourceDriven?discovered:sourceCount}</b></span><span>排除商业来源 <b>{report?.excluded_count??0}</b></span>{pending&&elapsed!==undefined&&<span>已用时 <b>{elapsed}</b> 秒</span>}</div>
    </div>
    <section className="hhba-refined-section hhba-discovery-feed"><div className="hhba-refined-subhead"><h3>{pending?'最新发现':'候选岗位一览'}</h3><small>{pending?'LIVE DISCOVERY':'DISCOVERY'}</small></div>
     {recent.length?recent.map(job=><div className="hhba-discovery-item" key={job.official_url}><div><JobTitle job={job}/></div><OfficialApplyAction job={job}/></div>):empty(pending?'等待实际搜索返回首个候选岗位。':'本次没有保留候选岗位。')}

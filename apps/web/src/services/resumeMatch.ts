@@ -53,7 +53,7 @@ export type MatchedJob = {
   evidence_quality?:{skills:string;experience:string;education:string};
   ranking_version?:'HHBA_MATCH_RANKING_V2';
 };
-export type MatchResearchReport={profile:MatchProfile;rounds:{round:number;queries:string[];cited_count:number;candidates:number;added:number;excluded_count:number}[];excluded_count:number;discovered:number;search_source_count?:number;candidate_target?:number;final_target?:number;concrete_count?:number;completion_reason?:string;unresolved_source_count?:number;diagnostics?:Record<string,number>};
+export type MatchResearchReport={profile:MatchProfile;rounds:{round:number;queries:string[];cited_count:number;candidates:number;added:number;excluded_count:number}[];excluded_count:number;discovered:number;search_source_count?:number;search_mode?:'source_pool'|'candidate_target';candidate_target?:number;final_target?:number;concrete_count?:number;completion_reason?:string;unresolved_source_count?:number;diagnostics?:Record<string,number>};
 export type MatchResponse = {
   status:'COMPLETE';profile:MatchProfile;matches:MatchedJob[];
   research_report?:MatchResearchReport;research_leads?:MatchedJob[];

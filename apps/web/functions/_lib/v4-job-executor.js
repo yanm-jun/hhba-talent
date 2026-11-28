@@ -35,7 +35,9 @@ function oneJobCheckpoint(checkpoint,url,job,lane){
  const scored=sourceFor(checkpoint,url);
  const proofUrls=new Set([url,job.employer_proof_url,...(job.employer_proof_urls||[])].filter(Boolean));
  return {
-  phase:lane==='verification'?'verification':'reporting',rows:[[url,structuredClone(job)]],
+  phase:lane==='verification'?'verification':'reporting',
+   search_mode:checkpoint.search_mode,candidate_target:checkpoint.candidate_target,final_target:checkpoint.final_target,
+   rows:[[url,structuredClone(job)]],
   toolUrls:(checkpoint.toolUrls||[]).filter(x=>proofUrls.has(x)),profile:checkpoint.profile,
   round:checkpoint.round||0,rounds:[],sourceLeads:[],observedSearchSources:[],
   publicEvidence:(checkpoint.publicEvidence||[]).filter(r=>proofUrls.has(r?.url)||proofUrls.has(r?.document_url)),

@@ -288,3 +288,22 @@ test('repeatedly crashed JD work cannot monopolize 300 untouched candidates',asy
  assert.equal(later.attempts,3,'research attempts are not capped');
  assert.equal(local.prepare("SELECT COUNT(*) n FROM hhba_v4_job_work_queue WHERE state='COMPLETED'").get().n,8);
 });
+
+
+test('source-driven checkpoint schedules every discovered JD but only top 30 confirmed ranked reports',async()=>{
+ const {db,local}=fixture();
+ const urls=Array.from({length:45},(_,i)=>url+'/unbounded-'+String(i+1).padStart(4,'0'));
+ const ranked=urls.slice(4,41);
+ const cp={phase:'reporting',search_mode:'source_pool',candidate_target:null,final_target:30,
+  rows:urls.map(u=>[u,{...source(),employer_proof_url:u}]),processedEarlier:[],processedEvidence:[],
+  matches:ranked.map(u=>({...scored(),official_url:u,research_candidate_url:u})),
+  globalOrder:ranked,globalRankState:{done:true}};
+ for(let i=0;i<5;i++){
+  const progress=await reconcileV4JobWork(db,taskKey,0,cp,{now:5000+i,maxChanges:40});
+  if(!progress.remaining)break;
+ }
+ assert.equal(local.prepare("SELECT COUNT(*) n FROM hhba_v4_job_work_queue WHERE lane='verification'").get().n,45,
+  'no 30- or 300-job cap on real JD verification');
+ assert.equal(local.prepare("SELECT COUNT(*) n FROM hhba_v4_job_work_queue WHERE lane='reporting'").get().n,30,
+  'only the global top 30 enter deep report queue');
+});
