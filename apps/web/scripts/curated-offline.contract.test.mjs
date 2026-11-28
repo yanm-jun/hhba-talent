@@ -53,20 +53,27 @@ test('local curated archive is self-contained, source-audited, and finite',()=>{
  }
  console.log('HHBA_CURATED_OFFLINE_CONTRACT_OK',JSON.stringify({companies:companies.companies.length,jobs:jobs.jobs.length,platforms:[...new Set(jobs.jobs.map(j=>j.originalPlatform))],thirdPartyFullJDs:0}));
 });
-test('offline mode uses same-origin JSON, not overseas ATS, Railway, or live JD fetches',()=>{
+test('optional offline archive uses same-origin JSON without replacing the current candidate route',()=>{
  const client=readFileSync('src/services/liveRecruitment.ts','utf8');
- const root=readFileSync('src/pages/HomePage.tsx','utf8');
+ const home=readFileSync('src/pages/HomePage.tsx','utf8');
  const router=readFileSync('src/main.tsx','utf8');
- assert.match(client,/BASE_URL\+'curated\/v1\/jobs\.json'/);
+ const market=readFileSync('src/components/UnifiedJobMarket.tsx','utf8');
+ // The curated toggle now belongs to the recruitment data service, not the router.
+ // Both the regular website and archive view must keep the same candidate routes.
+ assert.match(client,/const CURATED_100=import\.meta\.env\.VITE_HHBA_CURATED_STATIC==='1'/);
  assert.match(client,/if\(CURATED_100\)return listArchivedJobs\(filters,offset,signal\)/);
- assert.match(router,/VITE_HHBA_CURATED_STATIC==='1'/);
- assert.match(router,/if\(route==='\/'\)return <HomePage user=\{user\}\/>/);
- assert.doesNotMatch(router,/CuratedHomePage/);
+ assert.match(client,/fetch\(import\.meta\.env\.BASE_URL\+'curated\/v1\/jobs\.json'/);
+ assert.match(client,/credentials:'omit'/);
  assert.match(client,/recordKind:'CURATED_HISTORICAL'/);
- assert.match(root,/UnifiedJobMarket compact/);
- assert.match(router,/if\(route==='\/candidate'\)return import\.meta\.env\.VITE_HHBA_CURATED_STATIC/);
+ assert.match(router,/if\(route==='\/'\)return <HomePage user=\{user\}\/>/);
+ assert.match(router,/if\(route==='\/candidate'\)return user\?\.account_types\?\.includes\('candidate'\)/);
+ assert.match(router,/if\(route==='\/candidate\/jobs'\)return <UnifiedJobMarket user=\{user\}\/>/);
  assert.match(router,/UnifiedJobDetail/);
- assert.match(readFileSync('src/components/UnifiedJobMarket.tsx','utf8'),/历史公开岗位/);
- assert.match(readFileSync('src/components/UnifiedJobMarket.tsx','utf8'),/job\.editorial\.responsibilities/);
- assert.match(readFileSync('src/components/UnifiedJobMarket.tsx','utf8'),/尚未取得可核实/);
+ assert.doesNotMatch(router,/CuratedHomePage/);
+ assert.doesNotMatch(router,/VITE_HHBA_CURATED_STATIC/,'no legacy archive-only routing override');
+ assert.match(home,/<UnifiedJobMarket compact\/>/);
+ assert.match(market,/const curatedHundred=import\.meta\.env\.VITE_HHBA_CURATED_STATIC==='1'/);
+ assert.match(market,/历史公开岗位/);
+ assert.match(market,/job\.editorial\.responsibilities/);
+ assert.match(market,/尚未取得可核实/);
 });
