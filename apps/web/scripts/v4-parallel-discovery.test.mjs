@@ -20,7 +20,9 @@ test('actual V4 discovery overlaps three provider calls, deduplicates and preser
   return model({profile,jobs,research_complete:true,completion_reason:'test'},jobs.map(j=>j.url));
  };
  const first=await v4Match(fetcher,provider,resume,'',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true});
- const wave=await v4Match(fetcher,provider,resume,'',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:first.checkpoint});
+ // Prior source-pool checkpoints retain their original multi-lane research contract.
+ const legacyCheckpoint={...first.checkpoint,final_target:30,source_stop_target:null};
+ const wave=await v4Match(fetcher,provider,resume,'',{curated:true,officialOnly:true,stepMode:true,parallelResearch:true,checkpoint:legacyCheckpoint});
  assert.equal(calls,3);assert.equal(peak,3);assert.equal(wave.status,'CONTINUE');
  assert.equal(wave.checkpoint.rows.length,4);assert.equal(wave.checkpoint.discoveryWidth,1);
  assert.equal(wave.checkpoint.diagnostics.PARALLEL_AI_PROVIDER_RATE_LIMITED,1);
