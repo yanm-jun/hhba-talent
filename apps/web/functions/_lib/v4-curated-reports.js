@@ -1,5 +1,19 @@
 // Product-specific quantities, not limits on model reasoning or search rounds.
-export const CANDIDATE_TARGET=500,FINAL_TARGET=50;
+export const CANDIDATE_TARGET=300,FINAL_TARGET=30;
+export const LEGACY_CANDIDATE_TARGET=500,LEGACY_FINAL_TARGET=50;
+// New tasks use 300 -> 30. Existing encrypted checkpoints MUST retain the
+// 500 -> 50 contract under which their paid research already started. The
+// checkpoint goals are stamped on the very first continuation and carried
+// through discovery, verification, reporting and D1 job reconciliation.
+export function v4TaskTargets(checkpoint=null){
+ if(checkpoint?.candidate_target===CANDIDATE_TARGET&&checkpoint?.final_target===FINAL_TARGET)
+  return {candidateTarget:CANDIDATE_TARGET,finalTarget:FINAL_TARGET};
+ if(checkpoint&&(
+  typeof checkpoint.phase==='string'||Number.isSafeInteger(checkpoint.round)||
+  Array.isArray(checkpoint.rows)||checkpoint?.candidate_target===LEGACY_CANDIDATE_TARGET))
+  return {candidateTarget:LEGACY_CANDIDATE_TARGET,finalTarget:LEGACY_FINAL_TARGET};
+ return {candidateTarget:CANDIDATE_TARGET,finalTarget:FINAL_TARGET};
+}
 const str=v=>typeof v==='string'?v.trim():'';
 const norm=v=>str(v).replace(/\s+/g,' ').trim();
 const canonical=v=>norm(v).normalize('NFKC').toLowerCase();
