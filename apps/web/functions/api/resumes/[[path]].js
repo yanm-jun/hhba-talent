@@ -79,6 +79,19 @@ export async function onRequest({request,env}){
    const inputMime=(request.headers.get('Content-Type')||'').split(';')[0].toLowerCase();
    if(inputMime!==format.mime&&inputMime!=='application/octet-stream')
     return err('FILE_TYPE_MISMATCH',415);
+   // An authorized upload of the SAME bytes from the SAME account is
+   // idempotent. Return its original private ID, without re-uploading to R2,
+   // consuming another slot or blocking the AI match with a misleading 409.
+   // The caller still had to grant the normal explicit storage consent above.
+   const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
+   const hash=Array.from(digest,x=>x.toString(16).padStart(2,'0')).join('');
+   const existing=await db.prepare(
+    'SELECT id,filename,media_type,size_bytes,created_at FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'
+   ).bind(phone,hash).first();
+   if(existing)return safeJson({ok:true,kind:'HHBA_PRIVATE_RESUME_VAULT_V1',
+    item:summary(existing),already_saved:true});
+   // A genuinely different file still obeys both the vault quota and the
+   // per-account upload rate limit. Duplicate requests add no ledger entry.
    const count=await db.prepare(
     'SELECT COUNT(*) AS n FROM hhba_candidate_resumes WHERE phone=?'
    ).bind(phone).first();
@@ -88,12 +101,6 @@ export async function onRequest({request,env}){
     'SELECT COUNT(*) AS n FROM hhba_candidate_resume_upload_events WHERE phone=? AND created_at>=?'
    ).bind(phone,dayAgo).first();
    if(Number(uploads?.n)>=15)return err('UPLOAD_RATE_LIMITED',429);
-   const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));
-   const hash=Array.from(digest,x=>x.toString(16).padStart(2,'0')).join('');
-   const existing=await db.prepare(
-    'SELECT id FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'
-   ).bind(phone,hash).first();
-   if(existing)return err('RESUME_ALREADY_EXISTS',409);
    const id=crypto.randomUUID(),owner=await sha256Hex('candidate-resume:'+phone);
    const key='candidates/'+owner.slice(0,24)+'/'+id+'.'+format.ext;
    const createdAt=stamp();
