@@ -64,8 +64,8 @@ test('managed polling retains the complete report and uses the same report gate 
  assert.ok(route.includes('v4ManagedResourceBudget({background:input.background,recovering:input.resourceRecovery})')&&
   budgetSource.includes('progressReserve:background?4:0'),'managed background progress has explicit reserved capacity');
  assert.ok(/const reports=verifiedMatchReports\(liveCandidates\.jobs\(\)\);\s*onPartial\?\.\(reports\)/.test(service),'polling must feed the report pager, not just search results');
- assert.ok(dialog.includes('hasCompleteReport?2:'),'the first available report is shown without waiting for all candidates');
- assert.ok(panels.includes("pending||provisional?'已完成报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
+ assert.ok(dialog.includes('hasLiveCandidate?2:'),'the first real candidate opens its evolving research card before a complete report');
+ assert.ok(panels.includes("pending||provisional?'完整研究报告':'正式推荐'"),'unfinished global ranking must be identified as provisional');
 });
 
 
@@ -103,7 +103,8 @@ test('browser candidate reception uses direct SSE and actual managed snapshots; 
  assert.ok(service.includes('data.failure?.retryable?15000:completed?.more?1000:addedCandidates>0||deliveredJobs>0?2000:3000'));
  assert.ok(service.includes('liveCandidates.snapshot(data.research_leads,{final:true})'));
  assert.ok(/const reports=verifiedMatchReports\(liveCandidates\.jobs\(\)\);\s*onPartial\?\.\(reports\)/.test(service));
- assert.ok(panels.includes('Math.max(report?.discovered??0,jobs.length)'));
+ assert.ok(panels.includes('const browseItems=[...jdItems,...all.filter'),'each streamed candidate must appear in the research pager');
+ assert.ok(panels.includes('const sourceCount=report?.search_source_count??0'),'real source counts remain observable');
 });
 
 test('dedicated progress allowance cannot spend the final reserved report slot on candidates',async()=>{
