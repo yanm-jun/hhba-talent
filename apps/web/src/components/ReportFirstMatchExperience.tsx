@@ -137,7 +137,7 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
       <div className="hhba-rf-trust"><ShieldCheck size={16}/><span>{current.reference_jd_kind==='AI_GENERATED_REFERENCE'?'岗位详情为 AI 编写的参考研究，并非企业发布的原文要求。':'以可核实的岗位资料为依据；申请条件以招聘页面为准。'} 匹配分不代表录用概率。</span></div>
       <div className="hhba-rf-actions">
        {discoveryApplyDestination(current)&&<a href={discoveryApplyDestination(current)||undefined} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{isVerifiedMatchReport(current)?'投递官网':'查看岗位来源'}<ArrowUpRight size={15}/></a>}
-       {onOptimize&&isVerifiedMatchReport(current)&&<button type="button" disabled={!optimizationAvailable} onClick={()=>onOptimize(current)}><Sparkles size={15}/>针对岗位优化简历</button>}
+       {onOptimize&&isVerifiedMatchReport(current)&&<button type="button" disabled={!optimizationAvailable} aria-label={'针对'+(current.title_zh||current.title)+'优化简历'} onClick={()=>onOptimize(current)}><Sparkles size={15}/>针对岗位优化简历</button>}
       </div>
      </div>
     </article>
