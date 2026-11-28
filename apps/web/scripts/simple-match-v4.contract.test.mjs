@@ -1,6 +1,7 @@
 import test from 'node:test';
 import './v4-shared-capabilities.test.mjs';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {v4Provider,v4Call,v4ParseJson,v4GroundProfile,v4ToolSources,v4Sources,
  v4Match,v4ReadProviderResponse} from '../functions/_lib/simple-match-v4.js';
 import {v4PublicJobUrl,v4ReadEmployerJob} from '../functions/_lib/v4-open-job-evidence.js';
