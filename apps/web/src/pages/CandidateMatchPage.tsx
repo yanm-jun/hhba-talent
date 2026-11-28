@@ -366,7 +366,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
     return;
    }
    sessionTask.current=task;taskOpen.current=true;setTaskFailure(false);setError('');
-   await restoreTask(task);
+   void restoreTask(task);
   }catch(e){
    setTaskFailure(true);
    setError(e instanceof Error?e.message:'原研究任务暂无法恢复，请稍后重试。');
