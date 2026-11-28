@@ -8,7 +8,7 @@ import {v4PublicJobUrl,v4ReadEmployerJob,v4EmployerAuthorization,createEmployerP
 import {directOfficialJobEvidence} from './official-job-evidence.js';
 import {sha256Hex} from './real-auth.js';
 import {recruitmentSourceKind,isCommercialRecruitmentBoard,commercialBoardDomains} from './match-employer-source.js';
-import {v4TaskTargets,v4SourceStopReached,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,reportCoverageErrors,referenceSourceErrors,referenceMaterialErrors,eligibleCuratedScore,qualifiedReport,validateGlobalOrder,applyGlobalOrder,mergeGlobalRankProgress,carryGlobalRankProgress} from './v4-curated-reports.js';
+import {v4TaskTargets,v4SourceStopReached,curatedUrl,candidateSummary,candidateKey,concreteCandidate,validateCuratedReport,reportCoverageErrors,referenceSourceErrors,referenceMaterialErrors,eligibleCuratedScore,qualifiedReport,v4ReportFirstTask,completedReferenceReport,validateGlobalOrder,applyGlobalOrder,mergeGlobalRankProgress,carryGlobalRankProgress} from './v4-curated-reports.js';
 import {findMainlandCity} from './mainland-job-location.js';
 import {v4AcceptResearchDigest,V4_DIGEST_GUIDE,v4ResearchMemoryPage,v4ContextState,v4ContextFeedback,v4RotatingMemoryPage,v4NotesMemoryPage,v4MemoryRecordPage,v4NextStallRead,v4RunResearchAction,V4_RESEARCH_TOOL_GUIDE,v4RequestedActions,v4RunResearchActions,v4StageResearchCall,v4RememberPublicResult,v4EvidenceIndex,v4KnownPublicResearchUrls,v4ResearchEvidenceProgress,v4MayContinueBrowserRead} from './v4-research-tools.js';
 import {jdArchiveConfigured,saveVerifiedJobJd,saveV4PublicJobJd} from './job-jd-archive.js';
@@ -717,6 +717,34 @@ export async function v4Match(fetcher,provider,resume,roleHint,
  const fullResearch=curated&&env.HHBA_MATCH_V4_READY==='1';
  const independentExecutor=fullResearch&&env.HHBA_V4_JOB_EXECUTOR_ENABLED==='1'&&env.HHBA_V4_JOB_QUEUE_ENABLED==='1';
   const {candidateTarget,finalTarget,sourceDriven,sourceStopTarget}=v4TaskTargets(checkpoint);
+ // A separate reporting worker can deliver an AI-written reference dossier
+ // from the FIRST concrete candidate, before slow official-page verification
+ // or global ranking. Discovery and the official JD worker never enter here.
+ if(checkpoint?.phase==='reference'&&fullResearch&&v4ReportFirstTask(checkpoint)&&
+   Array.isArray(checkpoint.rows)&&checkpoint.rows.length===1){
+  const [url,source]=checkpoint.rows[0];
+  if(!concreteCandidate(source)||isCommercialRecruitmentBoard(url,source))throw fault('AI_REFERENCE_CANDIDATE_INVALID');
+  const prior=checkpoint.matches?.[0];
+  if(checkpoint.reference_complete&&prior)return {status:'CONTINUE',checkpoint};
+  const candidate=prior?structuredClone(prior):renderCandidatePreview(source,url,resume,false,0,new Set());
+  candidate.research_candidate_url=url;
+  // Model replay and this task-scoped checkpoint are persisted by the
+  // leased independent job worker, not by an untrusted browser callback.
+  const current=()=>({...checkpoint,matches:[candidate]});
+  onRecoveryState(current);
+  onProgress('writing');
+  onActivity('writing','已发现具体岗位，优先编写岗位详情与完整匹配研究；招聘来源独立核实。');
+  const note=code=>{const diagnostics=checkpoint.diagnostics||(checkpoint.diagnostics={});diagnostics[code]=(diagnostics[code]||0)+1;};
+  await scoreIncompleteJd(fetcher,provider,resume,roleHint,candidate,{
+   signal,browser:env.BROWSER,ledger:checkpoint.publicEvidence||[],note,
+   taskNotes:[],fullResearch:true,onMaterial:()=>onPartial([candidate])
+  });
+  if(completedReferenceReport(candidate))note('FIRST_REFERENCE_REPORT_COMPLETE');
+  const next={...current(),reference_complete:true};
+  onRecoveryState(()=>next);
+  onPartial([candidate]);
+  return {status:'CONTINUE',checkpoint:next};
+ }
  // Do not duplicate paid JD/score/report model work while separately leased
  // Pages job invocations are producing revision-bound results. If their worker
  // retries have exhausted, the ordinary V4 coordinator resumes as fallback.
