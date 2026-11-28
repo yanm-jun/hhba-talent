@@ -68,3 +68,22 @@ test('workbench no longer claims a past match implies a saved original file',()=
  assert.match(account,/listPrivateResumes\(\)/);
  assert.match(account,/listMatchHistory\(\)/);
 });
+
+test('failed pre-registration upload releases phantom research state and allows retry without pretending AI ran',()=>{
+ const run=page.slice(page.indexOf(' async function run()'),page.indexOf(' async function continueSearch()'));
+ assert.match(run,/const registered=!!sessionTask\.current\|\|!!pendingStart\.current/);
+ assert.match(run,/if\(!registered\)\{taskOpen\.current=false;setTaskFailure\(false\);\}/);
+ assert.match(run,/else setTaskFailure\(true\)/,'only a potentially registered server task can appear as interrupted');
+ assert.match(run,/setError\(e instanceof Error\?e\.message/,'show the actual upload or API error in the form');
+ assert.match(page,/!working&&taskOpen\.current&&<p role="status">/,'a failed prestart must not retain a blocking task dialog');
+});
+test('genuine interrupted task can reconnect to the original server task, without creating a second task',()=>{
+ const dialog=read('../src/components/CandidateMatchNativeDialog.tsx');
+ const retry=page.slice(page.indexOf(' async function retryFailedTask()'),page.indexOf(' async function continueSearch()'));
+ assert.match(retry,/await readSessionMatchTask\(\)/,'read the original task under the authenticated session');
+ assert.match(retry,/void restoreTask\(task\)/,'reuse the original task and generation');
+ assert.doesNotMatch(retry,/beginSessionMatchTask|advanceSessionMatchTask/,'never register a second paid task from an error dialog');
+ assert.match(dialog,/taskFailed&&onRetryFailedTask&&<button/);
+ assert.match(dialog,/恢复原研究任务/);
+ assert.match(page,/onRetryFailedTask=\{taskFailure\?\(\)=>void retryFailedTask\(\):undefined\}/);
+});
