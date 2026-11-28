@@ -73,7 +73,7 @@ test('client uses opaque cross-tab signals, scoped session storage and explicit 
  assert.match(client,/localStorage.setItem\(MATCH_TASK_SIGNAL,crypto.randomUUID\(\)\)/);
  assert.match(page,/void restoreTask\(found\)/);
  assert.match(page,/window.addEventListener\('online',online\)/);
- assert.match(page,/await closeSessionMatchTask\(task,working\|\|!!pendingStart.current\)/);
+ assert.match(page,/await closeSessionMatchTask\(task,explicitTerminate\|\|working\|\|!!pendingStart.current\)/);
  assert.match(route,/input.managed\?leaseAbort.signal:input.lease\?AbortSignal.any/);
  assert.match(route,/waitUntil\(execution\)/);
  assert.match(route,/await guard\(\);/);
