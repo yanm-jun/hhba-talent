@@ -1484,7 +1484,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
      else note('SOURCE_REVIEW_UNSUPPORTED');
     }}
    }
-   for(const u of [...v4Sources(response),...(Array.isArray(data.source_leads)?data.source_leads:[])].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(u))sourceLeads.add(curatedUrl(u));
+   for(const u of [...v4Sources(response),...(Array.isArray(data.source_leads)?data.source_leads:[])].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(u)&&canAdmitLead(curatedUrl(u)))sourceLeads.add(curatedUrl(u));
   }
   const fromModel=candidates(data,response);
   const beforeCount=rows.size;
@@ -1497,7 +1497,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
     if(sourceStopTarget&&rows.size>=sourceStopTarget&&!rows.has(url))continue;
     const compact=candidateSummary(job,url);
     for(const proof of [compact.employer_proof_url,...compact.employer_proof_urls].map(v4PublicJobUrl).filter(Boolean))if(!isCommercialRecruitmentBoard(proof)&&canAdmitLead(curatedUrl(proof)))sourceLeads.add(curatedUrl(proof));
-    if(!concreteCandidate(compact)&&(!compact.title||/^(待核实|职位详情待核实|招聘来源|招聘|职位详情|未知)$/i.test(compact.title))){sourceLeads.add(url);note('NON_JOB_LEAD');continue;}
+    if(!concreteCandidate(compact)&&(!compact.title||/^(待核实|职位详情待核实|招聘来源|招聘|职位详情|未知)$/i.test(compact.title))){if(canAdmitLead(url))sourceLeads.add(url);note('NON_JOB_LEAD');continue;}
     const prior=rows.get(url)||{};rows.set(url,{...prior,...Object.fromEntries(Object.entries(compact).filter(([,v])=>v!==null&&v!==''&&v!==undefined&&(!Array.isArray(v)||v.length)))});continue;
    }
    const useful=Object.fromEntries(Object.entries(job).filter(([,v])=>v!==null&&v!==undefined&&v!==''&&(!Array.isArray(v)||v.length)));
