@@ -23,7 +23,7 @@ import '../styles/siri-edge.css';
 // Downloaded DOCX preserves the original OOXML package, but without the
 // optional LibreOffice check its visual pagination is NOT verified.
 type PendingWordTextDraft={original:string;text:string;revision:number;page:number};
-export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted';occurrence?:number;occurrenceCount?:number};
+export type WordVisualSuggestion={id:string;original:string;proposed:string;state:'pending'|'accepted';occurrence?:number;occurrenceCount?:number;changeCount?:number};
 export type WordRevisionSnapshot={revision:number;history:WordHistoryEntry[]};
 export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChanges=[],onOpenSuggestions,pendingSuggestionCount=0,onPendingChange,onVerifiedSave,onVersionMoved,sessionWordDraft,onSessionWordDraftChange,editPanelHost,onEditingChange,glowActive=false,visualSuggestions=[],onVisualSuggestionSelect,onVisualSuggestionAction,onRevisionSnapshot,onDocumentReady,onEditableSegments}:{
  resume:PrivateResume;jobId?:string;jobTitle?:string;onClose?:()=>void;
@@ -634,6 +634,7 @@ export function OriginalWordViewer({resume,jobId,jobTitle,onClose,suggestedChang
        {visual?.state==='pending'&&<div className="hhba-word-siri-inline-actions"
         role="group" aria-label="当前彩虹文字操作"
         style={y>710?{bottom:'100%'}:{top:'100%'}}>
+        {visual.changeCount&&visual.changeCount>1&&<span className="hhba-word-suggestion-count">整合 {visual.changeCount} 项修改</span>}
         <button type="button" className="is-accept" disabled={busy}
          onClick={()=>void acceptVisualWord(anchor,visual)}><Check size={13}/> 采纳</button>
         <button type="button" disabled={busy}

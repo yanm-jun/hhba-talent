@@ -579,3 +579,5 @@
 .hhba-compact-disclaimer{margin:6px 0 0;font-size:11px}
 .hhba-unverified-records>details{padding:6px 0}
 @media(max-width:640px){.hhba-refined-stage[data-stage="2"]{padding:9px 8px}.hhba-compact-report-head h2{font-size:15px}.hhba-refined-stage[data-stage="2"] .hhba-score-metrics small{font-size:10px}.hhba-refined-stage[data-stage="2"] .hhba-curated-card{padding:12px 10px}}
+
+.hhba-report-order{display:flex;justify-content:center;gap:8px;margin:10px 0 6px;flex-wrap:wrap}.hhba-report-order button{border:1px solid #dbe4ee;border-radius:999px;padding:6px 13px;background:transparent;color:#52677e;font-size:12px;cursor:pointer}.hhba-report-order button[aria-pressed=true]{background:#eaf1f9;color:#244e80;border-color:#8eaaca;font-weight:600}

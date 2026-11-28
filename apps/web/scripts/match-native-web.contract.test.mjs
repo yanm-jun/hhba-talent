@@ -53,8 +53,10 @@ test('native results dialog never hides optimizer behind the optional match scor
  const ui=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(ui,/function visibleMatchScore\(/);
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
- assert.match(panels,/<button type="button" disabled=\{!optimizationAvailable\|\|\(!\(jdJob\.jd_version_id&&jdJob\.jd_sha256\)/);
- assert.match(panels,/jdJob\.reference_jd_kind==='AI_GENERATED_REFERENCE'&&jdJob\.reference_jd\?\.trim\(\)&&jdJob\.reference_jd_basis\?\.trim\(\)/);
+ assert.match(panels,/<button type="button" disabled=\{!optimizationAvailable\}/);
+ assert.match(ui,/if\(!parsedProfile\|\|!isVerifiedMatchReport\(job\)\)return;/);
+ const editor=await readFile(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
+ assert.match(editor,/recoverMatchedJdArchive\(job\.official_url,job\.evidence_excerpt,signal\)/);
  assert.doesNotMatch(ui,/!pending&&Number\.isInteger\(job\.match_score\)/);
  assert.match(panels,/优化简历/);
  assert.match(panels,/暂无可靠分数/);

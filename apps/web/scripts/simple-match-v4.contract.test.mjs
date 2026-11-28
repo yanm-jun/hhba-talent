@@ -402,7 +402,7 @@ test('V4 repeats scoring after reading an independently obtained full JD',async(
 });
 
 test('V4 independent public JD archive supports an unfamiliar employer without asserting official ownership',async()=>{
- const {saveV4PublicJobJd,readJobJdById,hydrateVerifiedJobRequirements}=await import('../functions/_lib/job-jd-archive.js');
+ const {saveV4PublicJobJd,readJobJdById,readV4PublicJdByContent,hydrateVerifiedJobRequirements}=await import('../functions/_lib/job-jd-archive.js');
  const {extractOfficialJdSections}=await import('../functions/_lib/official-job-evidence.js');
  const jd=extractOfficialJdSections('岗位职责\n负责区域渠道运营和经销商业务流程的标准化管理和优化。\n负责区域销售人员培训和业务数据管理。\n任职要求\n熟悉渠道运营和经销商业务流程，能够提供门店运营管理改善建议。\n具备项目沟通能力和业务数据分析能力。');
  const objects=new Map();
@@ -413,6 +413,11 @@ test('V4 independent public JD archive supports an unfamiliar employer without a
  assert.ok(saved.fresh);
  const found=await readJobJdById(env,saved.id);
  assert.equal(found.full_jd,jd.full_jd);
+ const recovered=await readV4PublicJdByContent(env,url,saved.jd_sha256);
+ assert.equal(recovered.id,saved.id);
+ assert.equal(await readV4PublicJdByContent(env,url,'0'.repeat(64)),null);
+ assert.equal(await readV4PublicJdByContent(env,'https://example.org/jobs/other',saved.jd_sha256),null);
+ assert.equal(await readV4PublicJdByContent(env,'https://www.zhipin.com/job_detail/12345.html',saved.jd_sha256),null);
  const trusted=await hydrateVerifiedJobRequirements(env,{jd_version_id:saved.id,jd_sha256:saved.jd_sha256,official_url:url});
  assert.equal(trusted.source_status,'VERIFIED_PUBLIC_JD');
  assert.equal(trusted.requirements,jd.full_jd);
@@ -1100,7 +1105,8 @@ test('the report separates verified JD from all candidate records even when form
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  assert.match(panels,/for\(const job of \[\.\.\.jobs,\.\.\.officialJobs\]\)/);
- assert.match(panels,/const jdItems=verifiedMatchReports\(officialJobs\)/);
+ assert.match(panels,/const recommended=verifiedMatchReports\(officialJobs\)/);
+ assert.match(panels,/orderVerifiedMatchReports\(officialJobs,'score'\)/);
  assert.match(panels,/尚未进入正式推荐/);
  assert.doesNotMatch(panels,/all\.filter\(j=>!confirmed\(j\)\)\.map/);
  assert.match(panels,/reportScore\(jdJob\)\?\?'—'/);
@@ -1111,7 +1117,7 @@ test('the report separates verified JD from all candidate records even when form
 });
 
 test('only complete grounded official reports enter the formal UI and preserve server rank order',async()=>{
- const {verifiedMatchReports}=await import('../src/services/verifiedMatchPresentation.mjs');
+ const {verifiedMatchReports,orderVerifiedMatchReports}=await import('../src/services/verifiedMatchPresentation.mjs');
  const {qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
  const good={...row,official_url:url,source_type:'站外官方招聘',jd_source_status:'VERIFIED_JD',evidence_status:'VERIFIED_FULL_JD',evidence_excerpt:'完整岗位原文',score_evidence_status:'GROUNDED_JD_RESUME_QUOTES',match_score:88,curated_suitable:true,report_status:'COMPLETE',research_detail:{score_explanation:'依据原文的理由',comparisons:[]}};
  const second={...good,official_url:'https://careers.other-motors.cn/recruitment/positions/9989',match_score:99};
@@ -1119,6 +1125,8 @@ test('only complete grounded official reports enter the formal UI and preserve s
  assert.ok(qualifiedReport(good));
  for(const item of bad){assert.equal(qualifiedReport(item),false);assert.deepEqual(verifiedMatchReports([item]),[]);}
  assert.deepEqual(verifiedMatchReports([...bad,good,second,good]),[good,second]);
+ assert.deepEqual(orderVerifiedMatchReports([...bad,good,second,good],'score'),[second,good]);
+ assert.deepEqual(orderVerifiedMatchReports([good,second]),[good,second]);
 });
 
 test('V4 private Word context overflow pages the exact complete JSON without public reads',async()=>{
@@ -1404,4 +1412,29 @@ test('source-pool goal has no numeric quota and legacy task continuations preser
  assert.match(source,/生成最多'\+finalTarget\+'份详细报告/);
  assert.match(source,/final.length<finalTarget/);
  assert.doesNotMatch(source,/目标为500个去重/);
+});
+
+
+test('multi-step Word append creates independent paragraphs only on a real paragraph anchor',async()=>{
+ const {parseSuggestions,normalizeDocumentSuggestions}=await import('../functions/_lib/resume-ai-provider.js');
+ const block={id:'word-0',text:'负责渠道运营',section:'experience',paragraphEditable:true};
+ const input={suggestions:[
+  {id:'first',blockId:block.id,action:'append',original:block.text,proposed:'维护客户关系',paragraphBreak:true,rationale:'依据经历',jobRequirement:'客户管理'},
+  {id:'second',blockId:block.id,action:'insert_paragraph',original:block.text,proposed:'参与门店培训',rationale:'真实培训经历',jobRequirement:'培训'},
+ ]};
+ const parsed=parseSuggestions(input,[block.id],{fullDocument:true});
+ const merged=normalizeDocumentSuggestions([block],parsed);
+ assert.equal(merged.length,1);
+ assert.equal(merged[0].proposed,'负责渠道运营\n维护客户关系\n参与门店培训');
+ assert.equal(merged[0].changeCount,2);
+ assert.deepEqual(normalizeDocumentSuggestions([{...block,paragraphEditable:false}],parsed),[]);
+});
+test('a formal report cannot claim the same requirement both supported and missing',async()=>{
+ const {validateCuratedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const req='渠道运营',cv='拥有渠道运营经历';
+ const value={suitable:true,score:85,reason:'证据相关',resume_quote:cv,jd_quote:req,comparisons:[
+  {jd_quote:req,resume_quote:cv,status:'supported',analysis:'有对应经历'},
+  {jd_quote:req,status:'missing',analysis:'无对应经历'}
+ ]};
+ assert.ok(validateCuratedReport(value,cv,req).errors.includes('comparison_conflicting_status'));
 });

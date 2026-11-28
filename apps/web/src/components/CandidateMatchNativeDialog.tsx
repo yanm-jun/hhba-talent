@@ -98,7 +98,7 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
  const activeJob=verifiedMatchReports(result.matches).find(job=>job.official_url===optimizedJobUrl)||result.matches.find(job=>job.official_url===optimizedJobUrl&&job.id===initialOptimizedJobId&&archivedHistoryJob(job));
  const parsedProfile=result.profile?({...result.profile,experiences:[]} as CandidateProfile):null;
  function optimizeJob(job:MatchedJob){
-  if(!parsedProfile||!isVerifiedMatchReport(job)||(!(job.jd_version_id&&job.jd_sha256)&&!(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd?.trim()&&job.reference_jd_basis?.trim())))return;
+  if(!parsedProfile||!isVerifiedMatchReport(job))return;
   matchListScroll.current=ref.current?.querySelector<HTMLElement>('.hhba-match-modal-content')?.scrollTop||0;
   setSelectedJobUrl(job.official_url);setOptimizationDirty(false);setOptimizedJobUrl(job.official_url);
  }

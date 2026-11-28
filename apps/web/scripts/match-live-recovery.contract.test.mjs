@@ -153,10 +153,13 @@ test('independently complete JD report can open optimizer without cancelling ong
  const dialog=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
  const panel=readFileSync(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
- assert.ok(dialog.includes('if(!parsedProfile||!isVerifiedMatchReport(job)||'));
+ assert.ok(dialog.includes('if(!parsedProfile||!isVerifiedMatchReport(job))return;'));
  assert.ok(dialog.includes('{activeJob&&parsedProfile?'));
  assert.ok(dialog.includes('if(pending||taskFailed){backToMatches();return;}'),'unfinished or failed research must preserve editor/job session');;
- assert.ok(panel.includes('disabled={!optimizationAvailable||'));
+ assert.ok(panel.includes('disabled={!optimizationAvailable}'));
+ const editor=readFileSync(new URL('../src/components/TargetedResumeOptimization.tsx',import.meta.url),'utf8');
+ assert.ok(editor.includes('recoverMatchedJdArchive(job.official_url,job.evidence_excerpt,signal)'));
+ assert.ok(editor.includes("prior?.score_evidence_status!=='GROUNDED_JD_RESUME_QUOTES'"));
  assert.ok(page.includes('sourceText={optimizationSource||undefined}'));
 });
 

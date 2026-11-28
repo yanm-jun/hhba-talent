@@ -93,6 +93,17 @@ export async function getArchivedJobJdVersion(id:string,signal?:AbortSignal):Pro
   throw new JobJdArchiveError('JD_VERSION_NOT_AVAILABLE',503);
  return result;
 }
+/** Read-only content-addressed lookup when a match lost the archive ID. */
+export async function recoverMatchedJdArchive(officialUrl:string,original:string,signal?:AbortSignal):Promise<ArchivedOfficialJd|null>{
+ if(!globalThis.crypto?.subtle)return null;
+ const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(original.trim())));
+ const hash=Array.from(bytes,x=>x.toString(16).padStart(2,'0')).join('');
+ const result=await request(PATH+'?official_url='+encodeURIComponent(officialUrl)+'&jd_sha256='+hash,{method:'GET'},signal) as ArchivedOfficialJd;
+ if(result.ok!==true||result.verified!==true)return null;
+ if(result.canonical_url!==officialUrl||result.jd_sha256!==hash||result.full_jd!==original.trim()||!result.fresh)
+  throw new JobJdArchiveError('JD_JOB_IDENTITY_MISMATCH',409);
+ return result;
+}
 /** Triggered only after the candidate's existing AI/verification consent. */
 export async function ensureArchivedJobJd(officialUrl:string,signal?:AbortSignal,previousJdId?:string):Promise<ArchivedOfficialJd>{
  const token=getRealAuthToken();

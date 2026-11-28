@@ -15,7 +15,7 @@ import {v4ReadEmployerJob} from '../_lib/v4-open-job-evidence.js';
 import {noteJdSourceFailure} from '../_lib/jd-posting-lifecycle.js';
 import {
  JD_ARCHIVE_KIND,jdArchiveConfigured,jdArchiveReady,safeJDSourceLocator,
- readJobJdById,readFreshJobJdByUrl,saveVerifiedJobJd,saveV4PublicJobJd,publicJdPayload
+ readJobJdById,readFreshJobJdByUrl,readV4PublicJdByContent,saveVerifiedJobJd,saveV4PublicJobJd,publicJdPayload
 } from '../_lib/job-jd-archive.js';
 
 const MAX_BODY=4500,DAILY_PERSON=40,DAILY_TOTAL=1200;
@@ -84,6 +84,14 @@ export async function onRequestGet({request,env}){
   }catch{return fail('JD_ARCHIVE_READ_FAILED',503)}
  }
  const requested=url.searchParams.get('official_url')||'';
+ if(url.searchParams.has('jd_sha256')){
+  const hash=url.searchParams.get('jd_sha256')||'';
+  if(!/^[a-f0-9]{64}$/.test(hash))return fail('INVALID_REQUEST',400);
+  try{
+   const item=await readV4PublicJdByContent(env,requested,hash);
+   return item?respond(publicJdPayload(item)):respond({ok:true,kind:JD_ARCHIVE_KIND,found:false,verified:false});
+  }catch{return fail('JD_ARCHIVE_READ_FAILED',503);}
+ }
  const locator=safeJDSourceLocator(requested);
  if(!locator)return fail('OFFICIAL_URL_NOT_SUPPORTED',422);
  try{

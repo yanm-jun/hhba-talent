@@ -226,6 +226,14 @@ async function readV4PublicJd(env,id){
   posting_status:'UNTRACKED',fresh:Number.isFinite(age)&&age>=-300000&&age<=JD_FRESH_MS};
 }
 
+// Read-only recovery for a completed match whose archive write response was lost.
+ // No external fetch and no client-supplied text becomes verified evidence.
+export async function readV4PublicJdByContent(env,url,hash){
+ if(!jdArchiveConfigured(env)||typeof url!=='string'||v4PublicJobUrl(url)!==url||recruitmentSourceKind(url)==='THIRD_PARTY_BOARD'||!/^[a-f0-9]{64}$/.test(hash||''))return null;
+ const id='jd_'+(await sha256Hex('v4-public\\n'+url+'\\n'+hash)).slice(0,32);
+ const saved=await readV4PublicJd(env,id);
+ return saved?.fresh&&saved.canonical_url===url&&saved.jd_sha256===hash?saved:null;
+}
 export function publicJdPayload(saved,{includeText=true}={}){
  if(!saved)return null;
  return {

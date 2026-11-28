@@ -12,3 +12,9 @@ export function verifiedMatchReports(jobs){
   seen.add(j.official_url);return true;
  });
 }
+
+// Optional view ordering only; the backend's selected recommendation set is unchanged.
+export function orderVerifiedMatchReports(jobs,mode='recommendation'){
+ const selected=verifiedMatchReports(jobs);
+ return mode==='score'?[...selected].sort((a,b)=>b.match_score-a.match_score):selected;
+}

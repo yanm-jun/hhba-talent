@@ -12,7 +12,7 @@ export function CuratedJobReport({detail,jd,reference=false}:{detail:MatchResear
     </div>)}
    </div>
   </section>
-  {sections.filter(s=>s.body.trim()).map(s=><section key={s.title}><h4>{recruitmentText(s.title)}</h4><p>{recruitmentText(s.body)}</p></section>)}
+  {sections.map(s=><section key={s.title}><h4>{recruitmentText(s.title)}</h4><p>{s.body.trim()?recruitmentText(s.body):'本次研究尚未提供该项独立分析；请勿将缺失内容视为已确认结论。'}</p></section>)}
   {detail.extra_sections.map((s,i)=><section key={i}><h4>{recruitmentText(s.title)}</h4><p>{recruitmentText(s.content)}</p></section>)}
   {jd&&<details><summary>查看完整岗位 JD 原文</summary><p>{recruitmentText(jd)}</p></details>}
  </div>;
