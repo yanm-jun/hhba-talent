@@ -1,22 +1,30 @@
-// New research tasks have NO numeric source or candidate target. Count every
-// observed search source, then independently validate and rank genuine jobs.
-// A 30-report delivery target is not a cap on discovery, reasoning or research.
-export const CANDIDATE_TARGET=null,FINAL_TARGET=30;
+// New tasks stop expanding discovery at 20 observed web-search sources OR
+// 20 distinct concrete job candidates, whichever comes first. Existing jobs
+// continue through JD verification, evidence scoring, and final report delivery.
+// This is an explicit user-requested stability limit, not a model reasoning cap.
+export const CANDIDATE_TARGET=null,FINAL_TARGET=20,SOURCE_STOP_TARGET=20;
+export const PREVIOUS_SOURCE_POOL_FINAL_TARGET=30;
 export const PREVIOUS_CANDIDATE_TARGET=300,PREVIOUS_FINAL_TARGET=30;
 export const LEGACY_CANDIDATE_TARGET=500,LEGACY_FINAL_TARGET=50;
 export const SOURCE_POOL_MODE='source_pool';
-// Existing authorized research stays on the immutable contract on which it
-// started. Never reinterpret a paid 300→30 / 500→50 continuation at deploy.
+// Preserve the original terms for already-running encrypted checkpoints:
+// never silently change a paid 30-report / 50-report task during a deployment.
 export function v4TaskTargets(checkpoint=null){
- if(checkpoint?.search_mode===SOURCE_POOL_MODE)
-  return {candidateTarget:null,finalTarget:FINAL_TARGET,sourceDriven:true};
+ if(checkpoint?.search_mode===SOURCE_POOL_MODE){
+  const former=checkpoint.final_target===PREVIOUS_SOURCE_POOL_FINAL_TARGET&&checkpoint.source_stop_target!==SOURCE_STOP_TARGET;
+  return {candidateTarget:null,finalTarget:former?PREVIOUS_SOURCE_POOL_FINAL_TARGET:FINAL_TARGET,sourceDriven:true,sourceStopTarget:former?null:SOURCE_STOP_TARGET};
+ }
  if(checkpoint?.candidate_target===PREVIOUS_CANDIDATE_TARGET&&checkpoint?.final_target===PREVIOUS_FINAL_TARGET)
-  return {candidateTarget:PREVIOUS_CANDIDATE_TARGET,finalTarget:PREVIOUS_FINAL_TARGET,sourceDriven:false};
+  return {candidateTarget:PREVIOUS_CANDIDATE_TARGET,finalTarget:PREVIOUS_FINAL_TARGET,sourceDriven:false,sourceStopTarget:null};
  if(checkpoint&&(
   typeof checkpoint.phase==='string'||Number.isSafeInteger(checkpoint.round)||
   Array.isArray(checkpoint.rows)||checkpoint?.candidate_target===LEGACY_CANDIDATE_TARGET))
-  return {candidateTarget:LEGACY_CANDIDATE_TARGET,finalTarget:LEGACY_FINAL_TARGET,sourceDriven:false};
- return {candidateTarget:null,finalTarget:FINAL_TARGET,sourceDriven:true};
+  return {candidateTarget:LEGACY_CANDIDATE_TARGET,finalTarget:LEGACY_FINAL_TARGET,sourceDriven:false,sourceStopTarget:null};
+ return {candidateTarget:null,finalTarget:FINAL_TARGET,sourceDriven:true,sourceStopTarget:SOURCE_STOP_TARGET};
+}
+export function v4SourceStopReached({sourceDriven=false,sourceStopTarget=null,sourceCount=0,candidateCount=0}={}){
+ return sourceDriven&&Number.isSafeInteger(sourceStopTarget)&&sourceStopTarget>0&&
+   (sourceCount>=sourceStopTarget||candidateCount>=sourceStopTarget);
 }
 const str=v=>typeof v==='string'?v.trim():'';
 const norm=v=>str(v).replace(/\s+/g,' ').trim();
