@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
 import {ArrowLeft,ArrowRight,ArrowUpRight,BookOpen,BriefcaseBusiness,CheckCircle2,ChevronRight,FileCheck2,Globe2,LoaderCircle,MapPin,ShieldCheck,Sparkles,UserRound} from 'lucide-react';
 import {isVerifiedMatchReport} from '../services/verifiedMatchPresentation.mjs';
 import {discoveryApplyDestination} from '../services/discoveryApplyDestination.mjs';
@@ -11,7 +11,7 @@ type Props={
  pending?:boolean;failed?:boolean;progressStage?:NativeMatchProgress;activity?:NativeMatchActivity|null;
  elapsed?:number;onOptimize?:(job:MatchedJob)=>void;optimizationAvailable?:boolean;
 };
-const safeScore=(job:MatchedJob)=>Number.isInteger(job.match_score)&&job.match_score!==null&&job.match_score!==undefined&&job.match_score>=0&&job.match_score<=100?job.match_score:null;
+const safeScore=(job:MatchedJob)=>{const score=job.match_score;return typeof score==='number'&&Number.isInteger(score)&&score>=0&&score<=100?score:null;};
 const fullReport=(job:MatchedJob)=>job.report_status==='COMPLETE'&&!!job.research_detail?.score_explanation?.trim()&&Array.isArray(job.research_detail.comparisons)&&!!(job.reference_jd?.trim()||job.evidence_excerpt?.trim())&&!job.excluded_board&&!job.excluded_closed&&!['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'UNKNOWN');
 const completeness=(job:MatchedJob)=>(fullReport(job)?100:0)+(job.reference_jd?20:0)+(job.research_detail?20:0)+(job.jd_research?.facts?.length||0)+(Number.isInteger(job.match_score)?5:0);
 const validJob=(job:MatchedJob)=>!!job.official_url&&!job.excluded_board&&!job.excluded_closed&&!['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'UNKNOWN');
@@ -21,7 +21,7 @@ const stageText:Record<NativeMatchProgress,string>={
  researching:'正在研究岗位与企业',writing:'AI 正在编写岗位研究报告',
  scoring:'正在分析岗位与你的契合度',waiting:'正在接续职业研究'
 };
-function Section({title,children}:{title:string;children:React.ReactNode}){
+function Section({title,children}:{title:string;children:ReactNode}){
  if(!children)return null;
  return <section className="hhba-rf-section"><h3>{title}</h3><div className="hhba-rf-text">{children}</div></section>;
 }
@@ -35,7 +35,7 @@ function EvidenceRows({job}:{job:MatchedJob}){
   {item.resume_evidence&&<small>简历依据：{item.resume_evidence}</small>}
  </article>)}</div>;
 }
-export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pending=false,failed=false,progressStage='preparing',activity,elapsed=0,onOptimize,optimizationAvailable=false}:Props){
+export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pending=false,failed=false,progressStage='preparing',activity,onOptimize,optimizationAvailable=false}:Props){
  const [view,setView]=useState<View>('reports');
  const [arrival,setArrival]=useState<string[]>([]);
  const [selectedUrl,setSelectedUrl]=useState<string|null>(null);
