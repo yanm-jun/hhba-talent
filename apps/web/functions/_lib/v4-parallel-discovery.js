@@ -24,13 +24,13 @@ export function admittedDiscoveryWidth(desired,budget,{maxConnections=6,inFlight
  const externalCalls=typeof budget.availableFor==='function'?Math.max(1,Math.floor(budget.availableFor('fetch'))):sockets;
  return Math.max(1,Math.min(wanted,sockets,budgetCalls,externalCalls));
 }
-export function discoveryLaneContext({profile,roleHint,round,lane,width,previousJobs,candidateTarget,remainingCandidates}){
+export function discoveryLaneContext({profile,roleHint,round,lane,width,previousJobs,candidateTarget,remainingCandidates,sourceDriven=false,sourceCount=0,finalTarget=30}){
  const roles=Array.isArray(profile?.target_roles)?profile.target_roles.filter(x=>typeof x==='string'&&x.trim()):[];
  // Roles are hints for diversity, never an allowlist. Rotate hints over waves.
  const roleHintForLane=roles.length?roles[(Math.max(0,round-1)*(width-1)+lane-1)%roles.length]:null;
  return {profile,preferred_job_or_city:roleHint,search_wave:round,parallel_lane:lane,parallel_width:width,
   independent_direction_hint:roleHintForLane,
-  previously_discovered_jobs:previousJobs,candidate_target:candidateTarget,remaining_candidates:remainingCandidates};
+  previously_discovered_jobs:previousJobs,...(sourceDriven?{search_mode:'source_pool',search_source_count:sourceCount,final_target:finalTarget}:{candidate_target:candidateTarget,remaining_candidates:remainingCandidates})};
 }
 export async function runDiscoveryWave(primary,extra,width,signal,onReady=()=>{}){
  const started=Date.now();
