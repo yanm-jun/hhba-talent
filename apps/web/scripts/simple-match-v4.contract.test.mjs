@@ -771,8 +771,8 @@ test('curated V4 stops a large discovery wave at 20 sources and completes the ad
  assert.ok(result.matches.every(j=>!j.excluded_board));
  assert.ok(result.matches.every(j=>j.research_detail?.comparisons?.length&&j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'));
  assert.equal(result.can_continue,false);
- assert.equal(result.research_leads.length,471);
- assert.ok(result.research_leads.some(j=>j.title==='区域运营岗位499'&&j.match_score===40));
+ assert.equal(result.research_leads.length,0,'unadmitted candidates must not leak into the final report');
+ assert.ok(!result.matches.some(j=>j.title==='区域运营岗位499'),'source cap must prevent tail admissions');
 });
 test('curated report rejects invented CV quotes but accepts flexible evidence-backed structure',async()=>{
  const {validateCuratedReport,curatedUrl,candidateKey,concreteCandidate}=await import('../functions/_lib/v4-curated-reports.js');
