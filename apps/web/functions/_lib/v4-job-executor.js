@@ -27,7 +27,8 @@ const workKey=(taskKey,url)=>sha256Hex('HHBA_V4_JOB_WORK:'+taskKey+':'+url);
 const revKey=revision=>sha256Hex('HHBA_V4_JOB_REV:'+revision);
 const itemUrl=job=>job?.research_candidate_url||job?.official_url||job?.url||'';
 const doneReport=job=>qualifiedReport(job)||completedReferenceReport(job)||['DECLINED','UNAVAILABLE'].includes(job?.report_status);
-const suitableScore=job=>job&&(Number.isInteger(job.match_score)||job.evidence_score_status==='AI_REFERENCE_JD_SCORED'||job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'||job.curated_suitable===false);
+const suitableScore=job=>job&&(!completedReferenceReport(job)||job.reference_vacancy_verified===true||job.jd_source_status==='VERIFIED_JD')&&
+ (Number.isInteger(job.match_score)||job.evidence_score_status==='AI_REFERENCE_JD_SCORED'||job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'||job.curated_suitable===false);
 const eligibleJob=(checkpoint,url)=>new Map(checkpoint?.rows||[]).get(url);
 const sourceFor=(checkpoint,url)=>[
  ...(checkpoint?.priorState?.matches||[]),...(checkpoint?.matches||[])
