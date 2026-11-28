@@ -21,3 +21,11 @@ test('a model cannot certify under-target coverage without any real search, but 
  assert.equal(ungroundedSearchCompletion({candidateCount:12,target:500,webSources:0,actualQueries:3,publicReads:0}),false);
  assert.equal(ungroundedSearchCompletion({candidateCount:500,target:500,webSources:0,actualQueries:0,publicReads:0}),false);
 });
+
+
+test('source-driven completion has no candidate/source minimum, but cannot claim research without any observed public evidence',()=>{
+ assert.equal(ungroundedSearchCompletion({candidateCount:0,target:null,webSources:0,actualQueries:0,publicReads:0}),true);
+ assert.equal(ungroundedSearchCompletion({candidateCount:800,target:null,webSources:0,actualQueries:0,publicReads:0}),true,'invented candidates without public research are not proof');
+ assert.equal(ungroundedSearchCompletion({candidateCount:3,target:null,webSources:1,actualQueries:0,publicReads:0}),false);
+ assert.equal(ungroundedSearchCompletion({candidateCount:3,target:null,webSources:0,actualQueries:1,publicReads:0}),false);
+});
