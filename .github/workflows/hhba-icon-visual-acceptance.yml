@@ -1,0 +1,45 @@
+name: HHBA Icon Visual Acceptance (Desktop and Mobile)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/src/**'
+      - 'apps/web/public/preview-admin/**'
+      - 'apps/web/scripts/icon-visual-acceptance.py'
+      - '.github/workflows/hhba-icon-visual-acceptance.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Build the actual Vite application
+        working-directory: apps/web
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+      - name: Install actual Chromium and Playwright
+        run: |
+          python3 -m pip install 'playwright>=1.55,<2'
+          python3 -m playwright install --with-deps chromium
+      - name: Run desktop/mobile and hidden-state visual acceptance
+        working-directory: apps/web
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/hhba-icon-preview.log 2>&1 &
+          python3 scripts/icon-visual-acceptance.py
+      - name: Save actual browser screenshots and geometry report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hhba-icon-desktop-mobile-acceptance
+          path: apps/web/tmp/icon-visual-screens/
+          if-no-files-found: warn
+          retention-days: 14
