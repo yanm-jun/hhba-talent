@@ -38,11 +38,11 @@ function OfficialApplyAction({job}:{job:MatchedJob}){
  // All safe candidate job URLs are clickable immediately. No disabled
  // placeholders or artificially delayed links while JD analysis proceeds.
  if(!href)return null;
- return <a className="hhba-discovery-apply" href={href} target="_blank" rel="noopener noreferrer" aria-label={label+' · '+job.company+' · '+(job.title_zh||job.title)}>{label}<ArrowUpRight size={13} aria-hidden="true"/></a>;
+ return <a className="hhba-discovery-apply" data-hhba-recruitment-outbound="true" href={href} target="_blank" rel="noopener noreferrer" aria-label={label+' · '+job.company+' · '+(job.title_zh||job.title)}>{label}<ArrowUpRight size={13} aria-hidden="true"/></a>;
 }
 function OfficialLink({job}:{job:MatchedJob}){
  const href=officialApplicationHref(job);
- return href?<a className="hhba-refined-source-link" href={href} target="_blank" rel="noopener noreferrer">投递官网 <ArrowUpRight size={13}/></a>:null;
+ return href?<a className="hhba-refined-source-link" data-hhba-recruitment-outbound="true" href={href} target="_blank" rel="noopener noreferrer">投递官网 <ArrowUpRight size={13}/></a>:null;
 }
 export function ReportPager({count,index,onChange,pending=false,inline=false}:{count:number;index:number;onChange:(i:number)=>void;pending?:boolean;inline?:boolean}){
  const anchor=useRef<HTMLDivElement>(null);

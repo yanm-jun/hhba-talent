@@ -84,7 +84,8 @@ test('all domestic employer photo tiles and international workplace imagery rema
 test('the official external recruiting gate only accepts a real candidate identity from backend',()=>{
  const s=read('components/Shell.tsx');
  const next=read('pages/OfficialRecruitmentContinuePage.tsx');
- const demo=read('pages/DemoAuthPage.tsx');
+ const phone=read('pages/PhoneAuthPage.tsx');
+ const main=read('main.tsx');
  assert.ok(s.includes('verifiedCandidate=hasCandidate&&(employerApiReady||realAuthReady)'));
  assert.ok(s.includes("anchor.dataset.hhbaRecruitmentOutbound==='true'"));
  assert.ok(s.includes('if(!destination||verifiedCandidate)return'));
@@ -94,6 +95,10 @@ test('the official external recruiting gate only accepts a real candidate identi
  assert.ok(next.includes("const signed=accountBackendReady&&!!user?.account_types?.includes('candidate')"));
  assert.ok(next.includes("!accountBackendReady?<><h2>正式账户服务尚未开通"));
  assert.ok(!next.includes('useDemoAccount'));
- assert.ok(demo.includes('演示注册无法解锁第三方招聘官网'));
+ assert.ok(!main.includes('DemoAuthPage'));
+ assert.ok(phone.includes('const me = await realAuth.me();'));
+ assert.ok(phone.includes('onUser(realAuthToUser(me))'));
+ assert.ok(phone.includes('真实账户服务尚未接入，不能进行注册或登录。'));
+ assert.equal(recruitmentTarget(link('https://hr.example.com/open?id=1','投递官网',{dataset:{hhbaRecruitmentOutbound:'true'}})),'https://hr.example.com/open?id=1');
  assert.ok(s.includes("navigate('/candidate/register?next=%2Fcandidate%2Fofficial-outbound')"));
 });

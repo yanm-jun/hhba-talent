@@ -6,7 +6,7 @@ const shell=src('components/Shell.tsx');
 const policy=src('services/recruitmentOutbound.ts');
 const flow=src('pages/OfficialRecruitmentContinuePage.tsx');
 const main=src('main.tsx');
-const demoAuth=src('pages/DemoAuthPage.tsx');
+const phoneAuth=src('pages/PhoneAuthPage.tsx');
 const realAuth=src('pages/AuthPage.tsx');
 const domestic=src('pages/DomesticCompanyPage.tsx');
 const domesticCss=src('styles/domestic-company-search.css');
@@ -38,9 +38,9 @@ test('all known official recruiter endpoints share same outbound marker',()=>{
   'pages/DomesticCompanyPage.tsx','pages/CompanyProfilePage.tsx',
   'pages/IndexedCompanyPage.tsx','components/UnifiedJobMarket.tsx',
   'pages/CandidateJobsPage.tsx','components/RecruitmentMarketplace.tsx',
-  'components/CuratedJobMarket.tsx','pages/EmployerPublicJobsPage.tsx',
+  'components/CuratedJobMarket.tsx','components/RecruitmentSourceLinks.tsx',
   'components/AICompanySearch.tsx','components/HomeFeaturedEmployers.tsx',
-  'pages/CandidateMatchPage.tsx','pages/ResumeMatchPage.tsx','pages/MajorCompaniesPage.tsx'
+  'components/CandidateMatchNativeDialog.tsx','components/MatchResearchPanels.tsx','pages/ResumeMatchPage.tsx'
  ];
  for(const file of files){
   const c=src(file);
@@ -51,11 +51,15 @@ test('all known official recruiter endpoints share same outbound marker',()=>{
   assert.ok(src('components/UnifiedJobMarket.tsx').includes(needle));
 });
 
-test('login and demo account routes preserve stored official link without arbitrary next= external redirects',()=>{
+test('real phone and email login routes preserve stored official link without arbitrary next= external redirects',()=>{
  assert.ok(main.includes("route==='/candidate/official-outbound'"));
  assert.ok(main.includes('OfficialRecruitmentContinuePage'));
- assert.ok(demoAuth.includes("'/candidate/official-outbound'"));
- assert.ok(demoAuth.includes('resumeQuery'));
+ assert.ok(main.includes("route==='/candidate/login'||route==='/candidate/register')return <PhoneAuthPage"));
+ assert.ok(!main.includes('DemoAuthPage'));
+ assert.ok(phoneAuth.includes("candidate && requested === '/candidate/official-outbound'"));
+ assert.ok(phoneAuth.includes("const me = await realAuth.me();"));
+ assert.ok(phoneAuth.includes('onUser(realAuthToUser(me))'));
+ assert.ok(phoneAuth.includes('navigate(safeNext)'));
  assert.ok(realAuth.includes("safeNext==='/candidate/official-outbound'"));
  assert.ok(flow.includes('pendingRecruitment()'));
  assert.ok(flow.includes('registered')||flow.includes('signed'));
@@ -66,7 +70,7 @@ test('login and demo account routes preserve stored official link without arbitr
  assert.ok(flow.includes("const signed=accountBackendReady&&!!user?.account_types?.includes('candidate')"));
  assert.ok(!flow.includes('useDemoAccount'));
  assert.ok(!flow.includes('demoModeEnabled&&!!demo'));
- assert.ok(demoAuth.includes('演示注册无法解锁第三方招聘官网'));
+ assert.ok(phoneAuth.includes('真实账户服务尚未接入，不能进行注册或登录。'));
  assert.ok(flow.indexOf('!accountBackendReady')<flow.indexOf('href={saved.url}'));
 
  assert.ok(policy.includes("sessionStorage.setItem(KEY"));
@@ -100,7 +104,8 @@ test('domestic marketplace experiment excluded and original 100 overseas records
  const home=src('pages/HomePage.tsx');
  const market=src('components/UnifiedJobMarket.tsx');
  const service=src('services/liveRecruitment.ts');
- assert.ok(home.includes('企业发现 · 200 家国内企业'));
+ assert.ok(home.includes('<UnifiedJobMarket compact/>'));
+ assert.ok(market.includes('to="/companies/discover"'));
  assert.ok(market.includes('浏览全部 200 家企业档案'));
  assert.ok(service.includes("VITE_HHBA_OVERSEAS_CURATED_100==='1'"));
  assert.ok(service.includes('(!OVERSEAS_CURATED_100||job.domestic)'));
