@@ -69,7 +69,8 @@ test('sidecar cannot replace main research evidence or bypass active session',as
  assert.ok(route.includes('await renewV4JobWork(db,claim,{leaseMs:300000})'));
  assert.ok(route.includes('exactSeed'));
  assert.ok(route.includes('await workKey(taskKey,seedUrl)===claim.job_key'));
- assert.ok(route.includes("await revKey(lane==='reporting'?reportWorkRevision(seedSource,seedScore):candidateRevision(seedSource))===claim.revision"));
+ assert.ok(route.includes("previous.reference_first?referenceWorkRevision(seedSource):reportWorkRevision(seedSource,seedScore)"),'reference and formal report revisions remain separately fenced');
+ assert.ok(route.includes('candidateRevision(seedSource))===claim.revision'),'independent verification revision must remain fenced');
  assert.ok(latest.includes("saved.revision!==record.revision"));
  assert.ok(latest.includes("saved.source_url!==found.url"));
 });

@@ -15,6 +15,9 @@ export type MatchProfile = {
 export type MatchResearchDetail={comparisons:{requirement:string;resume_evidence:string|null;status:'supported'|'partial'|'missing';analysis:string}[];strengths:string;risks:string;career_development:string;optimization_advice:string;competition:string;score_explanation:string;extra_sections:{title:string;content:string}[]};
 export type JobJdResearch={facts:{url:string;quote:string;context:'same_job'|'related_context'}[];inference:string;unknowns:string[];diagnostics:string[];checked_at?:string};
 export type MatchedJob = {
+  // Completed AI reference kept independently of later official JD research.
+  // Reading it never authorizes formal recommendation or official apply claims.
+  reference_report?:Partial<MatchedJob>;
   jd_research?:JobJdResearch;
   research_detail?:MatchResearchDetail;
   curated_suitable?:boolean;report_status?:'COMPLETE'|'DECLINED'|'UNAVAILABLE'|'RETRY_PENDING';

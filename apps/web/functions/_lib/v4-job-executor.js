@@ -3,8 +3,9 @@
 // authorized encrypted task checkpoint; no external Worker receives either.
 import {sha256Hex} from './real-auth.js';
 import {candidateRevision} from './v4-research-pipeline.js';
-import {eligibleCuratedScore,qualifiedReport} from './v4-curated-reports.js';
-import {claimV4JobWork,renewV4JobWork,finishV4JobWork,v4JobWorkQueueEnabled,reportWorkRevision} from './v4-job-work-queue.js';
+import {preserveJobEvidence} from './v4-jd-research.js';
+import {eligibleCuratedScore,qualifiedReport,completedReferenceReport,v4ReportFirstTask} from './v4-curated-reports.js';
+import {claimV4JobWork,renewV4JobWork,finishV4JobWork,v4JobWorkQueueEnabled,reportWorkRevision,referenceWorkRevision} from './v4-job-work-queue.js';
 import {readMatchTask,saveMatchTask,readMatchProgress} from './v4-match-checkpoint-storage.js';
 import {loadBackgroundMatch} from './v4-background-match.js';
 import {assertSessionTaskActive} from './v4-session-match-task.js';
@@ -25,18 +26,20 @@ export const independentJobKey=(taskKey,generation,lane,jobKey,revision)=>
 const workKey=(taskKey,url)=>sha256Hex('HHBA_V4_JOB_WORK:'+taskKey+':'+url);
 const revKey=revision=>sha256Hex('HHBA_V4_JOB_REV:'+revision);
 const itemUrl=job=>job?.research_candidate_url||job?.official_url||job?.url||'';
-const doneReport=job=>qualifiedReport(job)||['DECLINED','UNAVAILABLE'].includes(job?.report_status);
-const suitableScore=job=>job&&(Number.isInteger(job.match_score)||job.evidence_score_status==='AI_REFERENCE_JD_SCORED'||job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'||job.curated_suitable===false);
+const doneReport=job=>qualifiedReport(job)||completedReferenceReport(job)||['DECLINED','UNAVAILABLE'].includes(job?.report_status);
+const suitableScore=job=>job&&(!completedReferenceReport(job)||job.reference_vacancy_verified===true||job.jd_source_status==='VERIFIED_JD')&&
+ (Number.isInteger(job.match_score)||job.evidence_score_status==='AI_REFERENCE_JD_SCORED'||job.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'||job.curated_suitable===false);
 const eligibleJob=(checkpoint,url)=>new Map(checkpoint?.rows||[]).get(url);
 const sourceFor=(checkpoint,url)=>[
  ...(checkpoint?.priorState?.matches||[]),...(checkpoint?.matches||[])
 ].find(job=>itemUrl(job)===url);
-function oneJobCheckpoint(checkpoint,url,job,lane){
+function oneJobCheckpoint(checkpoint,url,job,lane,{referenceFirst=false}={}){
  const scored=sourceFor(checkpoint,url);
  const proofUrls=new Set([url,job.employer_proof_url,...(job.employer_proof_urls||[])].filter(Boolean));
  return {
-  phase:lane==='verification'?'verification':'reporting',
+  phase:lane==='verification'?'verification':referenceFirst?'reference':'reporting',
    search_mode:checkpoint.search_mode,candidate_target:checkpoint.candidate_target,final_target:checkpoint.final_target,
+   source_stop_target:checkpoint.source_stop_target,
    rows:[[url,structuredClone(job)]],
   toolUrls:(checkpoint.toolUrls||[]).filter(x=>proofUrls.has(x)),profile:checkpoint.profile,
   round:checkpoint.round||0,rounds:[],sourceLeads:[],observedSearchSources:[],
@@ -98,8 +101,9 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    previous.lane===lane&&previous.job_key===claim.job_key&&previous.revision===claim.revision&&
    typeof seedUrl==='string'&&seedSource&&previous.checkpoint&&
    await workKey(taskKey,seedUrl)===claim.job_key&&
-   await revKey(lane==='reporting'?reportWorkRevision(seedSource,seedScore):candidateRevision(seedSource))===claim.revision;
+   await revKey(lane==='reporting'?(previous.reference_first?referenceWorkRevision(seedSource):reportWorkRevision(seedSource,seedScore)):candidateRevision(seedSource))===claim.revision;
   let checkpoint=null,url=seedUrl,source=seedSource,activeScore=seedScore;
+  let referenceFirst=exactSeed&&previous.reference_first===true;
   if(!exactSeed){
    const latest=await readMatchTask(env,taskKey);
    if(latest?.generation!==generation||latest.result||!latest.checkpoint)return {status:'STALE'};
@@ -107,7 +111,9 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    const located=await locateV4ClaimCandidate(checkpoint,taskKey,claim.job_key);
    url=located?.url;source=located?.source;
    activeScore=url?sourceFor(checkpoint,url):null;
-   const version=source?(lane==='reporting'?reportWorkRevision(source,activeScore):candidateRevision(source)):null;
+   if(source&&lane==='reporting'&&v4ReportFirstTask(checkpoint)&&
+      await revKey(referenceWorkRevision(source))===claim.revision)referenceFirst=true;
+   const version=source?(lane==='reporting'?(referenceFirst?referenceWorkRevision(source):reportWorkRevision(source,activeScore)):candidateRevision(source)):null;
    if(!url||!source||!version||await revKey(version)!==claim.revision){
     // Once the authoritative checkpoint no longer contains this revision,
     // retire the obsolete queue row. Otherwise the 500-job incremental
@@ -127,7 +133,8 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    return {status:'DONE',lane,cached:true};
   }
   let child=(exactSeed||vettedPrevious)?previous.checkpoint:null;
-  if(!child)child=oneJobCheckpoint(checkpoint,url,source,lane);
+  if(!child)child=oneJobCheckpoint(checkpoint,url,source,lane,{referenceFirst});
+  if(child.phase==='reference')referenceFirst=true;
   const budget=v4IndependentJobBudget();
   const scoped=budget.env(env),provider=v4JobProvider(scoped);
   if(!provider)return {status:'DISABLED'};
@@ -150,7 +157,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
     }
     await assertSessionTaskActive(env,session,task.id,generation);
     await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
-     job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,
+     job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,reference_first:referenceFirst,
      ...(jobTransport==='json'?{transport_mode:'json'}:{}),
      checkpoint:recovery()||child,phaseReplay:entries,complete:false});
     console.info('HHBA_V4_JOB_MODEL_RESULT_CHECKPOINTED',JSON.stringify({lane,completed_calls:entries.length}));
@@ -172,7 +179,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    if(transportMode==='json'&&jobTransport!=='json')console.warn('HHBA_V4_INDEPENDENT_JOB_SSE_FALLBACK_NEXT_STEP',JSON.stringify({lane}));
    if(snapshot&&!leaseLost&&await renewV4JobWork(db,claim,{leaseMs:300000})){
     await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
-     job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,
+     job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,reference_first:referenceFirst,
      ...(transportMode==='json'?{transport_mode:'json'}:{}),checkpoint:snapshot,phaseReplay:replay.snapshot(),complete:false});
    }
    retryError=errorCode(e);
@@ -190,7 +197,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   // Avoid decrypting a 500-job master checkpoint again after the AI call.
   if(leaseLost||!await renewV4JobWork(db,claim,{leaseMs:300000}))throw Object.assign(Error('AI_CHECKPOINT_LEASE_LOST'),{code:'AI_CHECKPOINT_LEASE_LOST'});
   await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
-   job_key:claim.job_key,checkpoint:snapshot,phaseReplay:replay.snapshot(),job:result,complete:done,source_url:url,seed_source:source,seed_score:activeScore,
+   job_key:claim.job_key,checkpoint:snapshot,phaseReplay:replay.snapshot(),job:result,complete:done,source_url:url,seed_source:source,seed_score:activeScore,reference_first:referenceFirst,
    ...(jobTransport==='json'?{transport_mode:'json'}:{})});
   await finishV4JobWork(db,claim,{completed:done,continued:!done});
   return {status:done?'DONE':'CONTINUE',lane,
@@ -223,14 +230,16 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   if(typeof url!=='string'||!job)continue;
   const scored=scoredByUrl.get(url),rr=reportWorkRevision(job,scored);
   const key=locator?.[i]||await workKey(taskKey,url);
-  byKey.set(key,{url,job,revision:await revKey(candidateRevision(job)),reportRevision:rr?await revKey(rr):null});
+  byKey.set(key,{url,job,revision:await revKey(candidateRevision(job)),reportRevision:rr?await revKey(rr):null,
+   referenceRevision:v4ReportFirstTask(checkpoint)?await revKey(referenceWorkRevision(job)):null});
  }
  let next=null;
  const done=new Set(checkpoint.processedEarlier||[]),revisions=new Map(checkpoint.processedEvidence||[]);
  let count=0;
  for(const record of entries){
   const current=byKey.get(record.job_key);
-  if(!current||(record.lane==='reporting'?current.reportRevision:current.revision)!==record.revision)continue;
+  const isReferenceResult=record.lane==='reporting'&&current?.referenceRevision===record.revision;
+  if(!current||(record.lane==='reporting'&&!isReferenceResult?current.reportRevision:record.lane==='verification'?current.revision:current.referenceRevision)!==record.revision)continue;
   if(record.lane==='verification'&&done.has(current.url)&&revisions.get(current.url)===candidateRevision(current.job))continue;
   // The encrypted locator is an optimization hint, not authorization:
   // re-check the actual candidate URL against the D1 claim before merging.
@@ -243,8 +252,9 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   const existingMatches=(available.phase==='research'?available.priorState?.matches:available.matches)||[];
   const present=existingMatches.findIndex(x=>itemUrl(x)===current.url);
   if(record.lane==='verification'&&present>=0&&suitableScore(existingMatches[present]))continue;
-  if(record.lane==='reporting'&&present<0)continue;
-  if(record.lane==='reporting'&&doneReport(existingMatches[present]))continue;
+  if(record.lane==='reporting'&&present<0&&!isReferenceResult)continue;
+  if(isReferenceResult&&present>=0&&(completedReferenceReport(existingMatches[present])||completedReferenceReport(existingMatches[present]?.reference_report)))continue;
+  if(record.lane==='reporting'&&!isReferenceResult&&doneReport(existingMatches[present]))continue;
   // Most resume phases have no new independent evidence. Clone the large
   // checkpoint only after a revision-fenced, not-yet-applied result exists.
   if(!next)next=structuredClone(checkpoint);
@@ -252,7 +262,11 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   const matches=parent.matches||(parent.matches=[]);
   const idx=matches.findIndex(x=>itemUrl(x)===current.url);
   const row=structuredClone(saved.job);
-  if(idx<0)matches.push(row);else matches[idx]={...matches[idx],...row};
+  if(idx<0)matches.push(row);
+  else matches[idx]=preserveJobEvidence(matches[idx],row);
+  // Do not spread an AI reference COMPLETE flag into new official evidence.
+  // preserveJobEvidence keeps the finished reference as a separately labelled
+  // fallback and only lets independently validated official reports qualify.
   if(record.lane==='verification'){
    done.add(current.url);revisions.set(current.url,candidateRevision(current.job));
    for(const field of ['read','scored','archived','scoreFailures']){

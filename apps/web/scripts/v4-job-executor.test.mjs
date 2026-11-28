@@ -210,3 +210,93 @@ test('failed model answers are not reused and checkpoint write failure remains r
  await assert.rejects(()=>replay.persist(),/temporary encrypted storage failure/);
  assert.equal(writes,2,'failed durable writes cannot acknowledge model evidence as persisted');
 });
+
+
+test('independent reference merges before official verification and is retained as a separate fallback',async()=>{
+ const {db,env}=fixture();
+ const cp={phase:'research',search_mode:'source_pool',source_stop_target:20,final_target:20,
+  rows:[[url,candidate()]],matches:[],processedEarlier:[],processedEvidence:[]};
+ await reconcileV4JobWork(db,taskKey,2,cp);
+ const refClaim=await claimV4JobWork(db,taskKey,2,'reporting',{owner:'reference-first'});
+ assert.ok(refClaim,'an unverified source should have an independent reporting job');
+ assert.equal(await finishV4JobWork(db,refClaim),true);
+ const ref={research_candidate_url:url,official_url:url,company:'真实雇主',title:'区域督导',location:'上海',
+  source_type:'站外招聘职位',curated_suitable:true,match_score:84,reference_score:84,report_status:'COMPLETE',
+  reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'岗位详情：AI 参考岗位职责',
+  reference_jd_basis:'只依据岗位名称整理，非企业实际要求',
+  evidence_score_status:'AI_REFERENCE_JD_SCORED',
+  research_detail:{comparisons:[],score_explanation:'真实简历与推断职责的适配依据'}};
+ const refKey=await independentJobKey(taskKey,2,'reporting',refClaim.job_key,refClaim.revision);
+ const records=new Map([[refKey,{kind:'V4_INDEPENDENT_JOB_V1',complete:true,generation:2,lane:'reporting',
+  revision:refClaim.revision,source_url:url,job:ref}]]);
+ const read=async(_env,id)=>records.get(id)||null;
+ const first=await mergeIndependentV4Jobs(env,taskKey,2,cp,{read});
+ assert.equal(first.count,1,'a report must merge without any prior JD or score');
+ assert.equal(first.checkpoint.priorState.matches[0].report_status,'COMPLETE');
+ assert.equal(first.checkpoint.priorState.matches[0].jd_source_status,undefined);
+ const verification=await claimV4JobWork(db,taskKey,2,'verification',{owner:'official-verifier'});
+ assert.ok(verification,'reference completion must not consume the verification job');
+ assert.equal(await finishV4JobWork(db,verification),true);
+ const key=await independentJobKey(taskKey,2,'verification',verification.job_key,verification.revision);
+ records.set(key,{kind:'V4_INDEPENDENT_JOB_V1',complete:true,generation:2,lane:'verification',
+  revision:verification.revision,source_url:url,job:scored(),checkpoint:{read:1,scored:1}});
+ const merged=await mergeIndependentV4Jobs(env,taskKey,2,first.checkpoint,{read});
+ assert.equal(merged.count,1,'official JD verification must still be merged after a reference report');
+ const updated=merged.checkpoint.priorState.matches[0];
+ assert.equal(updated.jd_source_status,'VERIFIED_JD');
+ assert.equal(updated.reference_report?.reference_jd,'岗位详情：AI 参考岗位职责');
+ assert.equal(updated.reference_report?.report_status,'COMPLETE');
+ assert.equal(updated.report_status,undefined,'reference must not falsely qualify the official JD assessment');
+ assert.equal((await mergeIndependentV4Jobs(env,taskKey,2,merged.checkpoint,{read})).count,0,
+  'the same revision-fenced reports never merge twice');
+});
+
+
+test('reference-first AI writes the first full report without a slow employer-page fetch',async()=>{
+ const {v4Match,v4Provider}=await import('../functions/_lib/simple-match-v4.js');
+ const {completedReferenceReport,qualifiedReport}=await import('../functions/_lib/v4-curated-reports.js');
+ const resume='我负责区域门店运营和销售人员培训，也参与销售数据分析。';
+ const reference='岗位职责：负责区域门店运营和销售业务协调，整理经营数据并跟踪改善。\n能力方向：需准备运营数据分析、团队沟通与业务协同的真实案例。';
+ const report={reference_jd:reference,reference_basis:'根据岗位名称和通用职业知识推导，非雇主确认的岗位职责。',
+  suitable:true,score:85,reason:'简历原文中的区域门店运营与岗位方向有关，但企业要求尚未核实。',
+  matched:['区域门店运营','销售人员培训'],gaps:['企业实际岗位职责尚待核实'],
+  resume_quote:'区域门店运营',jd_quote:'负责区域门店运营',
+  comparisons:[{jd_quote:'负责区域门店运营',resume_quote:'区域门店运营',status:'supported',analysis:'有同类区域门店工作经验，不能直接证明符合未知企业的所有条件。'}],
+  strengths:'已有门店运营、人员培训与数据跟踪经验。',
+  risks:'实际在招状态、学历年限与工作职责均待核实。',
+  career_development:'可进一步提升区域经营管理和经营数据分析能力。',
+  optimization_advice:'突出真实区域门店案例、培训成果和改善指标。',
+  competition:'需准备可核实的运营结果与真实项目证据。',
+  extra_sections:[{title:'面试准备',content:'准备区域门店的具体改善案例。'}],
+  reference_coverage:{duties_quote:'负责区域门店运营',capabilities_quote:'运营数据分析'},
+  reference_source_anchors:{
+   duties:{kind:'title_direction',url:'',quote:'区域督导'},
+   capabilities:{kind:'title_direction',url:'',quote:'区域督导'}},
+  quality_review:{status:'complete',explanation:'已覆盖可能职责、能力方向及真实简历对照，明确非官方信息。',missing:[]},
+  reference_material_review:{status:'complete',explanation:'信息仅为岗位方向参考，不虚构企业条件。',missing:[]}};
+ let providerCalls=0,externalPages=0;const live=[];
+ const fetcher=async(url,opts)=>{
+  if(!String(url).includes('/responses')){externalPages++;throw Error('must not fetch official JD before reference report');}
+  providerCalls++;
+  const sent=JSON.parse(opts.body);
+  assert.match(JSON.stringify(sent),/区域督导/);
+  return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(report)}]}]});
+ };
+ const cp={phase:'reference',search_mode:'source_pool',source_stop_target:20,final_target:20,
+  rows:[[url,candidate()]],matches:[],profile:{skills:[],target_roles:[]},publicEvidence:[]};
+ const provider=v4Provider({HHBA_AGENT_RELAY_API_KEY:'TEST_ONLY_FAKE_KEY_0123456789'});
+ provider.stream=false;
+ const result=await v4Match(fetcher,provider,resume,'',{
+  curated:true,officialOnly:true,parallelResearch:false,pipelineChild:true,stepMode:true,
+  env:{HHBA_MATCH_V4_READY:'1'},checkpoint:cp,onPartial:jobs=>live.push(structuredClone(jobs))});
+ assert.equal(result.status,'CONTINUE');
+ assert.equal(result.checkpoint.phase,'reference');
+ assert.equal(result.checkpoint.reference_complete,true);
+ assert.equal(externalPages,0,'no employer-page fetch blocks the first reference report');
+ assert.equal(providerCalls,1,'one completed AI response can deliver a complete report');
+ const job=result.checkpoint.matches[0];
+ assert.ok(completedReferenceReport(job),JSON.stringify(job));
+ assert.equal(qualifiedReport(job),false,'AI reference alone is not a verified formal recommendation');
+ assert.equal(job.reference_vacancy_verified,undefined,'reference must not invent vacancy confirmation');
+ assert.ok(live.some(jobs=>jobs.some(completedReferenceReport)),'completed report must be published immediately');
+});

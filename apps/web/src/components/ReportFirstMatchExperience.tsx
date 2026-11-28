@@ -13,7 +13,15 @@ type Props={
 };
 const safeScore=(job:MatchedJob)=>{const score=job.match_score;return typeof score==='number'&&Number.isInteger(score)&&score>=0&&score<=100?score:null;};
 const fullReport=(job:MatchedJob)=>job.report_status==='COMPLETE'&&!!job.research_detail?.score_explanation?.trim()&&Array.isArray(job.research_detail.comparisons)&&!!(job.reference_jd?.trim()||job.evidence_excerpt?.trim())&&!job.excluded_board&&!job.excluded_closed&&!['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'UNKNOWN');
-const completeness=(job:MatchedJob)=>(fullReport(job)?100:0)+(job.reference_jd?20:0)+(job.research_detail?20:0)+(job.jd_research?.facts?.length||0)+(Number.isInteger(job.match_score)?5:0);
+// Preserve a completed AI reference while a separate worker verifies the JD.
+const readableReportJob=(job:MatchedJob):MatchedJob|null=>{
+ if(fullReport(job))return job;
+ const reference=job.reference_report;
+ if(!reference||reference.reference_jd_kind!=='AI_GENERATED_REFERENCE')return null;
+ const combined={...job,...reference,reference_report:reference} as MatchedJob;
+ return fullReport(combined)?combined:null;
+};
+const completeness=(job:MatchedJob)=>(readableReportJob(job)?100:0)+(job.reference_jd?20:0)+(job.research_detail?20:0)+(job.jd_research?.facts?.length||0)+(Number.isInteger(job.match_score)?5:0);
 const validJob=(job:MatchedJob)=>!!job.official_url&&!job.excluded_board&&!job.excluded_closed&&!['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status||'UNKNOWN');
 const stageText:Record<NativeMatchProgress,string>={
  preparing:'正在准备职业研究',parsing:'正在理解你的简历',connected:'正在连接研究服务',
@@ -55,12 +63,13 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
     research_detail:preferred.research_detail||secondary.research_detail,
     reference_jd:preferred.reference_jd||secondary.reference_jd,
     reference_jd_basis:preferred.reference_jd_basis||secondary.reference_jd_basis,
-    jd_research:preferred.jd_research||secondary.jd_research
+    jd_research:preferred.jd_research||secondary.jd_research,
+    reference_report:preferred.reference_report||secondary.reference_report
    });
   }
   return [...result.values()];
  },[jobs,officialJobs]);
- const ready=useMemo(()=>all.filter(fullReport),[all]);
+ const ready=useMemo(()=>all.map(readableReportJob).filter((job):job is MatchedJob=>job!==null),[all]);
  useEffect(()=>{
   setArrival(previous=>{
    const found=new Set(ready.map(j=>j.official_url)),kept=previous.filter(url=>found.has(url)),existing=new Set(kept);
@@ -80,7 +89,7 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
  const discovered=Math.max(report?.discovered||0,all.length);
  const profileData=report?.profile||profile;
  const sourceCount=report?.search_source_count||0;
- const officialReady=ready.filter(isVerifiedMatchReport).length;
+ const officialReady=officialJobs.filter(isVerifiedMatchReport).length;
  const progressMessage=activity?.message||stageText[progressStage];
  const choose=(index:number)=>{if(index<0||index>=order.length)return;setSelectedUrl(order[index].official_url);};
  return <div className="hhba-report-first" data-hhba-report-first="true">
@@ -117,7 +126,7 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
      <div className="hhba-rf-report-head">
       <div className="hhba-rf-report-identity"><span className="hhba-rf-report-label">PERSONALIZED CAREER REPORT</span>
        <h2>{current.title_zh||current.title}</h2><p><BriefcaseBusiness size={14}/>{current.company}<span className="hhba-rf-mid-dot">·</span><MapPin size={14}/>{current.location}</p>
-       <span className={isVerifiedMatchReport(current)?'hhba-rf-source-tag hhba-rf-source-official':'hhba-rf-source-tag'}>{isVerifiedMatchReport(current)?'岗位资料已核实':'AI 参考研究 · 招聘信息待核实'}</span>
+       <span className={isVerifiedMatchReport(current)&&current.reference_jd_kind!=='AI_GENERATED_REFERENCE'?'hhba-rf-source-tag hhba-rf-source-official':'hhba-rf-source-tag'}>{current.reference_jd_kind==='AI_GENERATED_REFERENCE'?'AI 参考研究 · 招聘详情以来源为准':isVerifiedMatchReport(current)?'岗位资料已核实':'招聘信息待核实'}</span>
       </div>
       <div className="hhba-rf-score"><strong>{safeScore(current)??'—'}{safeScore(current)!==null&&<small>/100</small>}</strong><span>匹配参考分</span></div>
      </div>
@@ -137,7 +146,7 @@ export function ReportFirstMatchExperience({profile,report,jobs,officialJobs,pen
       <div className="hhba-rf-trust"><ShieldCheck size={16}/><span>{current.reference_jd_kind==='AI_GENERATED_REFERENCE'?'岗位详情为 AI 编写的参考研究，并非企业发布的原文要求。':'以可核实的岗位资料为依据；申请条件以招聘页面为准。'} 匹配分不代表录用概率。</span></div>
       <div className="hhba-rf-actions">
        {discoveryApplyDestination(current)&&<a href={discoveryApplyDestination(current)||undefined} target="_blank" rel="noopener noreferrer" data-hhba-recruitment-outbound="true">{isVerifiedMatchReport(current)?'投递官网':'查看岗位来源'}<ArrowUpRight size={15}/></a>}
-       {onOptimize&&isVerifiedMatchReport(current)&&<button type="button" disabled={!optimizationAvailable} aria-label={'针对'+(current.title_zh||current.title)+'优化简历'} onClick={()=>onOptimize(current)}><Sparkles size={15}/>针对岗位优化简历</button>}
+       {onOptimize&&isVerifiedMatchReport(current)&&current.reference_jd_kind!=='AI_GENERATED_REFERENCE'&&<button type="button" disabled={!optimizationAvailable} aria-label={'针对'+(current.title_zh||current.title)+'优化简历'} onClick={()=>onOptimize(current)}><Sparkles size={15}/>针对岗位优化简历</button>}
       </div>
      </div>
     </article>
