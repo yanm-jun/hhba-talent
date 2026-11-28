@@ -229,3 +229,32 @@ test('expired JD job resumes its saved revision before 500 fresh jobs; active le
  assert.equal(await finishV4JobWork(db,resumed,{now:16103,completed:true}),true);
  assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE state='PENDING'").get().n,118);
 });
+
+
+test('new 300-candidate tasks enqueue every JD and only 30 ranked in-depth reports',async()=>{
+ const {db,local}=fixture();
+ const urls=Array.from({length:300},(_,i)=>url+'/goal-300-'+String(i+1).padStart(4,'0'));
+ const ranked=urls.slice(250,290);
+ const cp={candidate_target:300,final_target:30,phase:'reporting',
+  rows:urls.map(u=>[u,{...source(),employer_proof_url:u}]),processedEarlier:[],processedEvidence:[],
+  matches:ranked.map(u=>({...scored(),official_url:u,research_candidate_url:u})),
+  globalOrder:ranked,globalRankState:{done:true}};
+ let last=Infinity,remaining=Infinity;
+ for(let i=0;i<20;i++){
+  const result=await reconcileV4JobWork(db,taskKey,0,cp,{now:1000+i,maxChanges:40});
+  assert.ok(result.createdOrUpdated<=40,'each execution preserves bounded D1 writes');
+  assert.ok(result.remaining<=last,'every page moves forward');
+  last=result.remaining;remaining=result.remaining;
+  if(!remaining)break;
+ }
+ assert.equal(remaining,0);
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE lane='verification'").get().n,300);
+ assert.equal(local.prepare("SELECT COUNT(*) AS n FROM hhba_v4_job_work_queue WHERE lane='reporting'").get().n,30);
+ const result=await reconcileV4JobWork(db,taskKey,0,cp,{now:5000,maxChanges:40});
+ assert.equal(result.createdOrUpdated,0,'repeated recovery must not reset the queue');
+});
+test('legacy 500→50 checkpoint retains original ranked report eligibility after release',async()=>{
+ const cp={phase:'reporting',candidate_target:500,final_target:50,rows:[[url,source()]],matches:[scored()],globalOrder:[url],globalRankState:{done:true},processedEarlier:[]};
+ const work=await desiredV4JobWork(taskKey,0,cp);
+ assert.deepEqual(work.map(w=>w.lane),['verification','reporting']);
+});

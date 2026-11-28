@@ -1,6 +1,7 @@
 import test from 'node:test';
 import './v4-shared-capabilities.test.mjs';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {v4Provider,v4Call,v4ParseJson,v4GroundProfile,v4ToolSources,v4Sources,
  v4Match,v4ReadProviderResponse} from '../functions/_lib/simple-match-v4.js';
 import {v4PublicJobUrl,v4ReadEmployerJob} from '../functions/_lib/v4-open-job-evidence.js';
@@ -725,7 +726,7 @@ test('V4 excludes an unfamiliar commercial board discovered from the actual page
  await assert.rejects(v4ReadEmployerJob(u,{fetcher:async()=>new Response(html,{headers:{'content-type':'text/html'}})}),/V4_COMMERCIAL_BOARD_EXCLUDED/);
 });
 
-test('curated V4 retains all candidates beyond the 500 target and scores before globally selecting reports',async()=>{
+test('curated V4 defaults to 300→30, retains extra candidates and globally ranks verified reports',async()=>{
  const jobs=Array.from({length:502},(_,i)=>({...row,company:'新企业'+(i+1),title:'区域运营岗位'+(i+1),url:'https://careers.new-employer.cn/roles/'+(i+1),fit_summary:'适合区域运营经验',requirements:'渠道运营和经销商业务流程'}));
  const board={...jobs[0],url:'https://www.zhipin.com/job_detail/123.html'},duplicate={...jobs[0],url:jobs[0].url+'?utm_source=search'},generic={company:'待核实',title:'职位详情待核实',location:'上海',url:'https://careers.new-employer.cn/'};
  let searches=0,deep=0,parsed=0;const readIds=new Set(),scoreIds=new Set(),reportIds=[];
@@ -752,8 +753,8 @@ test('curated V4 retains all candidates beyond the 500 target and scores before 
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
  assert.equal(parsed,1);assert.equal(searches,2);
- assert.equal(result.research_report.discovered,502);assert.equal(result.research_report.unresolved_source_count,0);assert.equal(result.matches.length,50);
- assert.equal(readIds.size,502);assert.equal(scoreIds.size,501);assert.equal(deep,51);
+ assert.equal(result.research_report.discovered,502);assert.equal(result.research_report.unresolved_source_count,0);assert.equal(result.research_report.candidate_target,300);assert.equal(result.research_report.final_target,30);assert.equal(result.matches.length,30);
+ assert.equal(readIds.size,502);assert.equal(scoreIds.size,501);assert.equal(deep,31);
  assert.equal(reportIds[0],498);assert.equal(reportIds[1],497);
  assert.equal(result.native_search.jd_verification.scored,501);
  assert.equal(result.native_search.jd_verification.eligible,502);
@@ -761,7 +762,7 @@ test('curated V4 retains all candidates beyond the 500 target and scores before 
  assert.equal(result.matches[0].title,'区域运营岗位498');
  assert.ok(result.matches.every(j=>j.research_detail?.comparisons?.length&&j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'));
  assert.equal(result.can_continue,false);
- assert.equal(result.research_leads.length,451);
+ assert.equal(result.research_leads.length,471);
  assert.ok(result.research_leads.some(j=>j.title==='区域运营岗位499'&&j.match_score===40));
 });
 test('curated report rejects invented CV quotes but accepts flexible evidence-backed structure',async()=>{
@@ -1374,4 +1375,23 @@ test('an incomplete Cloudflare background stream resumes the same checkpoint usi
  assert.equal(v4RecoveredTransportMode({phase:'research',round:2},null,'AI_BACKGROUND_TRANSPORT_INTERRUPTED'),'json');
  assert.equal(v4RecoveredTransportMode({phase:'research',round:2},null,'AI_EDGE_RESOURCE_EXHAUSTED'),'sse');
  assert.equal(v4RecoveredTransportMode({phase:'research',transport_mode:'json'},null),'json');
+});
+
+
+test('V4 task goals are pinned for new and already-running checkpoints',async()=>{
+ const {CANDIDATE_TARGET,FINAL_TARGET,LEGACY_CANDIDATE_TARGET,LEGACY_FINAL_TARGET,v4TaskTargets}=await import('../functions/_lib/v4-curated-reports.js');
+ assert.deepEqual([CANDIDATE_TARGET,FINAL_TARGET],[300,30]);
+ assert.deepEqual([LEGACY_CANDIDATE_TARGET,LEGACY_FINAL_TARGET],[500,50]);
+ assert.deepEqual(v4TaskTargets(null),{candidateTarget:300,finalTarget:30});
+ assert.deepEqual(v4TaskTargets({phase:'research',round:0,rows:[],candidate_target:300,final_target:30}),{candidateTarget:300,finalTarget:30});
+ for(const phase of ['research','verification','reporting']){
+  assert.deepEqual(v4TaskTargets({phase,round:15,rows:[['https://employer.test/job/1',{}]]}),{candidateTarget:500,finalTarget:50},'old checkpoint cannot silently shrink its paid work');
+ }
+ assert.deepEqual(v4TaskTargets({phase:'reporting',candidate_target:500,final_target:50}),{candidateTarget:500,finalTarget:50});
+ const source=readFileSync(new URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
+ assert.match(source,/checkpoint:\{phase,candidate_target:candidateTarget,final_target:finalTarget,/);
+ assert.match(source,/candidate_target:candidateTarget,final_target:finalTarget/);
+ assert.match(source,/生成最多'\+finalTarget\+'份详细报告/);
+ assert.doesNotMatch(source,/目标为500个去重/);
+ assert.doesNotMatch(source,/最多50份详细报告/);
 });

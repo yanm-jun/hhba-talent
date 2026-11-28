@@ -434,7 +434,7 @@ function renderV4SearchSpeed(){
  if(!root||!state)return;
  root.replaceChildren();
  const valid=data?.quality==='collected';
- state.textContent=valid?'已观察 '+fmt.format(data.runs)+' 个匿名研究任务，完成 '+fmt.format(data.completed)+' 个；最多实际发现 '+fmt.format(data.maxObservedCandidates)+' 个候选。未达到的里程碑不计入耗时均值。':data?.quality==='no_records'?'暂无真实任务测速记录；不能推算 500 个岗位需要的时间。':'测速数据暂不可用（或尚未完成数据库迁移）';
+ state.textContent=valid?'已观察 '+fmt.format(data.runs)+' 个匿名研究任务，完成 '+fmt.format(data.completed)+' 个；最多实际发现 '+fmt.format(data.maxObservedCandidates)+' 个候选。未达到的里程碑不计入耗时均值。':data?.quality==='no_records'?'暂无真实任务测速记录；不能推算当前任务候选目标所需时间。':'测速数据暂不可用（或尚未完成数据库迁移）';
  if(!valid)return;
  const duration=ms=>typeof ms==='number'&&Number.isFinite(ms)?(ms>=60000?(ms/60000).toFixed(1)+' 分钟':(ms/1000).toFixed(1)+' 秒'):'—';
  for(const m of data.milestones||[]){
