@@ -1283,7 +1283,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    const candidateEvents=lane=>(curated&&provider.stream===true||typeof onDiscoveryCandidate==='function')?
     createV4DiscoveryCandidateEvents({round,lane,signal,onCandidate:acceptStreamed,
      allow:j=>acceptedLiveUrl(j.url)}):undefined;
-   const canParallel=parallelResearch&&curated&&!activeResumePage&&!researchToolResult&&(fullResearch||(!sourceDriven&&concreteCount()<candidateTarget))&&(!priorState||checkpoint?.pipelineActive&&!backfillSignature);
+   const canParallel=parallelResearch&&curated&&!activeResumePage&&!researchToolResult&&(fullResearch||sourceDriven||concreteCount()<candidateTarget)&&(!priorState||checkpoint?.pipelineActive&&!backfillSignature);
    if(canParallel){
     const width=admittedDiscoveryWidth(discoveryWidth,resourceBudget,{maxConnections:checkpoint?.pipelineActive?5:6,inFlight:0,reserve:6});
     onActivity('searching','主研究 Agent 与 '+(width-1)+' 个辅助 Agent 正在并行搜索企业官方岗位。');
