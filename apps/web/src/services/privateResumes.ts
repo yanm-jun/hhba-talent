@@ -80,8 +80,10 @@ export async function checkPrivateResumeDuplicate(file:File,signal?:AbortSignal)
  }
  const data=await response.json().catch(()=>null) as {kind?:string;existing?:PrivateResume|null}|null;
  if(data?.kind!=='HHBA_PRIVATE_RESUME_DUPLICATE_CHECK_V1'||
-  (data.existing!==null&&data.existing!==undefined&&
-   (typeof data.existing.id!=='string'||! /^[a-f0-9-]{36}$/.test(data.existing.id))))
+  !Object.prototype.hasOwnProperty.call(data,'existing')||
+  (data.existing!==null&&
+   (typeof data.existing?.id!=='string'||
+    !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(data.existing.id))))
   throw Error('重复简历检查响应异常，请重试或仅用于本次匹配。');
  return data.existing||null;
 }
