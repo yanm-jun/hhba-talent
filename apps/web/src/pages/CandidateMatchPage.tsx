@@ -517,7 +517,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
     {((result||partialJobs.length>0)||working||researchJobs.length>0||taskFailure)&&<CandidateMatchNativeDialog
       hostRoute={hostRoute} taskStartedAt={sessionTask.current?.started_at} taskFailed={taskFailure} initialMinimized={restoringTask||!!hostRoute&&!/\/candidate\/(?:account\/)?match$/.test(hostRoute)}
       result={result||{matches:partialJobs,profile:researchReport?.profile}}
-      researchReport={result?.research_report||researchReport} researchJobs={result?.research_leads||researchJobs}
+      researchReport={result?.research_report||researchReport} researchJobs={[...researchJobs,...(result?.research_leads||[])]}
       pending={working&&!result} progressStage={stage} progressActivity={activity} execution={execution}
       onContinue={result?.can_continue?()=>void continueSearch():undefined}
       notice={working?'':error}
