@@ -3,6 +3,7 @@
 // authorized encrypted task checkpoint; no external Worker receives either.
 import {sha256Hex} from './real-auth.js';
 import {candidateRevision} from './v4-research-pipeline.js';
+import {preserveJobEvidence} from './v4-jd-research.js';
 import {eligibleCuratedScore,qualifiedReport,completedReferenceReport,v4ReportFirstTask} from './v4-curated-reports.js';
 import {claimV4JobWork,renewV4JobWork,finishV4JobWork,v4JobWorkQueueEnabled,reportWorkRevision,referenceWorkRevision} from './v4-job-work-queue.js';
 import {readMatchTask,saveMatchTask,readMatchProgress} from './v4-match-checkpoint-storage.js';
@@ -228,14 +229,16 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   if(typeof url!=='string'||!job)continue;
   const scored=scoredByUrl.get(url),rr=reportWorkRevision(job,scored);
   const key=locator?.[i]||await workKey(taskKey,url);
-  byKey.set(key,{url,job,revision:await revKey(candidateRevision(job)),reportRevision:rr?await revKey(rr):null});
+  byKey.set(key,{url,job,revision:await revKey(candidateRevision(job)),reportRevision:rr?await revKey(rr):null,
+   referenceRevision:v4ReportFirstTask(checkpoint)?await revKey(referenceWorkRevision(job)):null});
  }
  let next=null;
  const done=new Set(checkpoint.processedEarlier||[]),revisions=new Map(checkpoint.processedEvidence||[]);
  let count=0;
  for(const record of entries){
   const current=byKey.get(record.job_key);
-  if(!current||(record.lane==='reporting'?current.reportRevision:current.revision)!==record.revision)continue;
+  const isReferenceResult=record.lane==='reporting'&&current?.referenceRevision===record.revision;
+  if(!current||(record.lane==='reporting'&&!isReferenceResult?current.reportRevision:record.lane==='verification'?current.revision:current.referenceRevision)!==record.revision)continue;
   if(record.lane==='verification'&&done.has(current.url)&&revisions.get(current.url)===candidateRevision(current.job))continue;
   // The encrypted locator is an optimization hint, not authorization:
   // re-check the actual candidate URL against the D1 claim before merging.
@@ -248,8 +251,9 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   const existingMatches=(available.phase==='research'?available.priorState?.matches:available.matches)||[];
   const present=existingMatches.findIndex(x=>itemUrl(x)===current.url);
   if(record.lane==='verification'&&present>=0&&suitableScore(existingMatches[present]))continue;
-  if(record.lane==='reporting'&&present<0)continue;
-  if(record.lane==='reporting'&&doneReport(existingMatches[present]))continue;
+  if(record.lane==='reporting'&&present<0&&!isReferenceResult)continue;
+  if(isReferenceResult&&present>=0&&(completedReferenceReport(existingMatches[present])||completedReferenceReport(existingMatches[present]?.reference_report)))continue;
+  if(record.lane==='reporting'&&!isReferenceResult&&doneReport(existingMatches[present]))continue;
   // Most resume phases have no new independent evidence. Clone the large
   // checkpoint only after a revision-fenced, not-yet-applied result exists.
   if(!next)next=structuredClone(checkpoint);
@@ -257,7 +261,9 @@ export async function mergeIndependentV4Jobs(env,taskKey,generation,checkpoint,{
   const matches=parent.matches||(parent.matches=[]);
   const idx=matches.findIndex(x=>itemUrl(x)===current.url);
   const row=structuredClone(saved.job);
-  if(idx<0)matches.push(row);else matches[idx]={...matches[idx],...row};
+  if(idx<0)matches.push(row);
+  else matches[idx]=isReferenceResult?preserveJobEvidence(matches[idx],row):
+   preserveJobEvidence(matches[idx],{...matches[idx],...row});
   if(record.lane==='verification'){
    done.add(current.url);revisions.set(current.url,candidateRevision(current.job));
    for(const field of ['read','scored','archived','scoreFailures']){
