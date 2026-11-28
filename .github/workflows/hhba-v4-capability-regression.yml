@@ -8,6 +8,12 @@ on:
       - 'apps/web/functions/_lib/simple-match-v4.js'
       - 'apps/web/functions/api/match-v4/**'
       - 'apps/web/src/components/MatchResearchPanels.tsx'
+      - 'apps/web/src/components/CandidateMatchNativeDialog.tsx'
+      - 'apps/web/src/components/JobResearchDossier.tsx'
+      - 'apps/web/src/services/jobResearchDossier.mjs'
+      - 'apps/web/src/services/jobResearchDossier.d.mts'
+      - 'apps/web/src/styles/job-research-dossier.css'
+      - 'apps/web/scripts/job-research-dossier.contract.test.mjs'
       - 'apps/web/functions/_lib/ai-token-usage.js'
       - 'apps/web/scripts/ai-token-usage.test.mjs'
       - 'apps/web/scripts/simple-match-v4.contract.test.mjs'
@@ -45,6 +51,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: node --test apps/web/scripts/job-research-dossier.contract.test.mjs
       - run: node --test apps/web/scripts/ai-token-usage.test.mjs apps/web/scripts/v4-search-expansion.test.mjs apps/web/scripts/v4-parallel-discovery.test.mjs apps/web/scripts/simple-match-v4.contract.test.mjs apps/web/scripts/v4-session-match-task.test.mjs apps/web/scripts/v4-stage-workflows.test.mjs apps/web/scripts/v4-job-work-queue.test.mjs apps/web/scripts/v4-job-executor.test.mjs apps/web/scripts/v4-job-locator.test.mjs apps/web/scripts/v4-independent-job-delivery.test.mjs apps/web/scripts/v4-readonly-progress.test.mjs apps/web/scripts/v4-job-ops-metrics.test.mjs apps/web/scripts/v4-minute-performance.test.mjs apps/web/scripts/v4-p0-job-resume.test.mjs apps/web/scripts/v4-search-speed.test.mjs services/match-background/runner.test.mjs
       - working-directory: apps/web
         run: npm ci --ignore-scripts && npm run build
