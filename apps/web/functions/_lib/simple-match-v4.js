@@ -143,7 +143,13 @@ export async function v4Call(fetcher,provider,payload,{signal,onEvent,onDiscover
   try{provider.onCallState?.('start',stage)}catch{}
   if(provider.usageDb)provider.phaseResourceBudget?.take('model_usage');
   data=await v4CallOpenAI(fetcher,effective,payload,{signal,onEvent,onDiscoveryJob:stage==='discovery'?onDiscoveryJob:undefined,onDiscoverySource:stage==='discovery'?onDiscoverySource:undefined,stage,timing});
-  if(replayKey&&data.status==='completed')provider.phaseReplay.remember(replayKey,data);
+  if(replayKey&&data.status==='completed'){
+    provider.phaseReplay.remember(replayKey,data);
+    // One-job pages invocations persist the completed model result BEFORE
+    // later JD source reads or evidence review can exhaust their resources.
+    // The existing master research path has no onRemember persistence hook.
+    await provider.phaseReplay.persist?.();
+   }
   return data;
  }catch(e){failure=e;throw e;}
  finally{
