@@ -4,7 +4,7 @@
 // digests and lease state. It cannot award a score or fabricate a report.
 import {sha256Hex} from './real-auth.js';
 import {candidateRevision,pendingVerification} from './v4-research-pipeline.js';
-import {eligibleCuratedScore,qualifiedReport,FINAL_TARGET} from './v4-curated-reports.js';
+import {eligibleCuratedScore,qualifiedReport,v4TaskTargets} from './v4-curated-reports.js';
 
 const taskId=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
 const generationOk=v=>Number.isSafeInteger(v)&&v>=0;
@@ -14,15 +14,16 @@ const valid=(key,generation)=>taskId(key)&&generationOk(generation);
 export const v4JobWorkQueueEnabled=env=>env?.HHBA_V4_JOB_QUEUE_ENABLED==='1'&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 
 export async function desiredV4JobWork(taskKey,generation,checkpoint,{candidateRows=checkpoint?.rows}={}){
+ const {finalTarget}=v4TaskTargets(checkpoint);
  if(!valid(taskKey,generation)||!checkpoint||!Array.isArray(checkpoint.rows))return [];
  const results=[],dedupe=new Set(),completed=new Set(checkpoint.processedEarlier||[]),
   revisions=new Map(checkpoint.processedEvidence||[]),rechecks=new Set(checkpoint.explicitRechecks||[]),
   matches=[...(checkpoint.priorState?.matches||[]),...(checkpoint.matches||[])];
  const byUrl=new Map(matches.map(job=>[job.research_candidate_url||job.official_url,job]).filter(([u])=>typeof u==='string'));
  const pending=new Set(pendingVerification(checkpoint).map(([url])=>url));
- // A long report is expensive: queue only the AI-confirmed global top 50,
+ // A long report is expensive: queue only the AI-confirmed task-scoped global top N,
  // never every scored candidate or a provisional order during discovery.
- const reportSelection=new Set(checkpoint.phase==='reporting'&&checkpoint.globalRankState?.done===true&&Array.isArray(checkpoint.globalOrder)?checkpoint.globalOrder.slice(0,FINAL_TARGET):[]);
+ const reportSelection=new Set(checkpoint.phase==='reporting'&&checkpoint.globalRankState?.done===true&&Array.isArray(checkpoint.globalOrder)?checkpoint.globalOrder.slice(0,finalTarget):[]);
  const digest=async(url,lane,revision)=>{
   const job_key=await sha256Hex('HHBA_V4_JOB_WORK:'+taskKey+':'+url);
   const rev=await sha256Hex('HHBA_V4_JOB_REV:'+revision);
@@ -54,6 +55,7 @@ lease_until_ms=CASE WHEN revision!=excluded.revision OR excluded.state='COMPLETE
 attempts=CASE WHEN revision!=excluded.revision THEN 0 ELSE attempts END,
 updated_at_ms=excluded.updated_at_ms`;
 export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=Date.now(),maxChanges=40}={}){
+ const {finalTarget}=v4TaskTargets(checkpoint);
  if(!db?.prepare||!valid(taskKey,generation))return {available:false};
  const changes=Math.max(1,Math.min(100,Number.isSafeInteger(maxChanges)?maxChanges:40));
  const allRows=Array.isArray(checkpoint?.rows)?checkpoint.rows:[];
@@ -68,7 +70,7 @@ export async function reconcileV4JobWork(db,taskKey,generation,checkpoint,{now=D
   const validRows=allRows.filter(([url,job])=>typeof url==='string'&&job&&!job.excluded_closed&&!job.excluded_board&&job.availability_status!=='CLOSED_LISTED');
   const candidateCount=validRows.length,verificationCount=(found.results||[]).filter(r=>r.lane==='verification').length;
   const selectedScores=new Map([...(checkpoint.priorState?.matches||[]),...(checkpoint.matches||[])].map(job=>[job.research_candidate_url||job.official_url,job]));
-  const rank=checkpoint.phase==='reporting'&&checkpoint.globalRankState?.done===true&&Array.isArray(checkpoint.globalOrder)?new Set(checkpoint.globalOrder.slice(0,FINAL_TARGET)):new Set();
+  const rank=checkpoint.phase==='reporting'&&checkpoint.globalRankState?.done===true&&Array.isArray(checkpoint.globalOrder)?new Set(checkpoint.globalOrder.slice(0,finalTarget)):new Set();
   const reportRows=rank.size?validRows.filter(([url])=>{
    const score=selectedScores.get(url);return score&&rank.has(score.official_url)&&(eligibleCuratedScore(score)||qualifiedReport(score));
   }):[];
@@ -134,7 +136,7 @@ export async function claimV4JobWork(db,taskKey,generation,lane,{now=Date.now(),
  AND ((state='PENDING' AND lease_until_ms<=?) OR (state='LEASED' AND lease_until_ms<=?))
  -- A crashed Pages invocation can leave an expired LEASED row with a
  -- revision-fenced encrypted continuation. Prefer that overdue recovery
- -- over newly queued candidates so 500 new PENDING rows cannot postpone
+ -- over newly queued candidates so a large backlog of new PENDING rows cannot postpone
  -- the interrupted JD until the entire pool has been visited. Active leases
  -- are excluded above and never stolen.
  ORDER BY CASE WHEN state='LEASED' THEN 0 ELSE 1 END,
