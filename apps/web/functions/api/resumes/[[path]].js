@@ -71,6 +71,30 @@ export async function onRequest({request,env}){
    return safeJson({kind:'HHBA_PRIVATE_RESUME_VAULT_V1',
     maxFiles:RESUME_MAX_PER_ACCOUNT,items:(rows.results||[]).map(summary)});
   }
+  // Duplicate preflight reads only a local SHA-256 fingerprint, not the file.
+  // It is account-scoped, same-origin, and never writes the private vault.
+  // This lets the user explicitly choose whether to reuse an existing resume
+  // BEFORE any upload or new AI matching task is started.
+  if(tail==='/check'&&method==='POST'){
+   if(!/^application\/json(?:\s*;|$)/i.test(request.headers.get('Content-Type')||''))
+    return err('INVALID_CHECK_REQUEST',415);
+   const length=request.headers.get('Content-Length');
+   if(length!==null&&(!/^\d+$/.test(length)||Number(length)>256))
+    return err('INVALID_CHECK_REQUEST',400);
+   const body=await request.text();
+   if(body.length>256)return err('INVALID_CHECK_REQUEST',400);
+   let input;
+   try{input=JSON.parse(body);}catch{return err('INVALID_CHECK_REQUEST',400);}
+   const hash=input?.sha256,size=input?.size;
+   if(typeof hash!=='string'||! /^[a-f0-9]{64}$/.test(hash)||
+      !Number.isSafeInteger(size)||size<30||size>RESUME_LIMIT_BYTES)
+    return err('INVALID_CHECK_REQUEST',400);
+   const match=await db.prepare(
+    'SELECT id,filename,media_type,size_bytes,created_at FROM hhba_candidate_resumes WHERE phone=? AND sha256=? AND size_bytes=?'
+   ).bind(phone,hash,size).first();
+   return safeJson({ok:true,kind:'HHBA_PRIVATE_RESUME_DUPLICATE_CHECK_V1',
+    existing:match?summary(match):null});
+  }
   if(tail===''&&method==='POST'){
    if(request.headers.get('X-HHBA-Storage-Consent')!==STORAGE_CONSENT_VERSION)
     return err('STORAGE_CONSENT_REQUIRED',400);
