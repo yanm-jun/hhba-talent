@@ -129,3 +129,84 @@ test('resumed isolated JD job uses a full safe phase budget instead of repeated 
  assert.match(source,/const budget=v4IndependentJobBudget\(\)/);
  assert.match(source,/HHBA_V4_INDEPENDENT_JOB_BUDGET_YIELD/);
 });
+
+
+test('completed JD model calls are durably replayed by exact payload on a later invocation, not repeated or truncated',async()=>{
+ const {phaseModelReplay}=await import('../functions/_lib/v4-phase-budget.js');
+ const {v4Call}=await import('../functions/_lib/simple-match-v4.js');
+ const reply={status:'completed',output:[
+  {type:'reasoning',summary:['private model reasoning must not persist']},
+  {type:'message',role:'assistant',content:[{type:'output_text',text:'{"sources":[{"url":"https://employer.test/jobs/22"}]}'}]}
+ ]};
+ let sent=0,persisted=null,writes=0;
+ const fetcher=async()=>{sent++;return Response.json(reply)};
+ const payload={input:JSON.stringify({job:'22',company:'employer'}),instructions:'Find the real official posting.'};
+ const firstReplay=phaseModelReplay([],{
+  onRemember:async entries=>{persisted=structuredClone(entries);writes++;}
+ });
+ const makeProvider=replay=>({kind:'openai',model:'gpt-test',key:'fake',baseUrl:'https://relay.test/v1',stream:false,phaseReplay:replay});
+ const first=await v4Call(fetcher,makeProvider(firstReplay),payload,{stage:'jd_search'});
+ assert.equal(first.status,'completed');
+ assert.equal(sent,1);
+ assert.equal(writes,1,'the successful model result must reach encrypted-sidecar writer before next JD step');
+ assert.equal(persisted.length,1);
+ assert.deepEqual(persisted[0][1].output,[reply.output[1]],'never persist hidden reasoning');
+ const resumed=phaseModelReplay(persisted,{onRemember:async entries=>{persisted=entries;writes++;}});
+ const exact=await v4Call(fetcher,makeProvider(resumed),payload,{stage:'jd_search'});
+ assert.equal(exact.status,'completed');
+ assert.equal(sent,1,'do not repeat an already completed, exact-payload paid call');
+ await v4Call(fetcher,makeProvider(resumed),payload,{stage:'jd_search'});
+ assert.equal(sent,2,'two intentional same-prompt calls within one invocation are not reused');
+ await v4Call(fetcher,makeProvider(resumed),{...payload,input:'different official vacancy'},{stage:'jd_search'});
+ assert.equal(sent,3,'new or changed official research is never blocked by replay');
+ assert.equal(writes,3);
+});
+test('independent JD sidecar enforces current lease, account generation and encrypted write for every completed model response',()=>{
+ const source=readFileSync(new URL('../functions/_lib/v4-job-executor.js',import.meta.url),'utf8');
+ assert.match(source,/const replay=phaseModelReplay\(vettedPrevious\?previous\?\.phaseReplay:\[\],\{/);
+ assert.match(source,/onRemember:async entries=>\{/);
+ assert.match(source,/await renewV4JobWork\(db,claim,\{leaseMs:300000\}\)/);
+ assert.match(source,/await assertSessionTaskActive\(env,session,task\.id,generation\)/);
+ assert.match(source,/checkpoint:recovery\(\)\|\|child,phaseReplay:entries,complete:false/);
+ assert.match(source,/phaseReplay:replay\.snapshot\(\),complete:false/);
+ assert.match(source,/checkpoint:snapshot,phaseReplay:replay\.snapshot\(\),job:result/);
+ const model=readFileSync(new URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
+ assert.match(model,/await provider\.phaseReplay\.persist\?\.\(\)/);
+});
+
+
+test('completed JD model calls are encrypted-checkpoint candidates, replayed only on the next invocation',async()=>{
+ const {phaseModelReplay}=await import('../functions/_lib/v4-phase-budget.js');
+ const persisted=[];
+ const first=phaseModelReplay([],{onRemember:async entries=>{persisted.push(structuredClone(entries));}});
+ const answer={status:'completed',output:[{type:'reasoning',summary:[]},{type:'message',content:[{type:'output_text',text:'公开招聘依据'}]}]};
+ first.remember('exact-jd-stage-and-prompt-digest',answer);
+ await first.persist();
+ assert.equal(persisted.length,1,'a successful paid model call must be saved before the next JD step');
+ assert.equal(persisted[0].length,1);
+ assert.ok(!JSON.stringify(persisted).includes('reasoning'),'private model reasoning must not be saved in replay');
+ assert.equal(first.take('exact-jd-stage-and-prompt-digest'),null,'same-run deliberate repeat must be live');
+ const restarted=phaseModelReplay(persisted[0]);
+ const once=restarted.take('exact-jd-stage-and-prompt-digest');
+ assert.equal(once.output[0].content[0].text,'公开招聘依据');
+ assert.equal(restarted.take('exact-jd-stage-and-prompt-digest'),null,'next deliberate repeat must still research live');
+ assert.equal(restarted.take('different-prompt-digest'),null,'new evidence/prompt must never reuse a stale result');
+ const source=readFileSync(new URL('../functions/_lib/v4-job-executor.js',import.meta.url),'utf8');
+ const model=readFileSync(new URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
+ assert.match(source,/phaseModelReplay\(vettedPrevious\?previous\?\.phaseReplay:/);
+ assert.match(source,/phaseReplay:replay\.snapshot\(\)/,'both finished and deferred JD checkpoints retain completed model evidence');
+ assert.match(source,/await saveMatchTask\(env,resultKey,/);
+ assert.match(model,/await provider\.phaseReplay\.persist\?\.\(\)/,'successful provider response must be saved before later verification can fail');
+});
+test('failed model answers are not reused and checkpoint write failure remains retryable',async()=>{
+ const {phaseModelReplay}=await import('../functions/_lib/v4-phase-budget.js');
+ let writes=0;
+ const replay=phaseModelReplay([],{onRemember:async()=>{writes++;throw Error('temporary encrypted storage failure')}});
+ replay.remember('failed',{status:'incomplete',output:[{type:'message'}]});
+ await replay.persist();
+ assert.equal(writes,0);
+ replay.remember('complete',{status:'completed',output:[{type:'message',content:[]}]});
+ await assert.rejects(()=>replay.persist(),/temporary encrypted storage failure/);
+ await assert.rejects(()=>replay.persist(),/temporary encrypted storage failure/);
+ assert.equal(writes,2,'failed durable writes cannot acknowledge model evidence as persisted');
+});

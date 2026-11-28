@@ -110,8 +110,10 @@ export function v4IndependentJobBudget(){
 // Only replay exact, already completed calls from an interrupted invocation.
 // Never store raw prompts, credentials or private reasoning. Within a live
 // invocation an intentional repeated call still goes to the provider.
-export function phaseModelReplay(entries=[]){
+export function phaseModelReplay(entries=[],{onRemember}={}){
  const previous=new Map(Array.isArray(entries)?entries:[]),current=new Map(),used=new Set();
+ const snapshot=()=>[...new Map([...previous,...current])];
+ let changed=false;
  return {
   take(key){
    if(used.has(key)||!previous.has(key))return null;
@@ -119,9 +121,19 @@ export function phaseModelReplay(entries=[]){
   },
   remember(key,response){
    if(response?.status!=='completed'||!Array.isArray(response.output))return;
+   // Reuse only completed, exact-payload model results in a *later* isolated
+   // invocation. A second intentional call in the same invocation is live.
+   // Never persist model reasoning, prompts or authentication secrets.
    current.set(key,{status:'completed',output:response.output.filter(item=>item?.type!=='reasoning')});
+   changed=true;
   },
-  snapshot:()=>[...new Map([...previous,...current])]
+  async persist(){
+   if(changed&&typeof onRemember==='function'){
+    await onRemember(snapshot());
+    changed=false;
+   }
+  },
+  snapshot
  };
 }
 

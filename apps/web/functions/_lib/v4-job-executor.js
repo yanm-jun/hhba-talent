@@ -9,7 +9,7 @@ import {readMatchTask,saveMatchTask,readMatchProgress} from './v4-match-checkpoi
 import {loadBackgroundMatch} from './v4-background-match.js';
 import {assertSessionTaskActive} from './v4-session-match-task.js';
 import {v4JobProvider,v4Match} from './simple-match-v4.js';
-import {v4IndependentJobBudget} from './v4-phase-budget.js';
+import {v4IndependentJobBudget,phaseModelReplay} from './v4-phase-budget.js';
 import {locateV4ClaimCandidate,v4VerifiedJobLocator} from './v4-job-locator.js';
 
 const keyOk=x=>typeof x==='string'&&/^[a-f0-9]{64}$/.test(x);
@@ -136,6 +136,25 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    console.info('HHBA_V4_INDEPENDENT_JOB_JSON_RECOVERY',JSON.stringify({lane}));
   }
   let recovery=()=>child;
+  // A long employer-JD review can complete several paid provider calls, then
+  // fail on a later page read or Cloudflare 1102. Save each *completed* model
+  // response against this revision-fenced, encrypted job sidecar immediately.
+  // On retry, the exact same prompt/payload is replayed once; the model still
+  // researches any new/changed prompt normally. No task-wide AI cap is added.
+  const replay=phaseModelReplay(vettedPrevious?previous?.phaseReplay:[],{
+   onRemember:async entries=>{
+    if(leaseLost||!await renewV4JobWork(db,claim,{leaseMs:300000})){
+     leaseLost=true;throw Object.assign(Error('AI_CHECKPOINT_LEASE_LOST'),{code:'AI_CHECKPOINT_LEASE_LOST'});
+    }
+    await assertSessionTaskActive(env,session,task.id,generation);
+    await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
+     job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,
+     ...(jobTransport==='json'?{transport_mode:'json'}:{}),
+     checkpoint:recovery()||child,phaseReplay:entries,complete:false});
+    console.info('HHBA_V4_JOB_MODEL_RESULT_CHECKPOINTED',JSON.stringify({lane,completed_calls:entries.length}));
+   }
+  });
+  provider.phaseReplay=replay;
   heartbeat=setInterval(()=>{void renewV4JobWork(db,claim,{leaseMs:300000}).then(ok=>{if(!ok)leaseLost=true;}).catch(()=>{leaseLost=true;});},45000);
   let run;
   try{
@@ -152,7 +171,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
    if(snapshot&&!leaseLost&&await renewV4JobWork(db,claim,{leaseMs:300000})){
     await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
      job_key:claim.job_key,source_url:url,seed_source:source,seed_score:activeScore,
-     ...(transportMode==='json'?{transport_mode:'json'}:{}),checkpoint:snapshot,complete:false});
+     ...(transportMode==='json'?{transport_mode:'json'}:{}),checkpoint:snapshot,phaseReplay:replay.snapshot(),complete:false});
    }
    retryError=errorCode(e);
    if(retryError==='AI_PHASE_RESOURCE_YIELD')console.warn('HHBA_V4_INDEPENDENT_JOB_BUDGET_YIELD',JSON.stringify({lane,resource:e?.resource_kind||'unknown',budget:budget.snapshot()}));
@@ -169,7 +188,7 @@ export async function runIndependentV4Job(env,ticket,lane,{fetcher=fetch}={}){
   // Avoid decrypting a 500-job master checkpoint again after the AI call.
   if(leaseLost||!await renewV4JobWork(db,claim,{leaseMs:300000}))throw Object.assign(Error('AI_CHECKPOINT_LEASE_LOST'),{code:'AI_CHECKPOINT_LEASE_LOST'});
   await saveMatchTask(env,resultKey,{kind:'V4_INDEPENDENT_JOB_V1',generation,lane,revision:claim.revision,
-   job_key:claim.job_key,checkpoint:snapshot,job:result,complete:done,source_url:url,seed_source:source,seed_score:activeScore,
+   job_key:claim.job_key,checkpoint:snapshot,phaseReplay:replay.snapshot(),job:result,complete:done,source_url:url,seed_source:source,seed_score:activeScore,
    ...(jobTransport==='json'?{transport_mode:'json'}:{})});
   await finishV4JobWork(db,claim,{completed:done,continued:!done});
   return {status:done?'DONE':'CONTINUE',lane,
