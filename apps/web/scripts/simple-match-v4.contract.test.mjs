@@ -695,9 +695,10 @@ test('commercial board exclusion is not an enterprise or industry whitelist',asy
 });
 test('history research profile retains derived outcomes but not original resume quotations',async()=>{
  const {safeResearchReport}=await import('../functions/_lib/match-history.js');
- const report=safeResearchReport({profile:{summary:'渠道运营',skills:[{name:'渠道管理',evidence:'ORIGINAL_RESUME_QUOTE'}],facts:[{quote:'ORIGINAL_RESUME_QUOTE'}],target_roles:['运营']},rounds:[{round:1,queries:['企业官网 区域运营'],added:3}],excluded_count:2,discovered:3});
+ const report=safeResearchReport({profile:{summary:'渠道运营',skills:[{name:'渠道管理',evidence:'ORIGINAL_RESUME_QUOTE'}],facts:[{quote:'ORIGINAL_RESUME_QUOTE'}],target_roles:['运营']},rounds:[{round:1,queries:['企业官网 区域运营'],added:3}],excluded_count:2,discovered:3,search_source_count:435,search_mode:'source_pool',final_target:30});
  assert.equal(report.profile.skills[0].name,'渠道管理');
  assert.ok(!JSON.stringify(report).includes('ORIGINAL_RESUME_QUOTE'));assert.equal(report.rounds[0].added,3);
+ assert.equal(report.search_source_count,435);assert.equal(report.search_mode,'source_pool');assert.equal(report.final_target,30);assert.equal(report.candidate_target,undefined);
 });
 test('three stage buttons show real reports without changing AI execution',async()=>{
  const {readFile}=await import('node:fs/promises');
