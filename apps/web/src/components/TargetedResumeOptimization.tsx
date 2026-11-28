@@ -634,7 +634,8 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
       onChange={e=>setSuggestionDrafts(old=>({...old,[s.id]:e.target.value}))}/>
     </label>:<p className="targeted-resume-gradient">{draft}</p>}
     <p className="targeted-resume-rationale">对应岗位要求：{s.jobRequirement}</p>
-    <p className="targeted-resume-rationale">{s.rationale}</p>
+    {s.changeCount&&s.changeCount>1&&<p className="targeted-resume-rationale">已整合本段 {s.changeCount} 项连续优化，请核对完整修改。</p>}
+    <p className="targeted-resume-rationale" style={{whiteSpace:'pre-wrap'}}>{s.rationale}</p>
     {s.action==='request_evidence'&&<label className="targeted-resume-fact-entry">
      <span>补充自己的真实经历或成果（AI 不会猜测数据）</span>
      <textarea maxLength={800} rows={3} value={newEvidence[s.id]||''}
@@ -722,7 +723,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   .slice(0,revealedSuggestionCount)
   .filter(s=>s.action==='replace'&&!ignored.includes(s.id)&&!resolvedWordVisualIds.includes(s.id))
   .map((s):WordVisualSuggestion=>({
-   id:s.id,original:s.original,
+   id:s.id,original:s.original,changeCount:s.changeCount,
    occurrence:version.blocks.find(b=>b.id===s.blockId)?.occurrence,
    occurrenceCount:version.blocks.find(b=>b.id===s.blockId)?.occurrenceCount,
    proposed:version.acceptedSuggestionIds.includes(s.id)?
