@@ -24,7 +24,7 @@ import {ResumePrintSheet} from './ResumePrintSheet';
 import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
-import {jobJdArchiveStatus,ensureArchivedJobJd,getArchivedJobJdVersion,type JdAwareJob} from '../services/jobJdArchive';
+import {JobJdArchiveError,jobJdArchiveStatus,ensureArchivedJobJd,getArchivedJobJdVersion,type JdAwareJob} from '../services/jobJdArchive';
 import {stablePostingScope} from '../services/stablePostingScope.mjs';
 import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
@@ -374,8 +374,26 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
   const title=job.title_zh||job.title;
   if(!postingScope)throw Error('岗位官网地址无效，已阻止可能串岗的简历优化。');
   if(job.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job.reference_jd?.trim()&&job.reference_jd_basis?.trim())return {title,requirements:job.reference_jd,official_url:job.official_url,reference_jd_kind:job.reference_jd_kind,reference_jd_basis:job.reference_jd_basis};
-  if(requireVerifiedJd&&(!job.jd_version_id||!job.jd_sha256))
-   throw Error('请先完成此岗位的 JD 核验，再优化简历。');
+  if(requireVerifiedJd&&(!job.jd_version_id||!job.jd_sha256)){
+   // A delivered evidence-backed match can outlive a failed archive write.
+   // Recover only via the authenticated existing archive/allowlisted reader.
+   const prior=job.prior_match_analysis;
+   if(job.evidence_status!=='VERIFIED_FULL_JD'||!job.evidence_excerpt?.trim()||prior?.score_evidence_status!=='GROUNDED_JD_RESUME_QUOTES'||prior.official_url!==job.official_url)
+    throw Error('请先完成此岗位的 JD 核验，再优化简历。');
+   try{
+    const official=await ensureArchivedJobJd(job.official_url,signal);
+    if(official.canonical_url!==job.official_url||official.company!==job.company||official.title!==job.title||official.location!==job.location)
+     throw Error('岗位 JD 版本不一致，请重新匹配后再优化。');
+    if(!signal.aborted)setArchivedJdId(official.job_id);
+    return {title:official.title,requirements:official.full_jd,official_url:official.canonical_url,jd_version_id:official.job_id,jd_sha256:official.jd_sha256,prior_match_analysis:prior};
+   }catch(error){
+    if(signal.aborted||!(error instanceof JobJdArchiveError)||!['OFFICIAL_URL_NOT_SUPPORTED','JD_ARCHIVE_NOT_READY','JD_ARCHIVE_READ_FAILED','JD_ARCHIVE_WRITE_FAILED','JD_OFFICIAL_FETCH_FAILED','JD_NOT_COMPLETE_ENOUGH','JD_VERSION_NOT_AVAILABLE','NETWORK_ERROR'].includes(error.code))throw error;
+    // No official proof token is invented. The optimization endpoint treats
+    // this strictly as untrusted, user-directed reference context.
+    setNotice('岗位 JD 存档暂未恢复，本次仅按匹配阶段保留的岗位资料作为参考优化，不视为重新核验的官方 JD。');
+    return {title,requirements:job.evidence_excerpt,official_url:job.official_url,reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd_basis:'匹配阶段保留的岗位资料；当前未能恢复可信存档，仅供求职表达参考，不是本次独立核验的企业要求。'};
+   }
+  }
   if(job.jd_version_id){
    let official=await getArchivedJobJdVersion(job.jd_version_id,signal);
    if(official.canonical_url!==job.official_url||official.job_id!==job.jd_version_id||
