@@ -111,3 +111,10 @@
  .hhba-rf-lead-working,.hhba-rf-lead-ready{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.hhba-rf-spin{animation:none}}
+
+/* A malformed model field must never crash the parent matching session. */
+.hhba-rf-fallback{padding:22px;border:1px solid #dce6f1;background:#f8fafc;color:#1e3759;border-radius:14px;margin:14px 0}
+.hhba-rf-fallback h2{font-size:17px;font-weight:750;margin:0 0 8px}
+.hhba-rf-fallback p{font-size:12px;line-height:1.75;color:#566b82;margin:0 0 13px}
+.hhba-rf-fallback button{cursor:pointer;background:#1c5cae;color:#fff;border:0;border-radius:9px;padding:11px 16px;font-size:12px;font-weight:700}
+.hhba-rf-fallback button:focus-visible{outline:3px solid #93c5fd;outline-offset:3px}
