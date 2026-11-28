@@ -84,7 +84,7 @@ test('one job = one private Word revision scope; the original file is untouched'
 
 test('backdrop and close minimize directly; only explicit termination aborts the running task',()=>{
  const close=dialog.slice(dialog.indexOf('function handleClose()'),dialog.indexOf('function handleKey('));
- assert.match(close,/if\(pending\)\{minimizeSearch\(\);return\}/);
+ assert.match(close,/if\(pending\|\|taskFailed\)\{minimizeSearch\(\);return\}/);
  const minimize=close.slice(close.indexOf('function minimizeSearch()'),close.indexOf('function restoreSearch()'));
  assert.match(minimize,/setMinimized\(true\)/);
  assert.doesNotMatch(minimize,/onClose\(|abort\(|setConfirmTerminate\(true\)/);
@@ -92,12 +92,16 @@ test('backdrop and close minimize directly; only explicit termination aborts the
  assert.match(dialog,/if\(!pending\)handleClose\(\)/);
  assert.match(dialog,/onClick=\{e=>\{if\(e.target===e.currentTarget&&pending\)minimizeSearch\(\)\}\}/);
  assert.match(dialog,/onClick=\{\(\)=>setConfirmTerminate\(true\)\}>终止匹配/);
- assert.match(dialog,/onClick=\{\(\)=>\{setConfirmTerminate\(false\);onClose\(\)\}\}>确认终止本次匹配/);
+ assert.match(dialog,/onClick=\{\(\)=>\{setConfirmTerminate\(false\);\(onTerminate\|\|onClose\)\(\)\}\}>确认终止本次匹配/);
  assert.match(dialog,/hidden=\{minimized\}/);
  assert.match(dialog,/onClick=\{restoreSearch\}/);
- assert.match(dialog,/confirmTerminate&&pending&&<dialog/);
+ assert.match(dialog,/confirmTerminate&&\(pending\|\|taskFailed\)&&<dialog/);
  assert.match(dialog,/dialog.showModal\(\)/);
- assert.match(dialog,/if\(!pending\)setConfirmTerminate\(false\)/);
+ assert.match(dialog,/if\(!pending&&!taskFailed\)setConfirmTerminate\(false\)/);
  assert.match(page,/onClose=\{\(\)=>void closeMatch\(\)\}/);
+  assert.match(page,/onTerminate=\{\(\)=>void closeMatch\(true\)\}/);
+  assert.match(page,/closeSessionMatchTask\(task,explicitTerminate\|\|working\|\|!!pendingStart\.current\)/);
+  assert.match(dialog,/if\(pending\|\|taskFailed\)\{minimizeSearch\(\);return\}/);
+  assert.match(dialog,/\{\(pending\|\|taskFailed\)&&<button className="hhba-match-terminate"/);
  assert.match(page,/\|\|working\|\|researchJobs\.length>0/);
 });
