@@ -84,10 +84,10 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
  useEffect(()=>{
   if(pending&&currentStage>=0)setFurthestStage(old=>Math.max(old,currentStage));
  },[pending,currentStage]);
- const hasCompleteReport=verifiedMatchReports(result.matches).length>0;
- // Show the first complete report as soon as it arrives, but never override
- // a user's explicitly selected tab.
- const selectedStage=manualStage??(pending||taskFailed?(hasCompleteReport?2:followProgress?Math.max(furthestStage,currentStage):0):2);
+ const hasLiveCandidate=researchJobs.length>0||result.matches.length>0;
+ // Enter the job dossier as soon as the FIRST real candidate is received.
+ // Manual tab selection always wins; switching tabs never cancels background work.
+ const selectedStage=manualStage??(pending||taskFailed?(hasLiveCandidate?2:followProgress?Math.max(furthestStage,currentStage):0):2);
  const showResults=selectedStage===2;
  const selectStage=(next:number|null)=>{
   setManualStage(next);if(next===null)setFollowProgress(true);
@@ -203,8 +203,8 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
       <div className="hhba-match-progress-copy">
        <strong id="hhba-native-title">{stageTitle[progressStage]}…</strong>
        {progressActivity?.message&&<span>{progressActivity.message}</span>}
-       {progressActivity?.searches!==undefined&&<span>
-        已执行 {progressActivity.searches} 次检索 · 发现 {progressActivity.candidate_links??0} 条企业岗位线索 · 已阅读 {progressActivity.pages_read??0} 份岗位资料
+       {progressActivity?.candidate_links!==undefined&&<span>
+        已收录 {progressActivity.candidate_links} 条招聘线索 · 已读取 {progressActivity.pages_read??0} 份岗位资料 · 逐岗位进行来源核对及适配研究
        </span>}
        {researchReport&&<span>已收到 {researchReport.search_source_count??0} 条公开检索来源 · 已发现 {Math.max(researchReport.discovered,researchJobs.length)} 个候选岗位 · 已排除 {researchReport.excluded_count} 条商业平台链接</span>}
        {verifiedMatchReports(result.matches).length>0&&<span>已完成 {verifiedMatchReports(result.matches).length} 份可核验报告，最终排名待确认</span>}
