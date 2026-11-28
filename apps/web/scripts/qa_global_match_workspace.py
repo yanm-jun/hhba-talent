@@ -115,7 +115,7 @@ def duplicate_resume_choice(browser,viewport):
     page.goto('http://127.0.0.1:4173/scripts/qa-global-match-workspace.html')
     payload=base64.b64encode(doc.getvalue()).decode('ascii')
     page.evaluate('(payload)=>window.qaEnableDuplicate(payload)',payload)
-    expect(page.get_by_text('之前保存的简历.docx',exact=False).first).to_be_visible(timeout=15000)
+    expect(page.locator('.hhba-ai-saved-picker-trigger')).to_be_visible(timeout=15000)
     page.locator('#hhba-ai-resume').set_input_files(fixture)
     dialog=page.get_by_role('alertdialog',name='检测到重复简历')
     expect(dialog).to_be_visible(timeout=15000)
