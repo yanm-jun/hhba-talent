@@ -3,7 +3,8 @@
 // task and active generation. No job text or resume is written to D1.
 import {sha256Hex} from './real-auth.js';
 import {candidateRevision} from './v4-research-pipeline.js';
-import {reportWorkRevision} from './v4-job-work-queue.js';
+import {reportWorkRevision,referenceWorkRevision} from './v4-job-work-queue.js';
+import {v4ReportFirstTask} from './v4-curated-reports.js';
 import {independentJobKey} from './v4-job-executor.js';
 import {locateV4ClaimCandidate} from './v4-job-locator.js';
 import {readMatchTask} from './v4-match-checkpoint-storage.js';
@@ -42,8 +43,11 @@ export async function completedV4JobDeltas(env,taskKey,generation,cursorValue,{r
   if(!found)continue;
   const score=[...(checkpoint.priorState?.matches||[]),...(checkpoint.matches||[])]
    .find(x=>itemUrl(x)===found.url);
-  const sourceVersion=record.lane==='reporting'?reportWorkRevision(found.source,score):candidateRevision(found.source);
-  if(!sourceVersion||await sha256Hex('HHBA_V4_JOB_REV:'+sourceVersion)!==record.revision)continue;
+  const revisions=record.lane==='reporting'?
+   [reportWorkRevision(found.source,score),...(v4ReportFirstTask(checkpoint)?[referenceWorkRevision(found.source)]:[])]:
+   [candidateRevision(found.source)];
+  const expected=await Promise.all(revisions.filter(Boolean).map(x=>sha256Hex('HHBA_V4_JOB_REV:'+x)));
+  if(!expected.includes(record.revision))continue;
   const key=await independentJobKey(taskKey,generation,record.lane,record.job_key,record.revision);
   const saved=await read(env,key);
   if(saved?.kind!=='V4_INDEPENDENT_JOB_V1'||!saved.complete||saved.generation!==generation||
