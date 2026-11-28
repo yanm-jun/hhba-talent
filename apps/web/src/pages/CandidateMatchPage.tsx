@@ -5,7 +5,7 @@ import type {User} from '../services/api';
 import {Link} from '../router';
 import {listSavedWordVersions,wordSourceBytes,type SavedWordVersion} from '../services/originalWordApi';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
-import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
+import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,checkPrivateResumeDuplicate,PRIVATE_RESUME_LIMIT,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
 import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,resumeMatchFileLimit,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress,type MatchExecution} from '../services/resumeMatch';
@@ -39,6 +39,11 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const [saveNotice,setSaveNotice]=useState('');
  // The user chooses whether the ORIGINAL binary should be retained.
  const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('undecided');
+ const [duplicateChecking,setDuplicateChecking]=useState(false);
+ const [duplicateReview,setDuplicateReview]=useState<{candidate:File;existing:PrivateResume}|null>(null);
+ const [duplicateCheckError,setDuplicateCheckError]=useState('');
+ const duplicateCheckController=useRef<AbortController|null>(null);
+ const duplicateCancelRef=useRef<HTMLButtonElement|null>(null);
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
@@ -65,6 +70,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const controller=useRef<AbortController|null>(null);
  const lastSearch=useRef<{text:string;options:MatchOptions;resumeId?:string}|null>(null);
  const identifiedCharacters=redactResumeTextLocally(previewText).replace(/\s/g,'').length;
+ useEffect(()=>{if(duplicateReview)duplicateCancelRef.current?.focus();},[duplicateReview]);
+ useEffect(()=>()=>{duplicateCheckController.current?.abort();},[]);
  useEffect(()=>{
   const abort=new AbortController();
   void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
@@ -132,9 +139,11 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   }catch(e){if(!abort.signal.aborted)setVaultError(e instanceof Error?e.message:'无法读取优化版本，请重新选择。');}
   finally{if(wordVersionRequest.current===abort){wordVersionRequest.current=null;setWordVersionBusy(false);}}
  }
- function selectSavedResume(id:string){
+ function selectSavedResume(id:string,known?:PrivateResume){
   if(working||saveBusy||taskOpen.current)return;
   wordVersionRequest.current?.abort();wordVersionRequest.current=null;setWordVersionBusy(false);
+  duplicateCheckController.current?.abort();duplicateCheckController.current=null;
+  setDuplicateChecking(false);setDuplicateCheckError('');setDuplicateReview(null);
   deepLinkPending.current=null;
   previewController.current?.abort();
   setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
@@ -142,12 +151,14 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setOptimizationSource('');
   setError('');setSaveConsent(false);setSaveNotice('');
   setStorageChoice('undecided');setSavedPickerOpen(false);
-  const entry=savedFiles.find(item=>item.id===id);
+  const entry=known||savedFiles.find(item=>item.id===id);
   if(entry)void preview(entry);
  }
  function choose(candidate:File|null){
   if(working||saveBusy||taskOpen.current)return;
   wordVersionRequest.current?.abort();wordVersionRequest.current=null;setWordVersionBusy(false);
+  duplicateCheckController.current?.abort();duplicateCheckController.current=null;
+  setDuplicateReview(null);setDuplicateChecking(false);setDuplicateCheckError('');
   deepLinkPending.current=null;
   setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
@@ -158,10 +169,43 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
   if(!format||candidate.size<30||candidate.size>resumeMatchFileLimit(format)){
-    setFile(null);setError('文件超过当前解析容量：Word 12 MB，V4 PDF 64 MB。');return;
+   setFile(null);setError('文件超过当前解析容量：Word 12 MB，V4 PDF 64 MB。');return;
   }
   setFile(candidate);
+  // A file is not accepted for private storage until the user resolves a
+  // duplicate decision. The server sees only the local SHA-256 and size.
+  // Documents too large for the private vault cannot be duplicates there.
+  if(privateResumeAvailable&&!!getRealAuthToken()&&candidate.size<=PRIVATE_RESUME_LIMIT){
+   const abort=new AbortController();duplicateCheckController.current=abort;
+   setDuplicateChecking(true);
+   void checkPrivateResumeDuplicate(candidate,abort.signal).then(existing=>{
+    if(abort.signal.aborted)return;
+    if(existing){setDuplicateReview({candidate,existing});return;}
+    void preview(candidate);
+   }).catch(e=>{
+    if(abort.signal.aborted)return;
+    setDuplicateCheckError('重复简历检查暂时不可用，请重新检测，或选择「仅用于本次匹配」继续。');
+    void preview(candidate);
+   }).finally(()=>{
+    if(duplicateCheckController.current===abort){
+     duplicateCheckController.current=null;setDuplicateChecking(false);
+    }
+   });
+   return;
+  }
   void preview(candidate);
+ }
+ function useAlreadySavedResume(){
+  const match=duplicateReview?.existing;
+  if(!match)return;
+  setSavedFiles(all=>all.some(item=>item.id===match.id)?all:[match,...all]);
+  selectSavedResume(match.id,match);
+  setSaveNotice('已选择账户中保存的「'+match.name+'」，无需重复保存。你仍可以正常进行 AI 岗位匹配。');
+ }
+ function cancelDuplicateUpload(){
+  if(!duplicateReview)return;
+  choose(null);
+  setSaveNotice('已取消本次重复上传。原来保存的简历没有修改或删除。');
  }
  async function preview(source:File|PrivateResume){
   previewController.current?.abort();
