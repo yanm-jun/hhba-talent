@@ -1,7 +1,7 @@
 import {lazy,Suspense,useEffect,useLayoutEffect,useRef,useState,type KeyboardEvent} from 'react';
 import {createPortal} from 'react-dom';
 import {ArrowUpRight,ArrowLeft,BriefcaseBusiness,FileText,X,LoaderCircle} from 'lucide-react';
-import {ReportFirstMatchExperience} from './ReportFirstMatchExperience';
+import {ReportFirstErrorBoundary,ReportFirstMatchExperience} from './ReportFirstMatchExperience';
 import {isVerifiedMatchReport,verifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
 import type {MatchResponse,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress,MatchExecution} from '../services/resumeMatch';
 import type {PrivateResume} from '../services/privateResumes';
@@ -180,9 +180,11 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
      {notice&&<p className="hhba-match-disclaimer" role="alert">{notice}{result.matches.length>0?' 已显示本次收到的岗位；请核对招聘原始页面。':''}</p>}
-     {!optimizedJobUrl&&<ReportFirstMatchExperience profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches}
-      pending={pending} failed={taskFailed} progressStage={progressStage} activity={progressActivity} elapsed={elapsed}
-      onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>}
+     {!optimizedJobUrl&&<ReportFirstErrorBoundary>
+      <ReportFirstMatchExperience profile={result.profile} report={researchReport} jobs={researchJobs} officialJobs={result.matches}
+       pending={pending} failed={taskFailed} progressStage={progressStage} activity={progressActivity} elapsed={elapsed}
+       onOptimize={optimizeJob} optimizationAvailable={!!parsedProfile}/>
+     </ReportFirstErrorBoundary>}
      {activeJob&&parsedProfile?
       <section className="hhba-match-workspace" aria-label="岗位专属简历优化">
        {pending&&<p className="hhba-refined-note" role="status">其他岗位仍在后台搜索与研究，当前这份已完成可靠报告的岗位可以单独优化简历。</p>}
