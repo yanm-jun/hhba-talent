@@ -124,6 +124,20 @@ export function rankCandidateUrls(payload,rows){
  const valid=ordered.filter(u=>keys.has(u)&&!seen.has(u)&&(seen.add(u),true));
  return valid.length===keys.size?valid:null;
 }
+// Only the new 20-source task uses early AI reference research. Existing
+// 30/50-report checkpoints retain their original paid research contract.
+export const v4ReportFirstTask=checkpoint=>checkpoint?.search_mode==='source_pool'&&
+ checkpoint?.source_stop_target===SOURCE_STOP_TARGET&&checkpoint?.final_target===FINAL_TARGET;
+// A reference research report is readable, but it is NOT a verified vacancy,
+// NOT a qualified final recommendation and NOT proof of an employer's JD.
+export function completedReferenceReport(job){
+ return job?.reference_jd_kind==='AI_GENERATED_REFERENCE'&&job?.report_status==='COMPLETE'&&
+  job?.curated_suitable===true&&Number.isInteger(job?.match_score)&&job.match_score>=0&&job.match_score<=100&&
+  !!str(job.reference_jd)&&!!str(job.reference_jd_basis)&&
+  !!str(job.research_detail?.score_explanation)&&Array.isArray(job.research_detail?.comparisons)&&
+  !job.excluded_board&&!job.excluded_closed&&
+  !['CLOSED_LISTED','POSSIBLY_CLOSED'].includes(job.availability_status);
+}
 export function qualifiedReport(job){return eligibleCuratedScore(job)&&job.report_status==='COMPLETE'&&!!str(job.research_detail?.score_explanation)&&Array.isArray(job.research_detail?.comparisons)&&!job.excluded_closed&&!job.excluded_board&&job.availability_status!=='CLOSED_LISTED'&&job.availability_status!=='POSSIBLY_CLOSED';}
 
 // Only independently verified, evidence-scored and suitable jobs enter the global report ranking.
