@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {JOBS_PER_PAGE,FETCH_BATCH_SIZE,pageCount,batchOffsetForPage,sliceJobsForPage} from '../src/services/jobPaging.mjs';
 
 const cards=readFileSync(new URL('../src/components/UnifiedJobMarket.tsx',import.meta.url),'utf8');
 const reader=readFileSync(new URL('../src/services/officialJd.ts',import.meta.url),'utf8');
@@ -55,13 +56,33 @@ test('recruitment market hides all three highlighted notices while retaining fil
  ])assert.ok(!market.includes(removed),'notice still visible: '+removed);
  for(const retained of [
    'unified-job-controls','unified-job-grid','unified-job-search',
-   'listJobs(filters,page*30,controller.signal)','officialStatus(j,snapshot.updated)',
+   'listJobs(filters,batchOffsetForPage(page),controller.signal)','officialStatus(j,snapshot.updated)',
    'type="checkbox"','unified-job-state'
  ])assert.ok(market.includes(retained),'required function unexpectedly removed: '+retained);
  assert.ok(cards.slice(cards.indexOf('export function UnifiedJobDetail')).includes('loadPublicJobAudit()'),
    'job detail official source audit must continue to work');
 });
 
+test('market pagination uses 10 visible jobs from independently verified 30-job backend batches',()=>{
+ assert.equal(JOBS_PER_PAGE,10);
+ assert.equal(FETCH_BATCH_SIZE,30);
+ assert.equal(pageCount(0),0);
+ assert.equal(pageCount(61),7);
+ const roles=Array.from({length:30},(_,i)=>({id:'official-'+i}));
+ for(let page=0;page<6;page++){
+  const offset=batchOffsetForPage(page);
+  assert.equal(offset,page<3?0:30,'backend fetch offset must cover 3 UI pages');
+  const rows=sliceJobsForPage(roles,page);
+  assert.equal(rows.length,10);
+  assert.equal(rows[0].id,'official-'+((page%3)*10));
+ }
+ assert.equal(batchOffsetForPage(6),60);
+ assert.throws(()=>batchOffsetForPage(-1),/INVALID_JOB_PAGE/);
+ const market=cards.slice(cards.indexOf('export function UnifiedJobMarket'),cards.indexOf('export function UnifiedJobDetail'));
+ assert.match(cards,/import \{JOBS_PER_PAGE,batchOffsetForPage,sliceJobsForPage,pageCount\}/);
+ assert.match(market,/listJobs\(filters,batchOffsetForPage\(page\),controller\.signal\)/);
+ assert.match(market,/sliceJobsForPage\(/);
+});
 test('cached original and complete Chinese are source-bound, no partial translation UI',()=>{
  const detail=cards.slice(cards.indexOf('export function UnifiedJobDetail'));
  assert.ok(detail.includes('setChineseJd(prepared.chinese'));
