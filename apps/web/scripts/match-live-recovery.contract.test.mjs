@@ -155,7 +155,7 @@ test('independently complete JD report can open optimizer without cancelling ong
  const page=readFileSync(new URL('../src/pages/CandidateMatchPage.tsx',import.meta.url),'utf8');
  assert.ok(dialog.includes('if(!parsedProfile||!isVerifiedMatchReport(job)||'));
  assert.ok(dialog.includes('{activeJob&&parsedProfile?'));
- assert.ok(dialog.includes('if(pending){backToMatches();return;}'));
+ assert.ok(dialog.includes('if(pending||taskFailed){backToMatches();return;}'),'unfinished or failed research must preserve editor/job session');;
  assert.ok(panel.includes('disabled={!optimizationAvailable||'));
  assert.ok(page.includes('sourceText={optimizationSource||undefined}'));
 });

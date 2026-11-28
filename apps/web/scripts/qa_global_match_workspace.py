@@ -58,7 +58,15 @@ def exercise(browser, viewport):
     expect(page.get_by_role('button',name='查看岗位研究异常')).to_be_visible()
     page.get_by_role('button',name='查看岗位研究异常').click()
     expect(page.get_by_text('AI 服务暂时异常',exact=False).last).to_be_visible()
-    page.get_by_role('button',name='完成查看').click()
+    # Failure is not success: closing the failed window must only minimize.
+    page.get_by_role('button',name='最小化',exact=True).click()
+    expect(page.get_by_role('button',name='查看岗位研究异常')).to_be_visible()
+    assert audit()=={'requests':2,'aborted':0,'finished':2},audit()
+    # A separate, explicit user confirmation may terminate this failed task.
+    page.get_by_role('button',name='查看岗位研究异常').click()
+    page.get_by_role('button',name='终止匹配',exact=True).click()
+    page.get_by_role('button',name='确认终止本次匹配').click()
+    expect(page.locator('.hhba-match-task-dock')).to_have_count(0)
     page.get_by_role('link',name='测试独立匹配').click()
     start();minimize()
     page.get_by_role('link',name='测试首页').click()
