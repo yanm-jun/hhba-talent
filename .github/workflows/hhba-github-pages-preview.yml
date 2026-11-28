@@ -687,7 +687,10 @@ jobs:
           grep -q "route==='/vision'" src/main.tsx
           grep -q '技术负责人 / 全栈架构工程师' src/pages/JoinUsPage.tsx
           grep -q '企业治理与劳动权益研究伙伴' src/pages/JoinUsPage.tsx
-          grep -q '薪酬与权益现状' src/pages/JoinUsPage.tsx
+          # The current disclosure clearly states venture stage, salary budget and legal employment safeguards.
+          grep -q '公司尚未完成设立，目前也没有稳定的薪资预算' src/pages/JoinUsPage.tsx
+          grep -q '工作范围、知识产权与退出安排，将在合作前充分协商并依法书面落实' src/pages/JoinUsPage.tsx
+          grep -q '若实际形成劳动关系，我们仍会依法支付工资并履行法定保障' src/pages/JoinUsPage.tsx
           ! grep -q '团队协作场景示意 · 非 HHBA 实际团队成员' src/pages/JoinUsPage.tsx
           ! grep -q '<figcaption>' src/pages/JoinUsPage.tsx
       - name: Confirm selected team photograph is packaged for public Pages
