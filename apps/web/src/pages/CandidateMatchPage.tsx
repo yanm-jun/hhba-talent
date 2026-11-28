@@ -277,12 +277,12 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   void check();window.addEventListener('storage',sync);window.addEventListener('online',online);
   return()=>{disposed=true;lookup.abort();clearTimeout(timer);window.removeEventListener('storage',sync);window.removeEventListener('online',online);};
  },[user?.id]);
- async function closeMatch(){
+ async function closeMatch(explicitTerminate=false){
   if(closingTask.current)return;
   const task=sessionTask.current||(pendingStart.current?{id:pendingStart.current,generation:0}:null);
   if(!task){clearTaskLocally();return;}
   closingTask.current=true;
-  try{await closeSessionMatchTask(task,working||!!pendingStart.current);clearTaskLocally();}
+  try{await closeSessionMatchTask(task,explicitTerminate||working||!!pendingStart.current);clearTaskLocally();}
   catch(e){setError(e instanceof Error?e.message:'未确认服务器终止，请恢复网络后重试。');window.alert('服务器尚未确认结束任务，请恢复网络后再试。');}
   finally{closingTask.current=false;}
  }
@@ -529,7 +529,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
        }:result&&savedId?{available:false,saved:true,consent:false,saving:false,
         notice:saveNotice,onConsent:()=>{},onSave:()=>{}}:undefined}
-      onClose={()=>void closeMatch()}/>}
+      onClose={()=>void closeMatch()}
+       onTerminate={()=>void closeMatch(true)}/>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;
