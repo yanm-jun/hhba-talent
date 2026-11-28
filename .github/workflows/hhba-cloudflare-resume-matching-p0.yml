@@ -31,6 +31,7 @@ jobs:
           node --check functions/_lib/simple-match-v4.js
           node --check 'functions/api/match-v4/[[path]].js'
           node --check scripts/simple-match-v4-live-smoke.mjs
+          node --test scripts/official-jd-release-contract.test.mjs
           node --test scripts/v4-session-match-task.test.mjs
           node --test scripts/v4-parallel-discovery.test.mjs
           node --test scripts/v4-shared-capabilities.test.mjs

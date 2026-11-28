@@ -755,9 +755,11 @@ jobs:
             apps/web/dist/data/job-search-facets.json
           retention-days: 30
           if-no-files-found: error
-      - name: Verify Airtable official JD and the green Chinese reader bridge
+      - name: Verify official ATS JD provenance and browser-readable JSONP
         working-directory: apps/web
-        run: node scripts/verify-official-jd.mjs
+        run: |
+          node --test scripts/official-jd-release-contract.test.mjs scripts/public-ats-jd.contract.test.mjs
+          node scripts/verify-official-jd.mjs
       - name: Verify stale or withdrawn official jobs cannot appear in active results
         run: |
           node -e "const fs=require('fs');const x=fs.readFileSync('apps/web/src/services/liveRecruitment.ts','utf8');if(!x.includes('MISSING_FROM_OFFICIAL_BOARD')||!x.includes('OFFICIAL_URL_CHANGED')||!x.includes('loadPublicJobAudit'))process.exit(1)"
