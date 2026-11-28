@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - 'apps/web/scripts/company200-integration.contract.test.mjs'
+      - 'apps/web/scripts/curated-offline.contract.test.mjs'
+      - 'apps/web/scripts/white-market-detail.contract.test.mjs'
+      - 'apps/web/src/services/jobPaging.mjs'
+      - 'apps/web/src/services/liveRecruitment.ts'
       - 'apps/web/src/components/UnifiedJobMarket.tsx'
       - 'apps/web/scripts/hhba-unified-static.contract.test.mjs'
       - 'apps/web/scripts/official-recruitment-gate-photos.contract.test.mjs'
@@ -32,6 +36,9 @@ jobs:
       - name: Ensure 200-company and recruitment routes coexist
         working-directory: apps/web
         run: node scripts/company200-integration.contract.test.mjs
+      - name: Verify curated offline fallback and real 10-of-30 paging contract
+        working-directory: apps/web
+        run: node --test scripts/curated-offline.contract.test.mjs scripts/white-market-detail.contract.test.mjs
 
       - name: Validate current static deployment contracts before merge
         working-directory: apps/web
