@@ -4,12 +4,15 @@
 // digests and lease state. It cannot award a score or fabricate a report.
 import {sha256Hex} from './real-auth.js';
 import {candidateRevision,pendingVerification} from './v4-research-pipeline.js';
-import {eligibleCuratedScore,qualifiedReport,v4TaskTargets} from './v4-curated-reports.js';
+import {eligibleCuratedScore,qualifiedReport,v4TaskTargets,v4ReportFirstTask,concreteCandidate,completedReferenceReport} from './v4-curated-reports.js';
 
 const taskId=v=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
 const generationOk=v=>Number.isSafeInteger(v)&&v>=0;
 const laneOk=v=>v==='verification'||v==='reporting';
 export const reportWorkRevision=(candidate,scored)=>scored?JSON.stringify([candidateRevision(candidate),scored.match_score,scored.jd_sha256,scored.jd_version_id,scored.score_evidence_status,scored.reference_vacancy_verified]):null;
+// Separate revision identity lets a fast AI reference report run concurrently
+// with the ordinary source verification job without weakening either result.
+export const referenceWorkRevision=candidate=>JSON.stringify(['HHBA_REFERENCE_REPORT_FIRST_V1',candidateRevision(candidate)]);
 const valid=(key,generation)=>taskId(key)&&generationOk(generation);
 export const v4JobWorkQueueEnabled=env=>env?.HHBA_V4_JOB_QUEUE_ENABLED==='1'&&typeof env?.HHBA_PNVS_AUTH_DB?.prepare==='function';
 
@@ -36,10 +39,16 @@ export async function desiredV4JobWork(taskKey,generation,checkpoint,{candidateR
   const task=await digest(url,'verification',version);
   if(task){task.state=!pending.has(url)&&completed.has(url)&&revisions.get(url)===version&&!rechecks.has(url)?'COMPLETED':'PENDING';results.push(task);}
   const scored=byUrl.get(url);
-  if(scored&&reportSelection.has(scored.official_url)&&(eligibleCuratedScore(scored)||qualifiedReport(scored))){
+  const formal=scored&&reportSelection.has(scored.official_url)&&(eligibleCuratedScore(scored)||qualifiedReport(scored));
+  if(formal){
    const reportVersion=reportWorkRevision(job,scored);
    const report=await digest(url,'reporting',reportVersion);
    if(report){report.state=qualifiedReport(scored)?'COMPLETED':'PENDING';results.push(report);}
+  }else if(v4ReportFirstTask(checkpoint)&&concreteCandidate(job)&&scored?.curated_suitable!==false&&!qualifiedReport(scored)){
+   // A first reference report requires only a discovered concrete job. It
+   // never waits for global ranking, nor claims the vacancy has been verified.
+   const report=await digest(url,'reporting',referenceWorkRevision(job));
+   if(report){report.state=completedReferenceReport(scored)||completedReferenceReport(scored?.reference_report)?'COMPLETED':'PENDING';results.push(report);}
   }
  }
  return results;
