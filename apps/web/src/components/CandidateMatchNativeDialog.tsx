@@ -31,10 +31,10 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 const archivedHistoryJob=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.reference_jd_kind!=='AI_GENERATED_REFERENCE'&&/^jd_[a-f0-9]{32}$/.test(job.jd_version_id||'')&&/^[a-f0-9]{64}$/.test(job.jd_sha256||'');
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinue,pending=false,progressStage='preparing',progressActivity,execution,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false,taskStartedAt}:{
+export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinue,onRetryFailedTask,pending=false,progressStage='preparing',progressActivity,execution,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false,taskStartedAt}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
- onClose:()=>void;onTerminate?:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
+ onClose:()=>void;onTerminate?:()=>void;onContinue?:()=>void;onRetryFailedTask?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
  progressActivity?:NativeMatchActivity|null;execution?:MatchExecution|null;
  researchReport?:MatchResearchReport;researchJobs?:MatchedJob[];
  notice?:string;resumeStorage?:ResumeStorageAction;
@@ -241,6 +241,7 @@ export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinu
      {!optimizedJobUrl&&onContinue&&!pending?
       <button className="hhba-match-done" type="button" onClick={onContinue}>继续搜索岗位</button>:
       <span>HHBA · 让机会与人才，找到彼此。</span>}
+     {taskFailed&&onRetryFailedTask&&<button className="hhba-match-done" type="button" onClick={onRetryFailedTask}>恢复原研究任务</button>}
      {(pending||taskFailed)&&<button className="hhba-match-terminate" type="button" onClick={()=>setConfirmTerminate(true)}>终止匹配</button>}
      <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobUrl?'返回匹配结果':pending||taskFailed?'最小化':'完成查看'}</button>
     </footer>
