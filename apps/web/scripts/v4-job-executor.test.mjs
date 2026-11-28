@@ -210,3 +210,43 @@ test('failed model answers are not reused and checkpoint write failure remains r
  await assert.rejects(()=>replay.persist(),/temporary encrypted storage failure/);
  assert.equal(writes,2,'failed durable writes cannot acknowledge model evidence as persisted');
 });
+
+
+test('independent reference merges before official verification and is retained as a separate fallback',async()=>{
+ const {db,env}=fixture();
+ const cp={phase:'research',search_mode:'source_pool',source_stop_target:20,final_target:20,
+  rows:[[url,candidate()]],matches:[],processedEarlier:[],processedEvidence:[]};
+ await reconcileV4JobWork(db,taskKey,2,cp);
+ const refClaim=await claimV4JobWork(db,taskKey,2,'reporting',{owner:'reference-first'});
+ assert.ok(refClaim,'an unverified source should have an independent reporting job');
+ assert.equal(await finishV4JobWork(db,refClaim),true);
+ const ref={research_candidate_url:url,official_url:url,company:'真实雇主',title:'区域督导',location:'上海',
+  source_type:'站外招聘职位',curated_suitable:true,match_score:84,reference_score:84,report_status:'COMPLETE',
+  reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'岗位详情：AI 参考岗位职责',
+  reference_jd_basis:'只依据岗位名称整理，非企业实际要求',
+  evidence_score_status:'AI_REFERENCE_JD_SCORED',
+  research_detail:{comparisons:[],score_explanation:'真实简历与推断职责的适配依据'}};
+ const refKey=await independentJobKey(taskKey,2,'reporting',refClaim.job_key,refClaim.revision);
+ const records=new Map([[refKey,{kind:'V4_INDEPENDENT_JOB_V1',complete:true,generation:2,lane:'reporting',
+  revision:refClaim.revision,source_url:url,job:ref}]]);
+ const read=async(_env,id)=>records.get(id)||null;
+ const first=await mergeIndependentV4Jobs(env,taskKey,2,cp,{read});
+ assert.equal(first.count,1,'a report must merge without any prior JD or score');
+ assert.equal(first.checkpoint.priorState.matches[0].report_status,'COMPLETE');
+ assert.equal(first.checkpoint.priorState.matches[0].jd_source_status,undefined);
+ const verification=await claimV4JobWork(db,taskKey,2,'verification',{owner:'official-verifier'});
+ assert.ok(verification,'reference completion must not consume the verification job');
+ assert.equal(await finishV4JobWork(db,verification),true);
+ const key=await independentJobKey(taskKey,2,'verification',verification.job_key,verification.revision);
+ records.set(key,{kind:'V4_INDEPENDENT_JOB_V1',complete:true,generation:2,lane:'verification',
+  revision:verification.revision,source_url:url,job:scored(),checkpoint:{read:1,scored:1}});
+ const merged=await mergeIndependentV4Jobs(env,taskKey,2,first.checkpoint,{read});
+ assert.equal(merged.count,1,'official JD verification must still be merged after a reference report');
+ const updated=merged.checkpoint.priorState.matches[0];
+ assert.equal(updated.jd_source_status,'VERIFIED_JD');
+ assert.equal(updated.reference_report?.reference_jd,'岗位详情：AI 参考岗位职责');
+ assert.equal(updated.reference_report?.report_status,'COMPLETE');
+ assert.equal(updated.report_status,undefined,'reference must not falsely qualify the official JD assessment');
+ assert.equal((await mergeIndependentV4Jobs(env,taskKey,2,merged.checkpoint,{read})).count,0,
+  'the same revision-fenced reports never merge twice');
+});
