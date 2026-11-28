@@ -294,6 +294,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   setWorking(true);setStage('preparing');setActivity(null);setExecution(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   const abort=new AbortController();
   controller.current=abort;
+  let researchStarted=false;
   try{
    // A new upload is never silently stored: save only after explicit choice,
    // and only after its private vault confirms a valid file ID.
@@ -327,6 +328,9 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
    const searchText=task?.text??previewText,searchOptions=task?managedMatchOptions(task):options;
    setOptimizationSource(redactResumeTextLocally(searchText));
    if(task){matchResumeId=task.resume_id||'';if(registration?.attached){setFile(null);setSavedId(matchResumeId);setPreviewText(task.text);setOptions(searchOptions);}}
+   // The non-managed compatibility path has no session-task record, but a
+   // submitted AI request is still real work and must retain its failure UI.
+   researchStarted=true;
    const matched=await submitExtractedResumeText(searchText,searchOptions,consent,abort.signal,matchResumeId||undefined,
     stage=>{if(!abort.signal.aborted)progress(stage);},
     jobs=>{if(!abort.signal.aborted)setPartialJobs(jobs);},
@@ -341,8 +345,36 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
    // Keep selected file for return-to-edit. No automatic re-analysis.
    setConsent(false);
   }catch(e){
-   if(!abort.signal.aborted){setTaskFailure(true);setError(e instanceof Error?e.message:'智能匹配暂时失败，请稍后再试。');}
+   if(!abort.signal.aborted){
+    // File storage or local preparation can fail BEFORE a server-side match
+    // task exists. Do not strand the user behind an imaginary broken task.
+    // A pending registration is different: the server may have accepted it
+    // before transport failed, so keep its ID and allow safe recovery.
+    const registered=researchStarted||!!sessionTask.current||!!pendingStart.current;
+    if(!registered){taskOpen.current=false;setTaskFailure(false);}
+    else setTaskFailure(true);
+    setError(e instanceof Error?e.message:'智能匹配暂时失败，请稍后再试。');
+   }
   }finally{if(controller.current===abort){setWorking(false);controller.current=null;}}
+ }
+ async function retryFailedTask(){
+  if(!taskFailure||controller.current||closingTask.current||checkingTask)return;
+  setCheckingTask(true);
+  try{
+   // Check the authoritative current session task before reconnecting. Never
+   // start a second task or resubmit the resume as a fresh paid request.
+   const task=await readSessionMatchTask();
+   if(!task){
+    clearTaskLocally();
+    setError('服务器没有可恢复的原任务，请重新开始本次匹配。');
+    return;
+   }
+   sessionTask.current=task;taskOpen.current=true;setTaskFailure(false);setError('');
+   void restoreTask(task);
+  }catch(e){
+   setTaskFailure(true);
+   setError(e instanceof Error?e.message:'原研究任务暂无法恢复，请稍后重试。');
+  }finally{setCheckingTask(false);}
  }
  async function continueSearch(){
   const previous=result,search=lastSearch.current;
@@ -520,6 +552,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
       researchReport={result?.research_report||researchReport} researchJobs={[...researchJobs,...(result?.research_leads||[])]}
       pending={working&&!result} progressStage={stage} progressActivity={activity} execution={execution}
       onContinue={result?.can_continue?()=>void continueSearch():undefined}
+      onRetryFailedTask={taskFailure?()=>void retryFailedTask():undefined}
       notice={working?'':error}
       sourceText={optimizationSource||undefined}
       sourceResume={savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
