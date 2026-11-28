@@ -137,7 +137,7 @@ test('V4 backend heartbeat reaches frontend without inventing new candidate coun
  assert.match(service,/onExecution\?\.\(matchExecutionFromServer\(data\.progress\?\.execution\)\)/);
  assert.match(service,/if\(event==='heartbeat'\)/);
  assert.match(page,/execution=\{execution\}/);
- assert.match(dialog,/execution=\{execution\}/);
+ assert.match(dialog,/activity=\{progressActivity\}/);
  assert.match(panel,/workerAge>90/);
  assert.match(panel,/最近新增研究成果/);
  assert.doesNotMatch(panel,/execution\?\.state==='processing'\?'已发现/);
