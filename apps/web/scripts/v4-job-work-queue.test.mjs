@@ -307,3 +307,31 @@ test('source-driven checkpoint schedules every discovered JD but only top 30 con
  assert.equal(local.prepare("SELECT COUNT(*) n FROM hhba_v4_job_work_queue WHERE lane='reporting'").get().n,30,
   'only the global top 30 enter deep report queue');
 });
+
+
+test('new 20-source task enqueues a reference dossier before source verification or global ranking',async()=>{
+ const {completedReferenceReport,eligibleCuratedScore}=await import('../functions/_lib/v4-curated-reports.js');
+ const {referenceWorkRevision}=await import('../functions/_lib/v4-job-work-queue.js');
+ const {db}=fixture();
+ const cp={phase:'research',search_mode:'source_pool',source_stop_target:20,final_target:20,
+  rows:[[url,source()]],processedEarlier:[],processedEvidence:[],matches:[]};
+ const planned=await desiredV4JobWork(taskKey,0,cp);
+ assert.deepEqual(planned.map(x=>x.lane),['verification','reporting']);
+ assert.notEqual(planned[0].revision,planned[1].revision);
+ assert.ok(!JSON.stringify(planned).includes(url),'D1 work remains digest-only');
+ assert.ok(referenceWorkRevision({...source(),requirements:'changed'})!==referenceWorkRevision(source()));
+ await reconcileV4JobWork(db,taskKey,0,cp,{now:1000});
+ const claimed=await claimV4JobWork(db,taskKey,0,'reporting',{now:1001,owner:'reference-first'});
+ assert.ok(claimed,'the reporting lane is claimable before a single JD is verified');
+ assert.equal(claimed.revision,planned[1].revision);
+ const reference={research_candidate_url:url,official_url:url,company:'测试企业',title:'区域运营',location:'北京',
+  source_type:'站外招聘职位',curated_suitable:true,match_score:84,reference_score:84,
+  reference_jd_kind:'AI_GENERATED_REFERENCE',reference_jd:'AI 参考岗位职责与能力方向',
+  reference_jd_basis:'依据岗位名称推导，招聘要求待核实',evidence_score_status:'AI_REFERENCE_JD_SCORED',
+  report_status:'COMPLETE',research_detail:{score_explanation:'简历真实经历与可能职责的具体匹配分析',comparisons:[]}};
+ assert.equal(completedReferenceReport(reference),true);
+ assert.equal(eligibleCuratedScore(reference),false,'the reference is not a formal or vacancy-verified recommendation');
+ const withReport={...cp,priorState:{matches:[reference]}};
+ const replay=await desiredV4JobWork(taskKey,0,withReport);
+ assert.equal(replay.find(x=>x.lane==='reporting')?.state,'COMPLETED','a completed reference is not generated repeatedly');
+});
