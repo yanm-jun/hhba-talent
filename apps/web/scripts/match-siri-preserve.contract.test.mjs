@@ -28,7 +28,7 @@ assert.match(panels,/jdJob\.reference_jd_kind==='AI_GENERATED_REFERENCE'/);
  assert.match(dialog,/const matchListScroll=useRef\(0\)/);
  assert.match(dialog,/viewport\.scrollTop=optimizedJobUrl\?0:matchListScroll\.current/);
  assert.match(dialog,/if\(optimizedJobUrl\)\{backToMatches\(\);return\}/);
- assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\?'最小化':'完成查看'\}/);
+ assert.match(dialog,/\{optimizedJobUrl\?'返回匹配结果':pending\|\|taskFailed\?'最小化':'完成查看'\}/);
  assert.match(dialog,/stageTitle\[progressStage\]/);
  assert.match(dialog,/activeJob&&parsedProfile/);
  assert.doesNotMatch(dialog,/<CandidateJourneySteps/);
