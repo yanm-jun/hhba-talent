@@ -1729,6 +1729,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
   if(reportQueue){for(const job of applyGlobalOrder(pending,null))submitEarlyReport(job);}
   else if(pending.length)await maybeEarlyReport(applyGlobalOrder(pending,null)[0]);
  }
+ let firstReferenceReportAdmitted=false;
  const worker=async()=>{
   while(cursor<entries.length){
    if(signal?.aborted)throw fault('AI_AGENT_CANCELLED');
@@ -1738,10 +1739,41 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(overlap&&cursor>0&&resourceBudget&&!resourceBudget.canStart())return;
     if(overlap&&batchSize>laneWidth&&cursor>=laneWidth&&verificationRequests>=(pipelineChild?20:30))return;
    const i=cursor++,[url,job]=entries[i];
+   let firstReferenceReport=null;
+   // Report-first delivery: prioritize one complete AI reference report before
+   // this invocation spends time repeatedly opening a difficult source page.
+   // It is an explicitly marked research reference, never proof of a live vacancy.
+   // Source verification still runs independently afterwards.
+   if(overlap&&fullResearch&&!firstReferenceReportAdmitted&&
+     !previousMatches.some(j=>j.report_status==='COMPLETE'&&!!j.research_detail)&&
+     concreteCandidate(job)&&(!resourceBudget||resourceBudget.canStart())){
+    firstReferenceReportAdmitted=true;
+    matches[i]=renderAssessmentCandidate(url,job,i);
+    onActivity('writing','优先编写首份岗位详情与完整匹配报告，招聘来源另行核实。');
+    await scoreIncompleteJd(verificationFetcher,provider,resume,roleHint,matches[i],{
+     signal,browser:env.BROWSER,ledger:publicEvidence,note,
+     taskNotes:jobNotes(url,'analysisNotes'),fullResearch,onMaterial:publishVerified
+    });
+    if(matches[i].report_status==='COMPLETE'&&matches[i].research_detail){
+     firstReferenceReport=structuredClone(matches[i]);
+     note('FIRST_REFERENCE_REPORT_COMPLETE');
+     publishVerified();
+    }
+   }
    if(overlap){
     const got=await enrich(verificationFetcher,new Map([[url,job]]),readOptions);
     results.set(url,got.results.get(url));read+=got.read;
     matches[i]=renderAssessmentCandidate(url,job,i);
+    if(firstReferenceReport){
+     // Keep the independent job details and matching evidence until an
+     // actual verified vacancy can upgrade this research reference.
+     for(const field of ['reference_jd','reference_jd_basis','reference_jd_kind','match_score',
+       'reference_score','evidence_score_status','score_basis','curated_suitable',
+       'recommendation_reason','matched','not_evidenced','research_detail','report_status']){
+      if(firstReferenceReport[field]!==undefined)matches[i][field]=firstReferenceReport[field];
+     }
+     publishVerified();
+    }
     onProgress('scoring');
    }
    const jd=results.get(url);
@@ -1749,7 +1781,7 @@ export async function v4Match(fetcher,provider,resume,roleHint,
    if(curated&&(isOfficialJd(jd)||matches[i].reference_vacancy_verified||matches[i].jd_research?.facts?.length))publishVerified();
    if(jd?.excluded_board){rejectedBoards.add(url);publishResearch();continue;}
    if(jd?.excluded_closed){if(!resourceBudget||resourceBudget.canPublish())await removeClosedPublicAsset(env,url);continue;}
-   if(curated&&!isOfficialJd(jd)){matches[i].score_basis='未取得完整官方 JD，继续生成AI参考JD及适配分析。';await scoreIncompleteJd(verificationFetcher,provider,resume,roleHint,matches[i],{signal,browser:env.BROWSER,ledger:publicEvidence,note,taskNotes:jobNotes(url,'analysisNotes'),fullResearch,publicMaterial:jd?.publicMaterial,onMaterial:publishVerified});publishVerified();continue;}
+   if(curated&&!isOfficialJd(jd)){if(firstReferenceReport&&matches[i].report_status==='COMPLETE'){publishVerified();continue;}matches[i].score_basis='未取得完整官方岗位详情，继续生成AI参考资料及适配分析。';await scoreIncompleteJd(verificationFetcher,provider,resume,roleHint,matches[i],{signal,browser:env.BROWSER,ledger:publicEvidence,note,taskNotes:jobNotes(url,'analysisNotes'),fullResearch,publicMaterial:jd?.publicMaterial,onMaterial:publishVerified});publishVerified();continue;}
    if(!jd?.full_jd)continue;
    if(officialOnly&&!curated&&matches[i].source_type!=='站外官方招聘')continue;
    const resolvedUrl=matches[i].official_url;
