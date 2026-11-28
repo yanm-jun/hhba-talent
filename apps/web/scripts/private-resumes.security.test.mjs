@@ -52,7 +52,7 @@ function fixture(){
    if(sql.startsWith('SELECT * FROM hhba_auth_users'))return users.get(args[0])||null;
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resumes'))return {n:[...resumes.values()].filter(r=>r.phone===args[0]).length};
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resume_upload_events'))return {n:events.filter(e=>e.phone===args[0]&&e.created_at>=args[1]).length};
-   if(sql.startsWith('SELECT id FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.sha256===args[1])||null;
+   if(sql.startsWith('SELECT id,filename,media_type,size_bytes,created_at FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.sha256===args[1])||null;
    if(sql.startsWith('SELECT sha256 FROM hhba_candidate_resumes WHERE phone=? AND id=?')){
     const row=resumes.get(args[1]);return row?.phone===args[0]?{sha256:row.sha256}:null;
    }
@@ -171,15 +171,24 @@ test('duplicate and quota protection cannot be bypassed by changing file names',
  const f=fixture();
  assert.equal((await invoke(f,'',PHONE_A,'POST',PDF)).response.status,201);
  const duplicate=await invoke(f,'',PHONE_A,'POST',PDF,{filename:'other.pdf'});
- assert.equal(duplicate.response.status,409);
- assert.equal(f.objects.size,1);
+ assert.equal(duplicate.response.status,200,'same-account byte-identical upload is idempotent');
+ assert.equal(duplicate.payload.already_saved,true);
+ assert.equal(duplicate.payload.item.id,[...f.resumes.values()][0].id);
+ assert.equal(duplicate.payload.item.name,'我的简历.pdf','a renamed duplicate cannot overwrite the stored original');
+ assert.equal(f.objects.size,1,'an identical upload must never duplicate an R2 object');
+ assert.equal(f.events.length,1,'an identical upload must not spend daily upload quota');
  for(let i=0;i<2;i++){
   const unique=Buffer.from(PDF.toString().replace('startxref','startxref'+i));
   assert.equal((await invoke(f,'',PHONE_A,'POST',unique,{filename:'more'+i+'.pdf'})).response.status,201);
  }
  const another=Buffer.from(PDF.toString().replace('startxref','startxref3'));
  assert.equal((await invoke(f,'',PHONE_A,'POST',another,{filename:'four.pdf'})).response.status,409);
- assert.equal(f.objects.size,3);
+ assert.equal(f.objects.size,3); 
+ const sameAtQuota=await invoke(f,'',PHONE_A,'POST',PDF,{filename:'reupload-original.pdf'});
+ assert.equal(sameAtQuota.response.status,200,'a stored original remains reusable even when all three slots are occupied');
+ assert.equal(sameAtQuota.payload.item.id,duplicate.payload.item.id);
+ assert.equal(f.resumes.size,3);
+ assert.equal(f.events.length,3);
  assert.equal((await invoke(f,'',PHONE_B)).payload.items.length,0);
 });
 
@@ -246,4 +255,15 @@ test('polished file picker remains functional, keyboard accessible and explicitl
  assert.match(css,/\.hhba-private-resumes button:focus-visible/);
  assert.match(css,/@media\(max-width:740px\)/);
  assert.doesNotMatch(css,/input\[type=file\]\{max-width/,'native browser file control must not be styled as a visible button');
+});
+
+test('identical content is never reused across different accounts',async()=>{
+ const f=fixture();
+ const original=await invoke(f,'',PHONE_A,'POST',PDF);
+ const other=await invoke(f,'',PHONE_B,'POST',PDF);
+ assert.equal(original.response.status,201);
+ assert.equal(other.response.status,201);
+ assert.notEqual(original.payload.item.id,other.payload.item.id);
+ assert.equal(f.resumes.size,2);
+ assert.equal(f.objects.size,2);
 });
