@@ -1,10 +1,26 @@
-import {useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
+import {Component,useEffect,useMemo,useRef,useState,type ReactNode} from 'react';
 import {ArrowLeft,ArrowRight,ArrowUpRight,BookOpen,BriefcaseBusiness,CheckCircle2,ChevronRight,FileCheck2,Globe2,LoaderCircle,MapPin,ShieldCheck,Sparkles,UserRound} from 'lucide-react';
 import {isVerifiedMatchReport} from '../services/verifiedMatchPresentation.mjs';
 import {discoveryApplyDestination} from '../services/discoveryApplyDestination.mjs';
 import type {MatchProfile,MatchResearchReport,MatchedJob,NativeMatchActivity,NativeMatchProgress} from '../services/resumeMatch';
 import '../styles/report-first-experience.css';
 
+/** Contain unexpected report rendering errors without unmounting the
+ * parent match dialog, cancelling the paid AI request or discarding polling.
+ * Error messages and resume content are never sent to console telemetry. */
+export class ReportFirstErrorBoundary extends Component<{children:ReactNode},{failed:boolean}>{
+ state={failed:false};
+ static getDerivedStateFromError(){return {failed:true};}
+ componentDidCatch(){console.warn('HHBA_REPORT_VIEW_RENDER_RECOVERABLE');}
+ render(){
+  if(!this.state.failed)return this.props.children;
+  return <section className="hhba-rf-fallback" role="alert">
+   <h2>研究报告暂时无法展示</h2>
+   <p>这是一处报告页面显示异常，不代表后台研究已停止。已有成果不会因关闭这个提示而被删除。</p>
+   <button type="button" onClick={()=>this.setState({failed:false})}>重新尝试显示报告</button>
+  </section>;
+ }
+}
 type View='reports'|'explore'|'profile';
 type Props={
  profile?:MatchProfile;report?:MatchResearchReport;jobs:MatchedJob[];officialJobs:MatchedJob[];
