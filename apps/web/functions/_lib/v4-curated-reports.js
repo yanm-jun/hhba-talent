@@ -1,18 +1,22 @@
-// Product-specific quantities, not limits on model reasoning or search rounds.
-export const CANDIDATE_TARGET=300,FINAL_TARGET=30;
+// New research tasks have NO numeric source or candidate target. Count every
+// observed search source, then independently validate and rank genuine jobs.
+// A 30-report delivery target is not a cap on discovery, reasoning or research.
+export const CANDIDATE_TARGET=null,FINAL_TARGET=30;
+export const PREVIOUS_CANDIDATE_TARGET=300,PREVIOUS_FINAL_TARGET=30;
 export const LEGACY_CANDIDATE_TARGET=500,LEGACY_FINAL_TARGET=50;
-// New tasks use 300 -> 30. Existing encrypted checkpoints MUST retain the
-// 500 -> 50 contract under which their paid research already started. The
-// checkpoint goals are stamped on the very first continuation and carried
-// through discovery, verification, reporting and D1 job reconciliation.
+export const SOURCE_POOL_MODE='source_pool';
+// Existing authorized research stays on the immutable contract on which it
+// started. Never reinterpret a paid 300→30 / 500→50 continuation at deploy.
 export function v4TaskTargets(checkpoint=null){
- if(checkpoint?.candidate_target===CANDIDATE_TARGET&&checkpoint?.final_target===FINAL_TARGET)
-  return {candidateTarget:CANDIDATE_TARGET,finalTarget:FINAL_TARGET};
+ if(checkpoint?.search_mode===SOURCE_POOL_MODE)
+  return {candidateTarget:null,finalTarget:FINAL_TARGET,sourceDriven:true};
+ if(checkpoint?.candidate_target===PREVIOUS_CANDIDATE_TARGET&&checkpoint?.final_target===PREVIOUS_FINAL_TARGET)
+  return {candidateTarget:PREVIOUS_CANDIDATE_TARGET,finalTarget:PREVIOUS_FINAL_TARGET,sourceDriven:false};
  if(checkpoint&&(
   typeof checkpoint.phase==='string'||Number.isSafeInteger(checkpoint.round)||
   Array.isArray(checkpoint.rows)||checkpoint?.candidate_target===LEGACY_CANDIDATE_TARGET))
-  return {candidateTarget:LEGACY_CANDIDATE_TARGET,finalTarget:LEGACY_FINAL_TARGET};
- return {candidateTarget:CANDIDATE_TARGET,finalTarget:FINAL_TARGET};
+  return {candidateTarget:LEGACY_CANDIDATE_TARGET,finalTarget:LEGACY_FINAL_TARGET,sourceDriven:false};
+ return {candidateTarget:null,finalTarget:FINAL_TARGET,sourceDriven:true};
 }
 const str=v=>typeof v==='string'?v.trim():'';
 const norm=v=>str(v).replace(/\s+/g,' ').trim();
