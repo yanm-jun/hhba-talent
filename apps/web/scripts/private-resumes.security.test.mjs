@@ -52,6 +52,8 @@ function fixture(){
    if(sql.startsWith('SELECT * FROM hhba_auth_users'))return users.get(args[0])||null;
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resumes'))return {n:[...resumes.values()].filter(r=>r.phone===args[0]).length};
    if(sql.includes('SELECT COUNT(*) AS n FROM hhba_candidate_resume_upload_events'))return {n:events.filter(e=>e.phone===args[0]&&e.created_at>=args[1]).length};
+   if(sql.startsWith('SELECT id,filename,media_type,size_bytes,created_at FROM hhba_candidate_resumes WHERE phone=? AND sha256=? AND size_bytes=?'))
+    return [...resumes.values()].find(r=>r.phone===args[0]&&r.sha256===args[1]&&r.size_bytes===args[2])||null;
    if(sql.startsWith('SELECT id,filename,media_type,size_bytes,created_at FROM hhba_candidate_resumes WHERE phone=? AND sha256=?'))return [...resumes.values()].find(r=>r.phone===args[0]&&r.sha256===args[1])||null;
    if(sql.startsWith('SELECT sha256 FROM hhba_candidate_resumes WHERE phone=? AND id=?')){
     const row=resumes.get(args[1]);return row?.phone===args[0]?{sha256:row.sha256}:null;
@@ -266,4 +268,44 @@ test('identical content is never reused across different accounts',async()=>{
  assert.notEqual(original.payload.item.id,other.payload.item.id);
  assert.equal(f.resumes.size,2);
  assert.equal(f.objects.size,2);
+});
+
+
+test('hash-only duplicate preflight is consent-independent, account-scoped and write-free',async()=>{
+ const f=fixture();
+ const saved=await invoke(f,'',PHONE_A,'POST',PDF);
+ assert.equal(saved.response.status,201);
+ const originalId=saved.payload.item.id;
+ const fingerprint=Buffer.from(JSON.stringify({sha256:sha(PDF),size:PDF.length}));
+ const first=await invoke(f,'/check',PHONE_A,'POST',fingerprint,{mime:'application/json',filename:'ignored.pdf',consent:false});
+ assert.equal(first.response.status,200);
+ assert.equal(first.payload.kind,'HHBA_PRIVATE_RESUME_DUPLICATE_CHECK_V1');
+ assert.equal(first.payload.existing.id,originalId);
+ assert.equal(first.payload.existing.name,'我的简历.pdf');
+ assert.equal(first.payload.existing.sha256,undefined,'the response must not disclose the document hash');
+ assert.equal((await invoke(f,'/check',PHONE_B,'POST',fingerprint,{mime:'application/json',consent:false})).payload.existing,null);
+ assert.equal(f.resumes.size,1,'checking must never insert a duplicate');
+ assert.equal(f.objects.size,1,'checking must never upload document bytes');
+ assert.equal(f.events.length,1,'checking must not consume daily upload quota');
+ const different=Buffer.from(JSON.stringify({sha256:'a'.repeat(64),size:PDF.length}));
+ assert.equal((await invoke(f,'/check',PHONE_A,'POST',different,{mime:'application/json'})).payload.existing,null);
+});
+test('duplicate preflight rejects malformed fingerprints and cross-site requests',async()=>{
+ const f=fixture();
+ const bad=[
+  {sha256:'A'.repeat(64),size:PDF.length},
+  {sha256:'abc',size:PDF.length},
+  {sha256:'a'.repeat(64),size:0},
+  {sha256:'a'.repeat(64),size:'75'},
+  {sha256:'a'.repeat(64),size:3*1024*1024+1},
+ ];
+ for(const body of bad){
+  const response=await invoke(f,'/check',PHONE_A,'POST',Buffer.from(JSON.stringify(body)),{mime:'application/json'});
+  assert.equal(response.response.status,400);
+  assert.equal(response.payload.error,'INVALID_CHECK_REQUEST');
+ }
+ assert.equal((await invoke(f,'/check',PHONE_A,'POST',Buffer.from('bad JSON'),{mime:'application/json'})).response.status,400);
+ assert.equal((await invoke(f,'/check',PHONE_A,'POST',Buffer.from('{}'),{mime:'text/plain'})).response.status,415);
+ assert.equal((await invoke(f,'/check',PHONE_A,'POST',Buffer.from('{}'),{mime:'application/json',origin:'https://evil.example'})).response.status,403);
+ assert.equal(f.objects.size,0);
 });
