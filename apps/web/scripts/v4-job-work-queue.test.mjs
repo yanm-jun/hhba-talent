@@ -258,3 +258,33 @@ test('legacy 500→50 checkpoint retains original ranked report eligibility afte
  const work=await desiredV4JobWork(taskKey,0,cp);
  assert.deepEqual(work.map(w=>w.lane),['verification','reporting']);
 });
+
+
+test('repeatedly crashed JD work cannot monopolize 300 untouched candidates',async()=>{
+ const {db,local}=fixture();
+ const urls=Array.from({length:9},(_,i)=>url+'/fair-'+String(i+1).padStart(3,'0'));
+ const cp={phase:'research',rows:urls.map(u=>[u,{...source(),employer_proof_url:u}]),processedEarlier:[],processedEvidence:[],matches:[]};
+ await reconcileV4JobWork(db,taskKey,0,cp,{now:1000,maxChanges:40});
+ const first=await claimV4JobWork(db,taskKey,0,'verification',{now:1100,leaseMs:15000,owner:'first'});
+ assert.ok(first);
+ const once=await claimV4JobWork(db,taskKey,0,'verification',{now:16101,leaseMs:15000,owner:'recovered-once'});
+ assert.equal(once.job_key,first.job_key,'a single crashed attempt retains first recovery priority');
+ assert.equal(once.attempts,2);
+ const firstFresh=await claimV4JobWork(db,taskKey,0,'verification',{now:31102,leaseMs:15000,owner:'first-fresh'});
+ assert.ok(firstFresh);
+ assert.notEqual(firstFresh.job_key,first.job_key,'a repeatedly crashed job cannot starve untouched job research');
+ assert.equal(firstFresh.attempts,1);
+ assert.equal(await finishV4JobWork(db,firstFresh,{now:31103,completed:true}),true);
+ for(let i=0;i<7;i++){
+  const fresh=await claimV4JobWork(db,taskKey,0,'verification',{now:31104+i,leaseMs:15000,owner:'untouched-'+i});
+  assert.ok(fresh,'untouched research remains schedulable even if old leased sidecar still exists');
+  assert.notEqual(fresh.job_key,first.job_key);
+  assert.equal(fresh.attempts,1);
+  assert.equal(await finishV4JobWork(db,fresh,{now:31105+i,completed:true}),true);
+ }
+ const later=await claimV4JobWork(db,taskKey,0,'verification',{now:31120,leaseMs:15000,owner:'eventual-recovery'});
+ assert.ok(later,'old JD is retained for continuation once other candidates have had a chance');
+ assert.equal(later.job_key,first.job_key);
+ assert.equal(later.attempts,3,'research attempts are not capped');
+ assert.equal(local.prepare("SELECT COUNT(*) n FROM hhba_v4_job_work_queue WHERE state='COMPLETED'").get().n,8);
+});
