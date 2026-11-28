@@ -31,10 +31,10 @@ function visibleMatchScore(job:{match_score?:number|null;reference_score?:number
 const archivedHistoryJob=(job:MatchedJob)=>job.jd_source_status==='VERIFIED_JD'&&job.reference_jd_kind!=='AI_GENERATED_REFERENCE'&&/^jd_[a-f0-9]{32}$/.test(job.jd_version_id||'')&&/^[a-f0-9]{64}$/.test(job.jd_sha256||'');
 type ResumeStorageAction={available:boolean;saved:boolean;consent:boolean;saving:boolean;
  notice:string;onConsent:(yes:boolean)=>void;onSave:()=>void};
-export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=false,progressStage='preparing',progressActivity,execution,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false,taskStartedAt}:{
+export function CandidateMatchNativeDialog({result,onClose,onTerminate,onContinue,pending=false,progressStage='preparing',progressActivity,execution,researchReport,researchJobs=[],notice='',resumeStorage,sourceText,sourceResume,accountScope,initialOptimizedJobId,hostRoute,taskFailed=false,initialMinimized=false,taskStartedAt}:{
  result:Pick<MatchResponse,'matches'>&Partial<Pick<MatchResponse,
   'disclaimer'|'history_id'|'history_status'|'new_job_count'|'profile'|'native_search'>>;
- onClose:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
+ onClose:()=>void;onTerminate?:()=>void;onContinue?:()=>void;pending?:boolean;progressStage?:NativeMatchProgress;
  progressActivity?:NativeMatchActivity|null;execution?:MatchExecution|null;
  researchReport?:MatchResearchReport;researchJobs?:MatchedJob[];
  notice?:string;resumeStorage?:ResumeStorageAction;
@@ -128,7 +128,7 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  }
  function handleClose(){
   if(optimizedJobUrl){backToMatches();return}
-  if(pending){minimizeSearch();return}
+  if(pending||taskFailed){minimizeSearch();return}
   onClose();
  }
  // Window visibility is independent of the request owned by CandidateMatchPage.
@@ -146,12 +146,12 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
  },[minimized]);
  useEffect(()=>{
   const dialog=confirmRef.current;
-  if(confirmTerminate&&pending&&dialog&&!dialog.open)dialog.showModal();
+  if(confirmTerminate&&(pending||taskFailed)&&dialog&&!dialog.open)dialog.showModal();
   return()=>{if(dialog?.open)dialog.close()};
- },[confirmTerminate,pending]);
+ },[confirmTerminate,pending,taskFailed]);
  useEffect(()=>{
-  if(!pending)setConfirmTerminate(false);
- },[pending]);
+  if(!pending&&!taskFailed)setConfirmTerminate(false);
+ },[pending,taskFailed]);
  function handleKey(event:KeyboardEvent<HTMLDivElement>){
   if(event.key==='Escape'){event.preventDefault();event.stopPropagation();if(!pending)handleClose();return}
   if(showResults&&!optimizedJobUrl&&event.target===ref.current&&(event.key==='ArrowLeft'||event.key==='ArrowRight')){event.preventDefault();ref.current?.querySelector<HTMLButtonElement>(event.key==='ArrowRight'?'.hhba-report-pager-next':'.hhba-report-pager-prev')?.click();return;}
@@ -189,10 +189,10 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
       {optimizedJobUrl&&sourceResume&&<span id="hhba-word-top-download" />}
       <button type="button" className="hhba-match-modal-close"
        onClick={optimizedJobUrl&&sourceResume?()=>{
-        if(pending){backToMatches();return;}
+        if(pending||taskFailed){backToMatches();return;}
          if(!optimizationDirty||window.confirm('简历还有未保存的文字草稿，关闭后可能丢失。确定关闭吗？'))onClose();
        }:handleClose}
-       aria-label={optimizedJobUrl&&sourceResume?'关闭简历编辑':pending?'最小化研究窗口':'关闭推荐'}><X size={19}/></button>
+       aria-label={optimizedJobUrl&&sourceResume?'关闭简历编辑':pending||taskFailed?'最小化研究窗口':'关闭推荐'}><X size={19}/></button>
      </div>
     </header>
     <div className="hhba-match-modal-content" data-hhba-stage={optimizedJobUrl?'optimization':'matches'}>
@@ -311,8 +311,8 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
      {!optimizedJobUrl&&onContinue&&!pending?
       <button className="hhba-match-done" type="button" onClick={onContinue}>继续搜索岗位</button>:
       <span>HHBA · 让机会与人才，找到彼此。</span>}
-     {pending&&<button className="hhba-match-terminate" type="button" onClick={()=>setConfirmTerminate(true)}>终止匹配</button>}
-     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobUrl?'返回匹配结果':pending?'最小化':'完成查看'}</button>
+     {(pending||taskFailed)&&<button className="hhba-match-terminate" type="button" onClick={()=>setConfirmTerminate(true)}>终止匹配</button>}
+     <button className="hhba-match-done" type="button" onClick={handleClose}>{optimizedJobUrl?'返回匹配结果':pending||taskFailed?'最小化':'完成查看'}</button>
     </footer>
    </div>
   </div>
@@ -321,12 +321,12 @@ export function CandidateMatchNativeDialog({result,onClose,onContinue,pending=fa
    <span className="hhba-match-task-copy"><strong>{pending?'AI 正在研究岗位':taskFailed?'岗位研究暂未完成':'岗位研究已结束'}</strong><small>{pending?stageTitle[progressStage]+' · '+(researchReport?.discovered??researchJobs.length)+' 个候选':taskFailed?'点击查看异常原因':'点击查看已收到的研究结果'}</small></span>
    <span className="hhba-match-task-action">{pending?'查看进度':'查看结果'}</span>
   </button>}
-  {confirmTerminate&&pending&&<dialog ref={confirmRef} className="hhba-match-exit-dialog" aria-labelledby="hhba-match-exit-title" onCancel={e=>{e.preventDefault();setConfirmTerminate(false)}} onClick={e=>{if(e.target===e.currentTarget)e.preventDefault()}}>
+  {confirmTerminate&&(pending||taskFailed)&&<dialog ref={confirmRef} className="hhba-match-exit-dialog" aria-labelledby="hhba-match-exit-title" onCancel={e=>{e.preventDefault();setConfirmTerminate(false)}} onClick={e=>{if(e.target===e.currentTarget)e.preventDefault()}}>
    <div className="hhba-match-exit-heading"><span className="hhba-match-task-icon"><BriefcaseBusiness size={22} aria-hidden="true"/></span><h2 id="hhba-match-exit-title">确定终止本次匹配？</h2></div>
    <p>终止后将取消当前请求，尚未保存的本次研究结果可能丢失。已经产生的 API 调用费用不会因终止而退回。</p>
    <div className="hhba-match-exit-actions">
     <button type="button" className="hhba-match-exit-primary" autoFocus onClick={()=>setConfirmTerminate(false)}>继续研究</button>
-    <button type="button" className="hhba-match-exit-danger" onClick={()=>{setConfirmTerminate(false);onClose()}}>确认终止本次匹配</button>
+    <button type="button" className="hhba-match-exit-danger" onClick={()=>{setConfirmTerminate(false);(onTerminate||onClose)()}}>确认终止本次匹配</button>
    </div>
   </dialog>}
  </>,document.body);
