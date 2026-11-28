@@ -1,0 +1,58 @@
+/* Research dossier: factual, job-local milestones instead of decorative AI chatter. */
+.hhba-job-dossier{min-width:0;margin:13px 0 17px;padding:18px 19px;border:1px solid #dce7e9;border-radius:14px;background:linear-gradient(150deg,#f7faf9 0%,#fff 58%);color:#213b45;overflow-wrap:anywhere}
+.hhba-job-dossier-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding-bottom:16px;border-bottom:1px solid #e1e9e8}
+.hhba-job-dossier-eyebrow{display:block;color:#638579;font-size:10px;font-weight:750;letter-spacing:1.25px}
+.hhba-job-dossier-top h3{margin:5px 0 6px!important;font-size:18px!important;font-weight:750!important;line-height:1.4;color:#152e36!important}
+.hhba-job-dossier-top p{margin:0!important;font-size:12px;line-height:1.65;color:#657980}
+.hhba-job-dossier-completeness{flex:none;min-width:85px;text-align:right;padding-left:12px;border-left:1px solid #dce7e3}
+.hhba-job-dossier-completeness strong{display:block;font-size:23px;font-weight:750;line-height:1.2;letter-spacing:-.8px;color:#1d6658;font-variant-numeric:tabular-nums}
+.hhba-job-dossier-completeness strong span{font-size:12px;font-weight:500;color:#8d9e9c;letter-spacing:0}
+.hhba-job-dossier-completeness small{display:block;font-size:10px;color:#849494;margin-top:5px}
+.hhba-job-dossier-milestones{list-style:none;margin:0!important;padding:12px 0 0!important}
+.hhba-job-dossier-milestones li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;position:relative;padding:9px 0 14px;border:0!important}
+.hhba-job-dossier-milestones li:not(:last-child):before{content:"";position:absolute;top:37px;bottom:-3px;left:14px;width:1px;background:#dce6e4}
+.hhba-job-dossier-stage-icon{display:inline-grid;place-items:center;position:relative;z-index:1;width:29px;height:29px;border-radius:10px;border:1px solid #dce5ea;background:#f0f4f6;color:#7a8b96}
+.hhba-job-dossier-milestones [data-evidence-state="complete"] .hhba-job-dossier-stage-icon{color:#24725c;border-color:#c8e0d6;background:#e9f6ee}
+.hhba-job-dossier-milestones [data-evidence-state="reference"] .hhba-job-dossier-stage-icon{color:#476f9a;border-color:#d3dfed;background:#ecf2fa}
+.hhba-job-dossier-milestones [data-evidence-state="partial"] .hhba-job-dossier-stage-icon{color:#a07535;border-color:#eadfc6;background:#fff8eb}
+.hhba-job-dossier-milestones [data-evidence-state="attention"] .hhba-job-dossier-stage-icon{color:#a65b43;border-color:#edd9d0;background:#fff4ef}
+.hhba-job-dossier-stage-body{min-width:0}
+.hhba-job-dossier-stage-heading{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.hhba-job-dossier-stage-heading strong{font-size:12.5px;font-weight:760;color:#25424a}
+.hhba-job-dossier-stage-heading strong span{font-size:10px;letter-spacing:.5px;font-variant-numeric:tabular-nums;color:#839a98}
+.hhba-job-dossier-stage-heading small{flex:none;font-size:10px;color:#71838b}
+.hhba-job-dossier-milestones [data-evidence-state="complete"] .hhba-job-dossier-stage-heading small{color:#1b7358}
+.hhba-job-dossier-milestones [data-evidence-state="reference"] .hhba-job-dossier-stage-heading small{color:#426d9b}
+.hhba-job-dossier-milestones [data-evidence-state="attention"] .hhba-job-dossier-stage-heading small{color:#9a5640}
+.hhba-job-dossier-stage-body p{margin:3px 0 0!important;font-size:11.5px;line-height:1.7;color:#657883}
+.hhba-job-dossier-evidence-count{display:inline-block;margin-top:6px;font-size:10px;color:#486d7b;background:#eff5f6;padding:2px 7px;border-radius:5px}
+.hhba-job-dossier-samples{display:grid;gap:10px;margin-top:4px;padding:13px 14px;background:#fff;border:1px solid #e4eceb;border-radius:10px}
+.hhba-job-dossier-samples-label{font-size:10px;color:#648478;font-weight:800;letter-spacing:.5px}
+.hhba-job-dossier-sample{border-top:1px solid #edf2f1;padding-top:9px;min-width:0}
+.hhba-job-dossier-sample strong{font-size:11.5px;color:#2b5163}
+.hhba-job-dossier-sample p{margin:3px 0!important;font-size:11.5px;line-height:1.8;color:#4f6878;white-space:pre-wrap;overflow-wrap:anywhere}
+.hhba-job-dossier-sample small{display:block;font-size:10.5px;line-height:1.65;color:#687f8b}
+.hhba-job-dossier-sample .hhba-job-dossier-analysis{color:#547368}
+.hhba-job-dossier-footnote{font-size:10.5px!important;color:#819398!important;line-height:1.75!important;margin:11px 0 0!important}
+@media(max-width:640px){.hhba-job-dossier{padding:13px 12px;margin:10px 0 13px}.hhba-job-dossier-top{gap:7px}.hhba-job-dossier-top h3{font-size:15px!important}.hhba-job-dossier-completeness{min-width:64px;padding-left:8px}.hhba-job-dossier-completeness strong{font-size:19px}.hhba-job-dossier-stage-heading{align-items:flex-start}.hhba-job-dossier-stage-heading strong{font-size:11.5px}.hhba-job-dossier-stage-heading small{font-size:9.5px;text-align:right;max-width:83px;white-space:normal}.hhba-job-dossier-samples{padding:10px}}
+/* Search overview: show real evidence throughput, not an oversized counter or
+   a provider-call count masquerading as professional effort. */
+.hhba-research-brief{padding:17px 0 13px;border-bottom:1px solid #e5eceb}
+.hhba-research-brief-heading{display:flex;align-items:center;gap:9px;font-size:10px;color:#5b7f77;font-weight:800;letter-spacing:1.1px}
+.hhba-research-live-dot{display:inline-block;height:8px;width:8px;border-radius:50%;background:#91a49d}
+.hhba-research-brief[data-live="true"] .hhba-research-live-dot{background:#2d846d;box-shadow:0 0 0 4px #e3f4ed}
+.hhba-research-brief h2{font-size:22px!important;font-weight:740!important;line-height:1.4!important;margin:8px 0 5px!important;color:#173742!important;letter-spacing:-.4px}
+.hhba-research-brief>p{font-size:12px;color:#6b8091;line-height:1.7;margin:0 0 15px}
+.hhba-research-brief-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.hhba-research-brief-metrics>div{padding:11px 10px;border:1px solid #e3eaeb;border-radius:9px;background:#f8fafb}
+.hhba-research-brief-metrics small{display:block;font-size:10px;line-height:1.5;color:#778c95}
+.hhba-research-brief-metrics strong{display:block;margin-top:4px;font-size:23px;line-height:1.3;font-weight:700;font-variant-numeric:tabular-nums;color:#1b4c5e}
+.hhba-research-brief-status{display:flex;gap:9px;align-items:flex-start;margin:13px 0 0;padding:10px 12px;border-radius:8px;background:#f3f7f8;font-size:12px;color:#526b7c;line-height:1.7}
+.hhba-research-brief-status svg{flex:none;color:#398170;margin-top:2px}
+.hhba-research-view-dossier{margin-top:10px!important;padding:9px 13px;background:#1c544c!important;color:#fff!important;border:1px solid #1c544c!important;border-radius:8px;font-weight:650;font-size:12px!important;cursor:pointer}
+.hhba-research-view-dossier:hover{background:#133f3a!important}
+.hhba-research-view-dossier:focus-visible{outline:2px solid #317e6c;outline-offset:3px}
+.hhba-dossier-global-update{font-size:11px;color:#647e88;padding:8px 10px;margin:8px 0!important;background:#f5f8fa;border-radius:7px;line-height:1.7}
+.hhba-dossier-status-pill{display:inline-block;padding:3px 9px;border:1px solid #dce7e2;border-radius:99px;background:#f3f8f6;color:#467066;font-size:10px;font-weight:650}
+.hhba-dossier-status-pill[data-kind="research"]{border-color:#d9e4ef;background:#f4f8fc;color:#54738e}
+@media(max-width:640px){.hhba-research-brief{padding:13px 0}.hhba-research-brief h2{font-size:19px!important}.hhba-research-brief-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.hhba-research-brief-metrics>div{padding:9px}.hhba-research-brief-metrics strong{font-size:21px}}

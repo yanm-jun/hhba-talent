@@ -786,37 +786,44 @@ test('curated report rejects invented CV quotes but accepts flexible evidence-ba
  assert.equal(candidateKey(row),candidateKey({...row,url:url+'?utm_source=x'}));
  assert.equal(concreteCandidate({company:'待核实',title:'职位详情待核实',location:'上海'}),false);
 });
-test('curated modal renders a single selected report with full detail and horizontal navigation',async()=>{
+test('curated modal keeps a single swipeable job dossier and the complete verified report below it',async()=>{
  const {readFile}=await import('node:fs/promises');
  const ui=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
- assert.match(ui,/const jdJob=jdItems\[currentJdIndex\]/);assert.match(ui,/onTouchEnd=/);assert.match(ui,/onWheel=/);assert.match(ui,/<CuratedJobReport detail=/);
- assert.match(ui,/<ReportPager count=\{jdItems.length\}/);assert.match(ui,/<JdResearchContent job=\{jdJob\}/);
+ assert.match(ui,/const jdJob=browseItems\[currentJdIndex\]/);
+ assert.match(ui,/const browseItems=\[\.\.\.jdItems,\.\.\.all\.filter/);
+ assert.match(ui,/onTouchEnd=/);assert.match(ui,/onWheel=/);
+ assert.match(ui,/<ReportPager count=\{browseItems.length\}/);
+ assert.match(ui,/<JobResearchDossier job=\{jdJob\}\/>/);
+ assert.match(ui,/<JdResearchContent job=\{jdJob\}/);
+ assert.match(ui,/<CuratedJobReport detail=\{jdJob\.research_detail\}/);
  const report=await readFile(new URL('../src/components/CuratedJobReport.tsx',import.meta.url),'utf8');
  assert.match(report,/岗位要求与简历经历逐项对照/);assert.match(report,/detail\.comparisons\.map/);
  assert.doesNotMatch(report,/\.slice\(/);
 });
 
-test('refined stage workspace derives discovery animation solely from actual backend events',async()=>{
+test('research overview is driven by observed evidence, not animated provider-call theater',async()=>{
  const {readFile}=await import('node:fs/promises');
  const panels=await readFile(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
  const dialog=await readFile(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
- const css=await readFile(new URL('../src/styles/resume-match-dialog.css',import.meta.url),'utf8');
- assert.match(panels,/discovered=pending\?Math\.max\(report\?\.discovered\?\?0,jobs\.length\):report\?\.discovered\?\?all\.length/);
- assert.match(panels,/key=\{mainCount\}/);
- assert.match(panels,/width:ratio\+'%'/); // historical quota tasks still show numeric progress
- assert.match(panels,/sourceDriven\?sourceCount:discovered/);
- assert.match(panels,/已收到检索来源 · 数量不设上限/);
- assert.match(panels,/hhba-search-progress-unbounded/);
+ const css=await readFile(new URL('../src/styles/job-research-dossier.css',import.meta.url),'utf8');
+ assert.match(panels,/const sourceCount=report\?\.search_source_count\?\?0/);
+ assert.match(panels,/const completedReports=all\.filter/);
+ assert.match(panels,/const verified=all\.filter\(confirmed\)/);
+ assert.match(panels,/已收到检索来源/);
+ assert.match(panels,/已收录具体岗位/);
+ assert.match(panels,/完整研究报告/);
+ assert.doesNotMatch(panels,/数量不设上限/);
+ assert.doesNotMatch(panels,/key=\{mainCount\}|hhba-search-progress-unbounded/);
  assert.match(panels,/activity\?\.message/);
  assert.match(panels,/setArrival\(old=>/);
  assert.doesNotMatch(panels,/setInterval|setTimeout|Math\.random|fetch\(/);
  assert.match(dialog,/selection=\{selectedStage\}/);
  assert.match(dialog,/onFollow=\{\(\)=>selectStage\(null\)\}/);
+ assert.match(dialog,/hasLiveCandidate\?2/);
  assert.match(dialog,/showResults&&<>/);
  assert.match(panels,/全部已收到候选岗位/);
- assert.match(panels,/<CuratedJobReport detail=\{jdJob\.research_detail\}/);
- assert.match(css,/prefers-reduced-motion:reduce/);
- assert.match(css,/hhba-search-progress>div\{[^}]*transition:width/);
+ assert.match(css,/max-width:640px/);
+ assert.match(css,/hhba-job-dossier-milestones/);
 });
 
 
