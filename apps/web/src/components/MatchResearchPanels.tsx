@@ -4,7 +4,7 @@ import {createPortal} from 'react-dom';
 import {ChevronLeft,ChevronRight,ChevronDown,ArrowUpRight,MapPin,Sparkles} from 'lucide-react';
 import '../styles/resume-match-dialog.css';
 import {CuratedJobReport} from './CuratedJobReport';
-import {verifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
+import {verifiedMatchReports,orderVerifiedMatchReports} from '../services/verifiedMatchPresentation.mjs';
 import {discoveryApplyDestination} from '../services/discoveryApplyDestination.mjs';
 import type {MatchProfile,MatchResearchReport,MatchedJob,NativeMatchProgress,NativeMatchActivity,MatchExecution} from '../services/resumeMatch';
 
@@ -94,6 +94,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  const [localJobUrl,setLocalJobUrl]=useState<string|null>(null);
  const [arrival,setArrival]=useState<string[]>([]);
  const [query,setQuery]=useState('');
+ const [reportOrder,setReportOrder]=useState<'recommendation'|'score'>('recommendation');
  const reportSwipe=useRef<{x:number;y:number}|null>(null);
  const active=Math.max(0,Math.min(stages.length-1,selection??selected));
  const actual=matchStageIndex(progressStage);
@@ -137,7 +138,8 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  const referenceCount=all.filter(j=>j.reference_jd_kind==='AI_GENERATED_REFERENCE'&&!!j.reference_jd?.trim()).length;
  const scoredCount=all.filter(j=>Number.isInteger(j.match_score)&&j.curated_suitable===true).length;
  // Preserve backend global ranking; research leads never enter this pager.
- const jdItems=verifiedMatchReports(officialJobs);
+ const recommended=verifiedMatchReports(officialJobs);
+ const jdItems=!pending&&!provisional&&reportOrder==='score'?orderVerifiedMatchReports(officialJobs,'score'):recommended;
  const scoredPending=all.filter(j=>(confirmed(j)&&scoreGrounded(j)||j.reference_vacancy_verified===true&&j.evidence_score_status==='AI_REFERENCE_JD_SCORED')&&reportScore(j)!==null&&j.curated_suitable===true&&!j.excluded_closed&&!j.excluded_board&&j.availability_status!=='CLOSED_LISTED'&&j.availability_status!=='POSSIBLY_CLOSED'&&!jdItems.some(item=>item.official_url===j.official_url));
  const materialOnly=all.filter(j=>!j.excluded_closed&&!j.excluded_board&&j.availability_status!=='CLOSED_LISTED'&&j.availability_status!=='POSSIBLY_CLOSED'&&!jdItems.some(item=>item.official_url===j.official_url)&&!scoredPending.some(item=>item.official_url===j.official_url)&&!!(j.reference_jd?.trim()||j.jd_research?.facts?.length||j.jd_research?.inference?.trim()||confirmed(j)));
  const currentJdIndex=Math.max(0,jdItems.findIndex(j=>j.official_url===(selectedJobUrl??localJobUrl)));
@@ -215,6 +217,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
    <div className="hhba-compact-report-head"><h2>岗位研究与匹配报告</h2>{pending&&onFollow&&<button type="button" onClick={onFollow}>跟随进度</button>}</div>
    <div className="hhba-refined-metrics hhba-score-metrics"><div><small>已发现</small><strong>{all.length}</strong></div><div><small>官方 JD 已核验</small><strong>{verified.length}</strong></div><div><small>{pending||provisional?'已完成报告':'正式推荐'}</small><strong>{jdItems.length}{report?.final_target?<em> / {report.final_target}</em>:null}</strong></div></div>
    <p className="hhba-refined-note" role="status">已整理 AI 参考 JD {referenceCount} 份 · 已完成有依据的匹配评分 {scoredCount} 份。官方 JD、参考 JD 和正式报告分别计数。</p>
+   {!pending&&!provisional&&jdItems.length>1&&<div className="hhba-report-order" role="group" aria-label="岗位排列方式"><button type="button" aria-pressed={reportOrder==='recommendation'} onClick={()=>{setReportOrder('recommendation');const first=recommended[0];if(first){setLocalJobUrl(first.official_url);onJobChange?.(first.official_url)}}}>综合推荐</button><button type="button" aria-pressed={reportOrder==='score'} onClick={()=>{setReportOrder('score');const first=orderVerifiedMatchReports(officialJobs,'score')[0];if(first){setLocalJobUrl(first.official_url);onJobChange?.(first.official_url)}}}>匹配分降序</button></div>}
    {jdJob?<><ReportPager count={jdItems.length} index={currentJdIndex} onChange={changeJob} pending={pending} inline/><article className="hhba-verified-report hhba-curated-card" key={jdJob.official_url}
     onTouchStart={e=>{reportSwipe.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}} onTouchEnd={e=>{const start=reportSwipe.current;reportSwipe.current=null;if(!start)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3)changeJob(currentJdIndex+(dx<0?1:-1))}}
     onWheel={e=>{if(Math.abs(e.deltaX)>50&&Math.abs(e.deltaX)>Math.abs(e.deltaY)*1.5)changeJob(currentJdIndex+(e.deltaX>0?1:-1))}}>
@@ -224,7 +227,7 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
     </div></div>
     <dl className="hhba-verification-facts"><div><dt>招聘来源</dt><dd>{confirmed(jdJob)||jdJob.reference_vacancy_verified?'官方岗位来源已核验':'尚未确认官方归属'}</dd></div><div><dt>完整岗位 JD</dt><dd>{jdJob.reference_jd_kind==='AI_GENERATED_REFERENCE'?'AI参考JD · 非官方原文':confirmed(jdJob)?'已取得完整原文':jdJob.jd_research?.facts.length?'已取得公开资料（非完整官方 JD）':jdJob.jd_research?.inference?'已完成 AI 职业方向研究':jdJob.evidence_excerpt||jdJob.requirements_basis?'已有待核验资料':pending&&!jdJob.jd_research?'等待研究':'尚未取得可核验原文'}</dd></div><div><dt>工作地点</dt><dd>{jdJob.location||'未知'}</dd></div><div><dt>薪资</dt><dd>{jdJob.salary||'未取得可确认薪资'}</dd></div><div><dt>投递状态</dt><dd>{jdJob.availability_status==='OPEN_LISTED'?'页面显示开放，仍需确认':'仍需官网确认'}</dd></div>{(jdJob.jd_checked_at||jdJob.checked_at)&&<div><dt>核验时间</dt><dd>{jdJob.jd_checked_at||jdJob.checked_at}</dd></div>}</dl>
     <JdResearchContent job={jdJob}/>
-    {!pending&&!provisional&&<p className="hhba-refined-note">推荐顺序为 AI 综合排序，匹配参考分不是唯一排序依据。</p>}
+    {!pending&&!provisional&&<p className="hhba-refined-note">{reportOrder==='score'?'按匹配参考分降序浏览已选岗位；不改变 AI 综合推荐名单。':'推荐顺序为 AI 综合排序，匹配参考分不是唯一排序依据。'}</p>}
     {jdJob.research_detail&&<CuratedJobReport detail={jdJob.research_detail} reference={jdJob.reference_jd_kind==='AI_GENERATED_REFERENCE'}/>}
     <RecruitmentSourceLinks job={jdJob}/>
    </article></>:empty(pending?'正在逐条研究已发现岗位；已取得的 JD 和评分会先展示，完整报告逐份送达。':'本次尚无完成岗位真实性核验和可靠适配报告的推荐，其他AI参考分析保留在搜索记录。')}
