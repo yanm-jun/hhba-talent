@@ -77,3 +77,31 @@ test('managed matching route gates job deltas through authenticated task and exa
  assert.ok(client.includes('job_cursor:completedCursor'));
  assert.ok(client.includes('progress_stamp:lastDeliveryStamp'));
 });
+
+
+test('first independently completed AI report reaches authenticated polling without official JD or global rank',async()=>{
+ const {db,env}=fixture(),candidateRow=candidate(1),target=url(1);
+ const cp={phase:'research',search_mode:'source_pool',source_stop_target:20,final_target:20,
+  rows:[[target,candidateRow]],matches:[],processedEarlier:[],processedEvidence:[]};
+ await reconcileV4JobWork(db,taskKey,0,cp,{now:500});
+ const claim=await claimV4JobWork(db,taskKey,0,'reporting',{now:600,owner:'reference-first'});
+ assert.ok(claim);
+ assert.equal(await finishV4JobWork(db,claim,{now:700}),true);
+ const resultKey=await independentJobKey(taskKey,0,'reporting',claim.job_key,claim.revision);
+ const reference={...scored(1),source_type:'站外招聘职位',jd_source_status:undefined,score_evidence_status:undefined,
+  curated_suitable:true,match_score:86,reference_jd_kind:'AI_GENERATED_REFERENCE',
+  reference_jd:'AI 参考岗位详情',reference_jd_basis:'仅依据岗位方向推断',
+  evidence_score_status:'AI_REFERENCE_JD_SCORED',report_status:'COMPLETE',
+  research_detail:{score_explanation:'简历事实与参考职责逐项对比',comparisons:[]}};
+ const files=new Map([[taskKey,{generation:0,checkpoint:cp}],[resultKey,{kind:'V4_INDEPENDENT_JOB_V1',
+  complete:true,generation:0,lane:'reporting',revision:claim.revision,source_url:target,job:reference}]]);
+ const read=async(_env,key)=>files.get(key)||null;
+ const first=await completedV4JobDeltas(env,taskKey,0,null,{read});
+ assert.equal(first.jobs.length,1,'first reference report arrives while source verification is unfinished');
+ assert.equal(first.jobs[0].report_status,'COMPLETE');
+ assert.equal(first.jobs[0].jd_source_status,undefined);
+ assert.equal((await completedV4JobDeltas(env,taskKey,0,first.cursor,{read})).jobs.length,0);
+ files.set(taskKey,{generation:0,checkpoint:{...cp,rows:[[target,{...candidateRow,requirements:'new revision'}]]}});
+ assert.equal((await completedV4JobDeltas(env,taskKey,0,null,{read})).jobs.length,0,
+  'changing the source revision invalidates a stale reference without leaking it');
+});
