@@ -84,8 +84,33 @@ def exercise(browser, viewport):
     assert not errors,errors
     print('HHBA_GLOBAL_MATCH_BROWSER_PASS',json.dumps({'viewport':viewport,**audit()}))
     page.close()
+def prestart_failure(browser):
+    # Synthetic private-vault response intentionally omits the expected item,
+    # simulating a rejected original-file save BEFORE any AI request starts.
+    page=browser.new_page(viewport={'width':1440,'height':900})
+    errors=[]
+    page.on('pageerror',lambda error:errors.append(str(error)))
+    page.goto('http://127.0.0.1:4173/scripts/qa-global-match-workspace.html')
+    page.locator('#hhba-ai-resume').set_input_files(fixture)
+    preview=page.locator('#hhba-ai-text-preview')
+    expect(preview).to_be_visible(timeout=20000)
+    preview.fill('合成测试简历：负责区域门店运营和销售数据跟踪，培训销售团队并持续改进流程。')
+    page.locator('input[name=hhba-resume-storage][value=save]').check()
+    page.locator('.hhba-ai-consent input').check()
+    page.locator('.hhba-ai-submit').click()
+    expect(page.get_by_text('原文件尚未保存，本次 AI 匹配未启动',exact=False)).to_be_visible(timeout=15000)
+    expect(page.get_by_role('button',name='开始智能匹配')).to_be_enabled()
+    expect(page.locator('.hhba-match-task-dock')).to_have_count(0)
+    expect(page.locator('.hhba-match-modal')).to_have_count(0)
+    assert page.evaluate('window.qaAudit')['requests']==0,'rejected file storage must never make a paid AI request'
+    page.locator('input[name=hhba-resume-storage][value=once]').check()
+    expect(page.get_by_role('button',name='开始智能匹配')).to_be_enabled()
+    assert not errors,errors
+    page.close()
+
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
+    prestart_failure(browser)
     exercise(browser,{'width':1440,'height':900})
     exercise(browser,{'width':390,'height':844})
     browser.close()
