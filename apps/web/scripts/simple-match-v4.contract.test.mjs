@@ -732,7 +732,7 @@ test('V4 excludes an unfamiliar commercial board discovered from the actual page
  await assert.rejects(v4ReadEmployerJob(u,{fetcher:async()=>new Response(html,{headers:{'content-type':'text/html'}})}),/V4_COMMERCIAL_BOARD_EXCLUDED/);
 });
 
-test('curated V4 accepts unrestricted source results and globally ranks 30 evidence-backed reports',async()=>{
+test('curated V4 stops a large discovery wave at 20 sources and completes the admitted reports',async()=>{
  const jobs=Array.from({length:502},(_,i)=>({...row,company:'新企业'+(i+1),title:'区域运营岗位'+(i+1),url:'https://careers.new-employer.cn/roles/'+(i+1),fit_summary:'适合区域运营经验',requirements:'渠道运营和经销商业务流程'}));
  const board={...jobs[0],url:'https://www.zhipin.com/job_detail/123.html'},duplicate={...jobs[0],url:jobs[0].url+'?utm_source=search'},generic={company:'待核实',title:'职位详情待核实',location:'上海',url:'https://careers.new-employer.cn/'};
  let searches=0,deep=0,parsed=0;const readIds=new Set(),scoreIds=new Set(),reportIds=[];
@@ -751,21 +751,24 @@ test('curated V4 accepts unrestricted source results and globally ranks 30 evide
   const id=Number(input.job.title.replace('区域运营岗位',''));
   const score=id===498?99:id===497?98:70;
   if(input.established_score!==undefined){
-   assert.equal(readIds.size,502,'every candidate attempted before reports');assert.equal(scoreIds.size,501,'every available JD scored before reports');
+   assert.equal(readIds.size,20,'only the first 20 admitted candidates are verified');assert.equal(scoreIds.size,20,'all admitted official JDs are scored');
    deep++;reportIds.push(id);assert.equal(input.established_score,score);
    return model(id===497?{suitable:false,reason:'深度核验发现硬性差距'}:{...report,score});
   }
   scoreIds.add(id);return model({suitable:id!==499,score:id===499?40:score,reason:report.reason,resume_quote:report.resume_quote,jd_quote:report.jd_quote,matched:report.matched,gaps:report.gaps});
  };
  const result=await v4Match(fetcher,provider,resume,'全国',{officialOnly:true,curated:true});
- assert.equal(parsed,1);assert.equal(searches,2);
- assert.equal(result.research_report.discovered,502);assert.equal(result.research_report.unresolved_source_count,0);assert.equal(result.research_report.search_mode,'source_pool');assert.equal(result.research_report.candidate_target,undefined);assert.ok(result.research_report.search_source_count>0);assert.equal(result.research_report.final_target,30);assert.equal(result.matches.length,30);
- assert.equal(readIds.size,502);assert.equal(scoreIds.size,501);assert.equal(deep,31);
- assert.equal(reportIds[0],498);assert.equal(reportIds[1],497);
- assert.equal(result.native_search.jd_verification.scored,501);
- assert.equal(result.native_search.jd_verification.eligible,502);
- assert.ok(result.research_leads.some(j=>j.title==='区域运营岗位497'&&j.match_score===98));
- assert.equal(result.matches[0].title,'区域运营岗位498');
+ assert.equal(parsed,1);assert.equal(searches,1,'once 20 sources arrive there must be no backfill search');
+ assert.equal(result.research_report.discovered,20);
+ assert.equal(result.research_report.search_mode,'source_pool');
+ assert.equal(result.research_report.candidate_target,undefined);
+ assert.equal(result.research_report.search_source_count,20);
+ assert.equal(result.research_report.final_target,20);assert.equal(result.matches.length,20);
+ assert.equal(readIds.size,20);assert.equal(scoreIds.size,20);assert.equal(deep,20);
+ assert.equal(reportIds.length,20);
+ assert.equal(result.native_search.jd_verification.scored,20);
+ assert.equal(result.native_search.jd_verification.eligible,20);
+ assert.ok(result.matches.every(j=>!j.excluded_board));
  assert.ok(result.matches.every(j=>j.research_detail?.comparisons?.length&&j.score_evidence_status==='GROUNDED_JD_RESUME_QUOTES'));
  assert.equal(result.can_continue,false);
  assert.equal(result.research_leads.length,471);
@@ -1390,25 +1393,33 @@ test('an incomplete Cloudflare background stream resumes the same checkpoint usi
 });
 
 
-test('source-pool goal has no numeric quota and legacy task continuations preserve their original target',async()=>{
- const {CANDIDATE_TARGET,FINAL_TARGET,PREVIOUS_CANDIDATE_TARGET,PREVIOUS_FINAL_TARGET,LEGACY_CANDIDATE_TARGET,LEGACY_FINAL_TARGET,v4TaskTargets}=await import('../functions/_lib/v4-curated-reports.js');
- assert.deepEqual([CANDIDATE_TARGET,FINAL_TARGET],[null,30]);
+test('new V4 source-pool stops at 20; old 30 and 50 tasks keep their checkpoint contracts',async()=>{
+ const {CANDIDATE_TARGET,FINAL_TARGET,SOURCE_STOP_TARGET,PREVIOUS_CANDIDATE_TARGET,PREVIOUS_FINAL_TARGET,LEGACY_CANDIDATE_TARGET,LEGACY_FINAL_TARGET,v4TaskTargets,v4SourceStopReached}=await import('../functions/_lib/v4-curated-reports.js');
+ assert.deepEqual([CANDIDATE_TARGET,FINAL_TARGET,SOURCE_STOP_TARGET],[null,20,20]);
  assert.deepEqual([PREVIOUS_CANDIDATE_TARGET,PREVIOUS_FINAL_TARGET],[300,30]);
  assert.deepEqual([LEGACY_CANDIDATE_TARGET,LEGACY_FINAL_TARGET],[500,50]);
- assert.deepEqual(v4TaskTargets(null),{candidateTarget:null,finalTarget:30,sourceDriven:true});
+ assert.deepEqual(v4TaskTargets(null),{candidateTarget:null,finalTarget:20,sourceDriven:true,sourceStopTarget:20});
+ for(const [sourceCount,candidateCount,expected] of [[19,19,false],[20,0,true],[0,20,true],[21,25,true]])assert.equal(v4SourceStopReached({sourceDriven:true,sourceStopTarget:20,sourceCount,candidateCount}),expected);
+ assert.equal(v4SourceStopReached({sourceDriven:true,sourceStopTarget:null,sourceCount:500,candidateCount:500}),false);
+ assert.equal(v4SourceStopReached({sourceDriven:false,sourceStopTarget:20,sourceCount:50,candidateCount:50}),false);
+ const newPool={phase:'research',round:1,search_mode:'source_pool',final_target:20,source_stop_target:20};
+ for(const phase of ['research','verification','reporting'])assert.deepEqual(v4TaskTargets({...newPool,phase}),{candidateTarget:null,finalTarget:20,sourceDriven:true,sourceStopTarget:20});
  const pool={phase:'research',round:2,rows:[],search_mode:'source_pool',candidate_target:null,final_target:30};
  for(const phase of ['research','verification','reporting'])
-  assert.deepEqual(v4TaskTargets({...pool,phase}),{candidateTarget:null,finalTarget:30,sourceDriven:true});
- assert.deepEqual(v4TaskTargets({phase:'research',round:5,rows:[],candidate_target:300,final_target:30}),{candidateTarget:300,finalTarget:30,sourceDriven:false});
+  assert.deepEqual(v4TaskTargets({...pool,phase}),{candidateTarget:null,finalTarget:30,sourceDriven:true,sourceStopTarget:null});
+ assert.deepEqual(v4TaskTargets({phase:'research',round:5,rows:[],candidate_target:300,final_target:30}),{candidateTarget:300,finalTarget:30,sourceDriven:false,sourceStopTarget:null});
  for(const phase of ['research','verification','reporting']){
-  assert.deepEqual(v4TaskTargets({phase,round:15,rows:[['https://employer.test/job/1',{}]]}),{candidateTarget:500,finalTarget:50,sourceDriven:false},'older jobs must retain the original candidate and report targets');
+  assert.deepEqual(v4TaskTargets({phase,round:15,rows:[['https://employer.test/job/1',{}]]}),{candidateTarget:500,finalTarget:50,sourceDriven:false,sourceStopTarget:null},'older jobs must retain the original candidate and report targets');
  }
- assert.deepEqual(v4TaskTargets({phase:'reporting',candidate_target:500,final_target:50}),{candidateTarget:500,finalTarget:50,sourceDriven:false});
+ assert.deepEqual(v4TaskTargets({phase:'reporting',candidate_target:500,final_target:50}),{candidateTarget:500,finalTarget:50,sourceDriven:false,sourceStopTarget:null});
  const source=readFileSync(new URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
- assert.match(source,/checkpoint:\{phase,search_mode:sourceDriven\?'source_pool':'candidate_target',candidate_target:candidateTarget,final_target:finalTarget,/);
+ assert.match(source,/checkpoint:\{phase,search_mode:sourceDriven\?'source_pool':'candidate_target',candidate_target:candidateTarget,final_target:finalTarget,source_stop_target:sourceStopTarget,/);
  assert.match(source,/search_mode:sourceDriven\?'source_pool':'candidate_target'/);
  assert.match(source,/search_source_count:observedSearchSources.size/);
- assert.match(source,/不设来源数或候选岗位数量目标/);
+ assert.match(source,/达到20条检索来源或20个候选的停止目标/);
+ assert.match(source,/if\(sourceStopReached\(\)\)/);
+ assert.match(source,/const needsReview=!sourceStopReached\(\)/);
+ assert.match(source,/can_continue:allowContinue&&!sourceStopReached\(\)/);
  assert.match(source,/生成最多'\+finalTarget\+'份详细报告/);
  assert.match(source,/final.length<finalTarget/);
  assert.doesNotMatch(source,/目标为500个去重/);
