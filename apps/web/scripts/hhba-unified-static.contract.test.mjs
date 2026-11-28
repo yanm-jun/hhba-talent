@@ -74,7 +74,7 @@ test('all career and vision pages are linked, original four cards are on join pa
  assert.match(css,/\.join-vision-opening\{/);
  assert.match(css,/\.join-vision-navigation\{/);
 });
-test('founder manifesto untouched and includes two authentic original image files',()=>{
+test('founder manifesto retains original image assets and uses the current traced signature',()=>{
  for(const text of ['让劳动更有尊严，让商业更有温度','每一份简历背后，都是一个认真生活的人。','求职者可以不被录用，但不应该被欺骗；','让劳动获得尊严，让招聘回归诚信。'])
    assert.ok(join.includes(text),'founder letter missing '+text);
  for(const image of ['hhba-founder-signature.webp','hhba-join-team.webp']){
@@ -84,8 +84,15 @@ test('founder manifesto untouched and includes two authentic original image file
    assert.equal(bytes.toString('ascii',0,4),'RIFF');
    assert.equal(bytes.toString('ascii',8,12),'WEBP');
    assert.ok(bytes.length>12000,image);
-   assert.ok(join.includes(image),'join missing image '+image);
+   if(image==='hhba-join-team.webp')assert.ok(join.includes(image),'join missing image '+image);
  }
+ const signature='hhba-founder-signature-2026.svg';
+ assert.ok(join.includes(signature),'current founder signature must be displayed');
+ const traced=readFileSync(new URL('../public/images/'+signature,import.meta.url),'utf8');
+ assert.match(traced,/<svg\b[^>]*viewBox="0 0 1301 691"/);
+ assert.match(traced,/Vector traced from the original signature photograph/);
+ assert.match(traced,/<path\s+d="M/);
+ assert.doesNotMatch(traced,/<script\b|<foreignObject\b|<image\b/i);
  assert.ok(!vision.includes('每一份简历背后，都是一个认真生活的人。'));
 });
 test('early partner application never fakes success, handles API errors and discloses venture stage',()=>{
@@ -98,7 +105,9 @@ test('early partner application never fakes success, handles API errors and disc
  assert.ok(submit.indexOf('if (!res.ok || !data?.ok)')<submit.indexOf('setSubmitted(true)'),'Success must only occur after server confirms');
  assert.ok(submit.includes('提交失败，请检查网络后重试。'),'Offline or missing API must display failure');
  assert.ok(submit.includes('form.acknowledged'),'Applicant must explicitly acknowledge stage disclosure');
- assert.ok(join.includes('尚未完成公司设立和融资'),'Business phase disclosure must be visible');
- assert.ok(join.includes('现阶段合作应先协商工作范围'),'No implied guaranteed employment terms');
+ assert.ok(join.includes('仍在创业筹备阶段，公司尚未完成设立，目前也没有稳定的薪资预算'),'Business phase disclosure must be visible');
+ assert.ok(join.includes('工作范围、知识产权与退出安排，将在合作前充分协商并依法书面落实'),'No implied guaranteed employment terms');
+ assert.ok(join.includes('协议生效前并不代表已经取得股份'));
+ assert.ok(join.includes('若实际形成劳动关系，我们仍会依法支付工资并履行法定保障'));
  assert.match(css,/prefers-reduced-motion/);
 });
