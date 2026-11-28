@@ -41,10 +41,6 @@ function OfficialApplyAction({job}:{job:MatchedJob}){
  if(!href)return null;
  return <a className="hhba-discovery-apply" data-hhba-recruitment-outbound="true" href={href} target="_blank" rel="noopener noreferrer" aria-label={label+' · '+job.company+' · '+(job.title_zh||job.title)}>{label}<ArrowUpRight size={13} aria-hidden="true"/></a>;
 }
-function OfficialLink({job}:{job:MatchedJob}){
- const href=officialApplicationHref(job);
- return href?<a className="hhba-refined-source-link" data-hhba-recruitment-outbound="true" href={href} target="_blank" rel="noopener noreferrer">投递官网 <ArrowUpRight size={13}/></a>:null;
-}
 export function ReportPager({count,index,onChange,pending=false,inline=false}:{count:number;index:number;onChange:(i:number)=>void;pending?:boolean;inline?:boolean}){
  const anchor=useRef<HTMLDivElement>(null);
  const [modal,setModal]=useState<HTMLElement|null>(null);
@@ -122,17 +118,10 @@ export function MatchResearchPanels({profile,report,jobs,officialJobs,pending=fa
  const arrivalSet=new Set(arrival);
  const recent=[...arrival.map(u=>byUrl.get(u)).filter((j):j is MatchedJob=>!!j),...all.filter(j=>!arrivalSet.has(j.official_url))].slice(-3).reverse();
  const identified=!!(parsed&&(parsed.summary||parsed.facts?.length||parsed.skills?.length||parsed.target_roles?.length||parsed.education));
- // The candidate event can precede the aggregate report. Count actual received
- // candidate rows immediately; final history still uses the authoritative total.
- const discovered=pending?Math.max(report?.discovered??0,jobs.length):report?.discovered??all.length;
- // New tasks count actual search sources, not a synthetic 300-candidate quota.
- // Existing 300→30 and 500→50 checkpoints keep their original targets.
+ // Research totals come from actual backend events, never provider-call counts.
  const sourceDriven=report?.search_mode==='source_pool'||!report;
  const sourceCount=report?.search_source_count??0;
- const mainCount=sourceDriven?sourceCount:discovered;
- const target=sourceDriven?undefined:report?.candidate_target;
  const searching=pending&&actual===1;
- const ratio=target?Math.max(0,Math.min(100,discovered/target*100)):0;
  const companies=new Set(all.map(j=>j.company.trim()).filter(x=>x&&!/待核实|未知/.test(x))).size;
  const visible=all.filter(j=>[j.company,j.title,j.title_zh||'',j.location].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
  const verified=all.filter(confirmed);
