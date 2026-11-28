@@ -71,7 +71,8 @@ test('workbench no longer claims a past match implies a saved original file',()=
 
 test('failed pre-registration upload releases phantom research state and allows retry without pretending AI ran',()=>{
  const run=page.slice(page.indexOf(' async function run()'),page.indexOf(' async function continueSearch()'));
- assert.match(run,/const registered=!!sessionTask\.current\|\|!!pendingStart\.current/);
+ assert.match(run,/const registered=researchStarted\|\|!!sessionTask\.current\|\|!!pendingStart\.current/);
+ assert.match(run,/researchStarted=true;[\s\S]*const matched=await submitExtractedResumeText\(/,'an actual AI request must retain genuine failure handling');
  assert.match(run,/if\(!registered\)\{taskOpen\.current=false;setTaskFailure\(false\);\}/);
  assert.match(run,/else setTaskFailure\(true\)/,'only a potentially registered server task can appear as interrupted');
  assert.match(run,/setError\(e instanceof Error\?e\.message/,'show the actual upload or API error in the form');
