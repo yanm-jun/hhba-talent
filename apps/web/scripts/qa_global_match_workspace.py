@@ -1,5 +1,5 @@
 """Actual matcher and body portal in desktop and mobile Chromium, no real AI."""
-import io,json,zipfile
+import io,json,zipfile,base64
 from playwright.sync_api import sync_playwright,expect
 
 doc=io.BytesIO()
@@ -108,9 +108,51 @@ def prestart_failure(browser):
     assert not errors,errors
     page.close()
 
+def duplicate_resume_choice(browser,viewport):
+    page=browser.new_page(viewport=viewport)
+    errors=[]
+    page.on('pageerror',lambda error:errors.append(str(error)))
+    page.goto('http://127.0.0.1:4173/scripts/qa-global-match-workspace.html')
+    payload=base64.b64encode(doc.getvalue()).decode('ascii')
+    page.evaluate('(payload)=>window.qaEnableDuplicate(payload)',payload)
+    expect(page.locator('.hhba-ai-saved-picker-trigger')).to_be_visible(timeout=15000)
+    page.locator('#hhba-ai-resume').set_input_files(fixture)
+    dialog=page.get_by_role('alertdialog',name='检测到重复简历')
+    expect(dialog).to_be_visible(timeout=15000)
+    expect(dialog.get_by_text('synthetic.docx')).to_be_visible()
+    expect(dialog.get_by_text('之前保存的简历.docx')).to_be_visible()
+    assert page.evaluate('window.qaAudit.requests')==0,'duplicate check cannot start a paid AI task'
+    assert page.evaluate('window.qaDuplicateAudit().uploads')==0,'duplicate check cannot upload the original'
+    dialog.get_by_role('button',name='取消本次上传').click()
+    expect(dialog).to_have_count(0)
+    expect(page.get_by_text('已取消本次重复上传',exact=False)).to_be_visible()
+    assert page.evaluate('window.qaAudit.requests')==0
+    assert page.evaluate('window.qaDuplicateAudit().uploads')==0
+    page.locator('#hhba-ai-resume').set_input_files(fixture)
+    dialog=page.get_by_role('alertdialog',name='检测到重复简历')
+    expect(dialog).to_be_visible(timeout=15000)
+    dialog.get_by_role('button',name='使用已保存的简历').click()
+    expect(dialog).to_have_count(0)
+    expect(page.get_by_text('无需重复保存',exact=False)).to_be_visible()
+    expect(page.locator('#hhba-ai-text-preview')).to_be_visible(timeout=15000)
+    expect(page.locator('.hhba-ai-consent input')).to_be_enabled()
+    assert page.evaluate('window.qaDuplicateAudit().uploads')==0
+    page.locator('.hhba-ai-consent input').check()
+    expect(page.get_by_role('button',name='开始智能匹配')).to_be_enabled()
+    page.get_by_role('button',name='开始智能匹配').click()
+    expect(page.get_by_role('button',name='最小化研究窗口')).to_be_visible(timeout=10000)
+    assert page.evaluate('window.qaAudit.requests')==1
+    page.evaluate('window.qaComplete()')
+    expect(page.get_by_role('button',name='完成查看')).to_be_visible()
+    assert not errors,errors
+    print('HHBA_DUPLICATE_CHOICE_BROWSER_PASS',json.dumps({'viewport':viewport,**page.evaluate('window.qaDuplicateAudit()')}))
+    page.close()
+
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True,args=['--no-sandbox'])
     prestart_failure(browser)
+    duplicate_resume_choice(browser,{'width':1440,'height':900})
+    duplicate_resume_choice(browser,{'width':390,'height':844})
     exercise(browser,{'width':1440,'height':900})
     exercise(browser,{'width':390,'height':844})
     browser.close()

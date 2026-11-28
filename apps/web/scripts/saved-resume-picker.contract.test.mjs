@@ -52,7 +52,9 @@ test('a saved resume is chosen with no duplicate upload, closes the list and cle
 test('existing deep-linked resume and local new upload still work independently',()=>{
  assert.match(match,/deepLinkPending=useRef/);
  assert.match(match,/setSavedId\(requested\)/);
- assert.match(match,/setFile\(candidate\);\s+void preview\(candidate\)/);
+ assert.match(match,/setFile\(candidate\);[\s\S]*checkPrivateResumeDuplicate\(candidate,abort\.signal\)/,'new uploads are checked for existing originals before preview');
+ assert.match(match,/if\(existing\)\{setDuplicateReview\(\{candidate,existing\}\);return;\}/,'duplicates require user choice, not implicit reuse');
+ assert.match(match,/void preview\(candidate\)/,'non-duplicates still preview locally');
  assert.match(match,/setSavedPickerOpen\(false\);\s+previewController\.current\?\.abort/);
  assert.match(match,/id="hhba-ai-resume"/);
  assert.match(match,/onDrop=\{\(e:DragEvent<HTMLLabelElement>\)=>\{e\.preventDefault\(\);setDrag\(false\);choose\(e\.dataTransfer\.files\?\.\[0\]\|\|null\)\}\}/);

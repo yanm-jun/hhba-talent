@@ -9,6 +9,24 @@ import type {User} from '../src/services/api';
 import '../src/styles.css';
 
 const audit={requests:0,aborted:0,finished:0};
+const storedResumeId='11111111-1111-4111-8111-111111111111';
+const storedResumeName='之前保存的简历.docx';
+let storedBytes:Uint8Array|null=null;
+let storedHash='';
+let duplicateChecks=0,privateUploads=0;
+const storedResume=()=>storedBytes?{id:storedResumeId,name:storedResumeName,
+ type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+ size:storedBytes.byteLength,createdAt:'2026-11-20T08:00:00.000Z'}:null;
+Object.assign(window,{
+ qaDuplicateAudit:()=>({checks:duplicateChecks,uploads:privateUploads}),
+ qaEnableDuplicate:async(encoded:string)=>{
+  const decoded=atob(encoded);
+  storedBytes=Uint8Array.from(decoded,char=>char.charCodeAt(0));
+  const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',storedBytes));
+  storedHash=Array.from(digest,x=>x.toString(16).padStart(2,'0')).join('');
+  window.dispatchEvent(new Event('hhba:private-resumes-changed'));
+ }
+});
 const profile={education:null,education_evidence:null,experience_years:2,experience_evidence:null,skills:[],target_roles:['运营督导'],warnings:[],summary:'虚构测试资料'};
 let complete:((fail?:boolean)=>void)|undefined;
 Object.assign(window,{qaAudit:audit,qaComplete:(fail=false)=>complete?.(fail)});
@@ -16,7 +34,18 @@ const realFetch=window.fetch.bind(window);
 const reply=(data:unknown,status=200)=>new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json'}});
 window.fetch=async (input,init)=>{
  const url=String(input);
- if(url==='/api/resumes')return reply({kind:'HHBA_PRIVATE_RESUME_VAULT_V1',items:[]});
+ if(url==='/api/resumes/check'){
+  duplicateChecks++;
+  const check=JSON.parse(String(init?.body||'{}'));
+  return reply({kind:'HHBA_PRIVATE_RESUME_DUPLICATE_CHECK_V1',
+   existing:storedBytes&&check.sha256===storedHash&&check.size===storedBytes.byteLength?storedResume():null});
+ }
+ if(url==='/api/resumes'&&init?.method==='POST'){privateUploads++;return reply({error:'UNEXPECTED_PRIVATE_UPLOAD_IN_QA'},500);}
+ if(url==='/api/resumes')return reply({kind:'HHBA_PRIVATE_RESUME_VAULT_V1',items:storedResume()?[storedResume()]:[]});
+ if(url==='/api/resumes/'+storedResumeId+'/download'&&storedBytes){
+  return new Response(new Uint8Array(storedBytes),{headers:{
+   'Content-Type':'application/octet-stream','Content-Length':String(storedBytes.byteLength)}});
+ }
  if(url.endsWith('/status')&&url.includes('/api/match'))return reply({kind:'HHBA_NATIVE_WEB_MATCH_V1',enabled:true});
  if(url.includes('/api/match')&&url.endsWith('/resume')){
   audit.requests++;

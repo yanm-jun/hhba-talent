@@ -56,6 +56,38 @@ export async function listPrivateResumes():Promise<PrivateResume[]>{
   throw Error('简历列表响应异常。');
  return data.items;
 }
+/**
+ * Compare a locally computed fingerprint with originals in THIS authenticated
+ * account. This sends no resume bytes, does not save a file, and does not
+ * authorize AI analysis. SHA-256 is scoped to the user's private-vault lookup.
+ */
+export async function checkPrivateResumeDuplicate(file:File,signal?:AbortSignal):Promise<PrivateResume|null>{
+ if(!privateResumeAvailable)throw Error('简历服务暂未启用，请稍后再试。');
+ if(!/\.(?:pdf|docx)$/i.test(file.name)||file.size<30||file.size>PRIVATE_RESUME_LIMIT)return null;
+ if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+ const digest=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());
+ if(signal?.aborted)throw new DOMException('Cancelled','AbortError');
+ const sha256=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
+ const response=await fetch(API+'/check',{
+  method:'POST',
+  headers:{Authorization:'Bearer '+token(),'Content-Type':'application/json'},
+  body:JSON.stringify({sha256,size:file.size}),
+  credentials:'same-origin',cache:'no-store',signal,
+ });
+ if(!response.ok){
+  const payload=await response.json().catch(()=>null) as {error?:string}|null;
+  throw Error(errors[payload?.error||'']||'暂时无法检查重复简历，请重试或仅用于本次匹配。');
+ }
+ const data=await response.json().catch(()=>null) as {kind?:string;existing?:PrivateResume|null}|null;
+ if(data?.kind!=='HHBA_PRIVATE_RESUME_DUPLICATE_CHECK_V1'||
+  !Object.prototype.hasOwnProperty.call(data,'existing')||
+  (data.existing!==null&&
+   (typeof data.existing?.id!=='string'||
+    !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(data.existing.id))))
+  throw Error('重复简历检查响应异常，请重试或仅用于本次匹配。');
+ return data.existing||null;
+}
+
 export async function uploadPrivateResume(file:File,consent:boolean):Promise<PrivateResume>{
  if(!consent)throw Error('请先确认本次简历私有存储授权。');
  if(!/\.(pdf|docx)$/i.test(file.name)||file.size<30||file.size>PRIVATE_RESUME_LIMIT)

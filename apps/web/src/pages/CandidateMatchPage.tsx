@@ -5,7 +5,7 @@ import type {User} from '../services/api';
 import {Link} from '../router';
 import {listSavedWordVersions,wordSourceBytes,type SavedWordVersion} from '../services/originalWordApi';
 import {CandidateMatchNativeDialog} from '../components/CandidateMatchNativeDialog';
-import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,type PrivateResume} from '../services/privateResumes';
+import {listPrivateResumes,privateResumeAvailable,fetchPrivateResumeForLocalReview,uploadPrivateResume,checkPrivateResumeDuplicate,PRIVATE_RESUME_LIMIT,type PrivateResume} from '../services/privateResumes';
 import {linkMatchHistoryResume} from '../services/matchHistory';
 import {getRealAuthToken} from '../services/realAuth';
 import {matchServiceReady,submitExtractedResumeText,inspectResumeTextLocally,recognizeResumeDocument,resumeFileFormat,resumeMatchFileLimit,redactResumeTextLocally,type MatchResponse,type MatchResearchReport,type MatchedJob,type MatchOptions,type NativeMatchActivity,type NativeMatchProgress,type MatchExecution} from '../services/resumeMatch';
@@ -39,6 +39,11 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const [saveNotice,setSaveNotice]=useState('');
  // The user chooses whether the ORIGINAL binary should be retained.
  const [storageChoice,setStorageChoice]=useState<'undecided'|'save'|'once'>('undecided');
+ const [duplicateChecking,setDuplicateChecking]=useState(false);
+ const [duplicateReview,setDuplicateReview]=useState<{candidate:File;existing:PrivateResume}|null>(null);
+ const [duplicateCheckError,setDuplicateCheckError]=useState('');
+ const duplicateCheckController=useRef<AbortController|null>(null);
+ const duplicateCancelRef=useRef<HTMLButtonElement|null>(null);
  const [drag,setDrag]=useState(false);
  const [consent,setConsent]=useState(false);
  const [availability,setAvailability]=useState<'loading'|'ready'|'disabled'>('loading');
@@ -65,6 +70,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
  const controller=useRef<AbortController|null>(null);
  const lastSearch=useRef<{text:string;options:MatchOptions;resumeId?:string}|null>(null);
  const identifiedCharacters=redactResumeTextLocally(previewText).replace(/\s/g,'').length;
+ useEffect(()=>{if(duplicateReview)duplicateCancelRef.current?.focus();},[duplicateReview]);
+ useEffect(()=>()=>{duplicateCheckController.current?.abort();},[]);
  useEffect(()=>{
   const abort=new AbortController();
   void matchServiceReady(abort.signal).then(ok=>{if(!abort.signal.aborted)setAvailability(ok?'ready':'disabled')});
@@ -132,9 +139,11 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   }catch(e){if(!abort.signal.aborted)setVaultError(e instanceof Error?e.message:'无法读取优化版本，请重新选择。');}
   finally{if(wordVersionRequest.current===abort){wordVersionRequest.current=null;setWordVersionBusy(false);}}
  }
- function selectSavedResume(id:string){
+ function selectSavedResume(id:string,known?:PrivateResume){
   if(working||saveBusy||taskOpen.current)return;
   wordVersionRequest.current?.abort();wordVersionRequest.current=null;setWordVersionBusy(false);
+  duplicateCheckController.current?.abort();duplicateCheckController.current=null;
+  setDuplicateChecking(false);setDuplicateCheckError('');setDuplicateReview(null);
   deepLinkPending.current=null;
   previewController.current?.abort();
   setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
@@ -142,12 +151,14 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   setSavedId(id);setFile(null);setResult(null);setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);setOptimizationSource('');
   setError('');setSaveConsent(false);setSaveNotice('');
   setStorageChoice('undecided');setSavedPickerOpen(false);
-  const entry=savedFiles.find(item=>item.id===id);
+  const entry=known||savedFiles.find(item=>item.id===id);
   if(entry)void preview(entry);
  }
  function choose(candidate:File|null){
   if(working||saveBusy||taskOpen.current)return;
   wordVersionRequest.current?.abort();wordVersionRequest.current=null;setWordVersionBusy(false);
+  duplicateCheckController.current?.abort();duplicateCheckController.current=null;
+  setDuplicateReview(null);setDuplicateChecking(false);setDuplicateCheckError('');
   deepLinkPending.current=null;
   setSavedPickerOpen(false);
   previewController.current?.abort();setPreviewText('');setPreviewLoaded(false);setPreviewError('');setConsent(false);
@@ -158,10 +169,43 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   if(!candidate){setFile(null);return}
   const format=resumeFileFormat(candidate.name);
   if(!format||candidate.size<30||candidate.size>resumeMatchFileLimit(format)){
-    setFile(null);setError('文件超过当前解析容量：Word 12 MB，V4 PDF 64 MB。');return;
+   setFile(null);setError('文件超过当前解析容量：Word 12 MB，V4 PDF 64 MB。');return;
   }
   setFile(candidate);
+  // A file is not accepted for private storage until the user resolves a
+  // duplicate decision. The server sees only the local SHA-256 and size.
+  // Documents too large for the private vault cannot be duplicates there.
+  if(privateResumeAvailable&&!!getRealAuthToken()&&candidate.size<=PRIVATE_RESUME_LIMIT){
+   const abort=new AbortController();duplicateCheckController.current=abort;
+   setDuplicateChecking(true);
+   void checkPrivateResumeDuplicate(candidate,abort.signal).then(existing=>{
+    if(abort.signal.aborted)return;
+    if(existing){setDuplicateReview({candidate,existing});return;}
+    void preview(candidate);
+   }).catch(e=>{
+    if(abort.signal.aborted)return;
+    setDuplicateCheckError('重复简历检查暂时不可用，请重新检测，或选择「仅用于本次匹配」继续。');
+    void preview(candidate);
+   }).finally(()=>{
+    if(duplicateCheckController.current===abort){
+     duplicateCheckController.current=null;setDuplicateChecking(false);
+    }
+   });
+   return;
+  }
   void preview(candidate);
+ }
+ function useAlreadySavedResume(){
+  const match=duplicateReview?.existing;
+  if(!match)return;
+  setSavedFiles(all=>all.some(item=>item.id===match.id)?all:[match,...all]);
+  selectSavedResume(match.id,match);
+  setSaveNotice('已选择账户中保存的「'+match.name+'」，无需重复保存。你仍可以正常进行 AI 岗位匹配。');
+ }
+ function cancelDuplicateUpload(){
+  if(!duplicateReview)return;
+  choose(null);
+  setSaveNotice('已取消本次重复上传。原来保存的简历没有修改或删除。');
  }
  async function preview(source:File|PrivateResume){
   previewController.current?.abort();
@@ -210,7 +254,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   }
  }
  async function saveResume(){
-  if(!file||savedId||!saveConsent||saveBusy||!user||!getRealAuthToken())return;
+  if(!file||savedId||!saveConsent||saveBusy||duplicateChecking||duplicateReview||duplicateCheckError||!user||!getRealAuthToken())return;
   setSaveBusy(true);setSaveNotice('');
   try{
    const item=await uploadPrivateResume(file,true);
@@ -287,9 +331,9 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
   finally{closingTask.current=false;}
  }
  async function run(){
-  if((!file&&!savedId)||!consent||working||saveBusy||checkingTask||wordVersionBusy||taskOpen.current||controller.current||previewBusy||ocrBusy||!previewLoaded||
+  if((!file&&!savedId)||!consent||working||saveBusy||checkingTask||wordVersionBusy||duplicateChecking||duplicateReview||taskOpen.current||controller.current||previewBusy||ocrBusy||!previewLoaded||
    identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()||
-   (file&&!savedId&&storageChoice==='undecided'))return;
+   (file&&!savedId&&(storageChoice==='undecided'||(storageChoice==='save'&&!!duplicateCheckError))))return;
   taskOpen.current=true;setTaskFailure(false);setRestoringTask(false);
   setWorking(true);setStage('preparing');setActivity(null);setExecution(null);setError('');setResult(null);setOptimizationSource('');setPartialJobs([]);setResearchReport(undefined);setResearchJobs([]);
   const abort=new AbortController();
@@ -462,7 +506,7 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
         </div>}
         {user&&privateResumeAvailable&&vaultError&&<p className="hhba-ai-vault-error" role="status">{vaultError}</p>}
         {!getRealAuthToken()&&<p className="hhba-ai-service-check">AI 简历匹配需要先 <Link to="/candidate/login?next=%2Fcandidate%2Fmatch">登录 HHBA 求职账号</Link>。</p>}
-        <input id="hhba-ai-resume" className="sr-only" type="file" accept={supportedTypes} disabled={working||saveBusy}
+        <input id="hhba-ai-resume" className="sr-only" type="file" accept={supportedTypes} disabled={working||saveBusy||duplicateChecking}
           onChange={(e:ChangeEvent<HTMLInputElement>)=>{choose(e.target.files?.[0]||null);e.target.value='';}}/>
         <label htmlFor="hhba-ai-resume" className={'hhba-ai-drop '+(drag?'dragging':'')}
           onDragOver={(e:DragEvent<HTMLLabelElement>)=>{e.preventDefault();setDrag(true)}}
@@ -472,6 +516,11 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
           <strong>{file?file.name:savedId?'或上传一份新简历，替换当前选择':'点击选择文件，或将简历拖到这里'}</strong>
           <span>{file?(file.size/1024/1024).toFixed(2)+' MB':'PDF 或 DOCX'}</span>
         </label>
+        {duplicateChecking&&<p className="hhba-ai-service-check" role="status"><LoaderCircle size={16} className="spin"/>正在检查这份简历是否已保存，不会上传文件或启动 AI。</p>}
+        {duplicateCheckError&&file&&<div className="hhba-ai-duplicate-check-error" role="status">
+         <span>{duplicateCheckError} 检测未完成时，暂不允许选择「保存到我的简历」。</span>
+         <button type="button" onClick={()=>choose(file)}>重新检测</button>
+        </div>}
         {(file||savedId)&&<div className="hhba-ai-review-tools">
          {previewBusy&&<p role="status">正在读取简历文字…</p>}
          {ocrBusy&&<p role="status"><LoaderCircle className="spin" size={15}/> 正在识别文档文字…</p>}
@@ -496,11 +545,11 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
            重新读取简历
          </button>}
         </div>}
-        {file&&!savedId&&<fieldset className="hhba-ai-storage-choice" disabled={working||saveBusy}>
+        {file&&!savedId&&<fieldset className="hhba-ai-storage-choice" disabled={working||saveBusy||duplicateChecking||!!duplicateReview}>
          <legend>这份简历，是否保存到「我的简历」？</legend>
          <label className={storageChoice==='save'?'is-selected':''}>
           <input type="radio" name="hhba-resume-storage" value="save"
-           checked={storageChoice==='save'} disabled={file.size>3*1024*1024} onChange={()=>setStorageChoice('save')}/>
+           checked={storageChoice==='save'} disabled={file.size>3*1024*1024||!!duplicateCheckError} onChange={()=>setStorageChoice('save')}/>
           <span><strong>保存到我的简历</strong><small>匹配前私有保存原 PDF/DOCX（目前单份 3 MB、最多 3 份），今后可直接选择复用。</small></span>
          </label>
          <label className={storageChoice==='once'?'is-selected':''}>
@@ -528,8 +577,8 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
         </label>
         {error&&<p className="hhba-ai-error" role="alert"><XCircle size={17}/>{error}</p>}
         <button className="hhba-ai-submit" type="button" onClick={()=>void run()}
-          disabled={(!file&&!savedId)||!consent||working||saveBusy||checkingTask||wordVersionBusy||taskOpen.current||previewBusy||ocrBusy||!previewLoaded||
-           (file&&!savedId&&storageChoice==='undecided')||
+          disabled={(!file&&!savedId)||!consent||working||saveBusy||checkingTask||wordVersionBusy||duplicateChecking||!!duplicateReview||taskOpen.current||previewBusy||ocrBusy||!previewLoaded||
+           (file&&!savedId&&(storageChoice==='undecided'||(storageChoice==='save'&&!!duplicateCheckError)))||
            identifiedCharacters<30||availability!=='ready'||!getRealAuthToken()}>
           {working?<><LoaderCircle className="spin" size={18}/> {saveBusy?'正在保存简历…':'正在匹配岗位…'}</>:
            <><BriefcaseBusiness size={17}/> 开始智能匹配 <ArrowRight size={17}/></>}
@@ -557,13 +606,32 @@ export function CandidateMatchPage({user,embedded=false,hosted=false,hostRoute}:
       sourceText={optimizationSource||undefined}
       sourceResume={savedId?savedFiles.find(item=>item.id===savedId&&/\.docx$/i.test(item.name)):undefined}
       accountScope={String(user?.id||'')}
-      resumeStorage={result&&file&&!savedId&&/\.docx$/i.test(file.name)?{
+      resumeStorage={result&&file&&!savedId&&!duplicateCheckError&&!duplicateChecking&&!duplicateReview&&/\.docx$/i.test(file.name)?{
         available:true,saved:false,consent:saveConsent,saving:saveBusy,
         notice:saveNotice,onConsent:setSaveConsent,onSave:()=>void saveResume()
        }:result&&savedId?{available:false,saved:true,consent:false,saving:false,
         notice:saveNotice,onConsent:()=>{},onSave:()=>{}}:undefined}
       onClose={()=>void closeMatch()}
        onTerminate={()=>void closeMatch(true)}/>}
+    {duplicateReview&&<div className="hhba-ai-duplicate-overlay" role="presentation">
+     <div className="hhba-ai-duplicate-dialog" role="alertdialog" aria-modal="true"
+      aria-labelledby="hhba-duplicate-title" aria-describedby="hhba-duplicate-description"
+      onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();cancelDuplicateUpload();}}}>
+      <div className="hhba-ai-duplicate-icon"><FileText size={22} aria-hidden="true"/></div>
+      <h2 id="hhba-duplicate-title">检测到重复简历</h2>
+      <p id="hhba-duplicate-description">你上传的文件与当前账户已保存的一份简历内容完全相同，无需再次保存。请选择如何处理本次上传。</p>
+      <div className="hhba-ai-duplicate-files">
+       <div><span>本次上传</span><strong>{duplicateReview.candidate.name}</strong></div>
+       <div><span>已保存的简历</span><strong>{duplicateReview.existing.name}</strong>
+        <small>{duplicateReview.existing.createdAt.slice(0,10)} 保存</small></div>
+      </div>
+      <div className="hhba-ai-duplicate-actions">
+       <button type="button" className="hhba-ai-duplicate-use" onClick={useAlreadySavedResume}>使用已保存的简历</button>
+       <button ref={duplicateCancelRef} type="button" className="hhba-ai-duplicate-cancel" onClick={cancelDuplicateUpload}>取消本次上传</button>
+      </div>
+      <p className="hhba-ai-duplicate-footnote">无论选择哪一项，都不会删除原简历，也不会自动启动 AI 匹配。</p>
+     </div>
+    </div>}
      <div className="hhba-ai-footer"><Link to="/candidate/jobs">不上传简历，直接搜索公开岗位 <ArrowRight size={15}/></Link></div>
   </section>
  </Shell>;

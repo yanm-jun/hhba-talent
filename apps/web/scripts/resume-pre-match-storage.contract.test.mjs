@@ -15,7 +15,7 @@ test('original file retention is a separate explicit choice, not a side effect o
  assert.match(page,/checked=\{storageChoice==='save'\}/);
  assert.match(page,/checked=\{storageChoice==='once'\}/);
  assert.match(page,/name="hhba-resume-storage" value="save"[\s\S]{0,160}onChange=\{\(\)=>setStorageChoice\('save'\)\}/);
- assert.match(page,/file&&!savedId&&storageChoice==='undecided'/);
+ assert.match(page,/file&&!savedId&&\(storageChoice==='undecided'\|\|\(storageChoice==='save'&&!!duplicateCheckError\)\)/,'upload requires deliberate storage choice; failed duplicate checks forbid saving');
  assert.match(page,/checked=\{consent\}/,'AI analysis authorization remains independent');
  assert.match(page,/onChange=\{e=>setConsent\(e.target.checked\)\}/);
 });
@@ -87,4 +87,28 @@ test('genuine interrupted task can reconnect to the original server task, withou
  assert.match(dialog,/taskFailed&&onRetryFailedTask&&<button/);
  assert.match(dialog,/恢复原研究任务/);
  assert.match(page,/onRetryFailedTask=\{taskFailure\?\(\)=>void retryFailedTask\(\):undefined\}/);
+});
+
+
+test('duplicate uploads are checked before preview, and choice B never auto-selects or auto-saves',()=>{
+ const client=read('../src/services/privateResumes.ts');
+ const route=read('../functions/api/resumes/[[path]].js');
+ const css=read('../src/styles/resume-match.css');
+ assert.match(client,/crypto\.subtle\.digest\('SHA-256',await file\.arrayBuffer\(\)\)/);
+ assert.match(client,/fetch\(API\+'\/check'/);
+ assert.match(client,/body:JSON\.stringify\(\{sha256,size:file\.size\}\)/);
+ assert.match(route,/if\(tail==='\/check'&&method==='POST'\)/);
+ assert.match(route,/WHERE phone=\? AND sha256=\? AND size_bytes=\?/);
+ assert.match(route,/existing:match\?summary\(match\):null/);
+ assert.match(page,/setDuplicateReview\(\{candidate,existing\}\)/);
+ assert.match(page,/role="alertdialog" aria-modal="true"/);
+ assert.match(page,/使用已保存的简历/);
+ assert.match(page,/取消本次上传/);
+ assert.match(page,/function useAlreadySavedResume\(\)/);
+ assert.match(page,/function cancelDuplicateUpload\(\)/);
+ assert.match(page,/selectSavedResume\(match\.id,match\)/);
+ assert.match(page,/choose\(null\)/);
+ assert.match(page,/duplicateChecking\|\|duplicateReview\|\|duplicateCheckError\|\|/);
+ assert.match(css,/\.hhba-ai-duplicate-overlay/);
+ assert.match(css,/@media\(max-width:520px\)/);
 });
