@@ -169,7 +169,9 @@ test('frontend never mounts analytics prompt or sends account bearer events',()=
  assert.match(privacy,/historicalRecorded/);
  assert.match(privacy,/清除旧版活动记录/);
  assert.match(resume,/我已知悉并单独同意/);
- assert.match(match,/授权 HHBA 使用简历信息进行智能匹配，并将脱敏后的简历文字发送至第三方 AI 服务分析/);
+ assert.match(match,/我已阅读并同意/);
+  assert.match(match,/《隐私政策》/);
+  assert.match(match,/授权进行 AI 简历分析与岗位匹配。/);
  assert.match(match,/checked=\{consent\}/);
  assert.match(match,/!consent\|\|working/);
 });
