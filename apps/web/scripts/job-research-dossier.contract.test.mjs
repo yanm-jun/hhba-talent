@@ -50,25 +50,19 @@ test('unavailable or declined report must not be represented as completed',()=>{
  }
 });
 
-test('the native workspace shows each candidate immediately, in one pager with real research stages',()=>{
- const panel=readFileSync(new URL('../src/components/MatchResearchPanels.tsx',import.meta.url),'utf8');
+test('report-first workspace only presents complete reports while retaining research evidence',()=>{
  const modal=readFileSync(new URL('../src/components/CandidateMatchNativeDialog.tsx',import.meta.url),'utf8');
+ const first=readFileSync(new URL('../src/components/ReportFirstMatchExperience.tsx',import.meta.url),'utf8');
  const dossier=readFileSync(new URL('../src/components/JobResearchDossier.tsx',import.meta.url),'utf8');
- const css=readFileSync(new URL('../src/styles/job-research-dossier.css',import.meta.url),'utf8');
- assert.match(modal,/hasLiveCandidate=researchJobs\.length>0\|\|result\.matches\.length>0/);
- assert.match(modal,/hasLiveCandidate\?2/,'live candidates must open a research card even without a finished report');
- assert.doesNotMatch(modal,/已执行 \{progressActivity\.searches\} 次检索/);
- assert.match(panel,/const browseItems=\[\.\.\.jdItems,\.\.\.all\.filter/);
- assert.match(panel,/<ReportPager count=\{browseItems\.length\}/);
- assert.match(panel,/<JobResearchDossier job=\{jdJob\}\/>/);
- assert.match(panel,/isVerifiedMatchReport\(jdJob\)/,'provisional candidates must not unlock official resume optimization');
- assert.match(panel,/已收到检索来源/);
- assert.match(panel,/已收录具体岗位/);
- assert.match(panel,/完整研究报告/);
- assert.doesNotMatch(panel,/来源数量不设上限/,'new finite discovery must not be advertised as unlimited');
+ const css=readFileSync(new URL('../src/styles/report-first-experience.css',import.meta.url),'utf8');
+ assert.match(modal,/<ReportFirstMatchExperience/);
+ assert.match(first,/const fullReport=/);
+ assert.match(first,/job\.report_status==='COMPLETE'/);
+ assert.match(first,/firstDelivered\.current=true;setView\('reports'\)/);
+ assert.match(first,/岗位详情/);
+ assert.match(first,/reference_jd\|\|current\.evidence_excerpt/);
+ assert.match(first,/isVerifiedMatchReport\(current\)/,'unverified references may be read but must not unlock formal optimization');
+ assert.match(first,/招聘信息待核实/);
  assert.match(dossier,/data-research-stage=\{stage\.id\}/);
- assert.match(dossier,/data-evidence-state=\{stage\.state\}/);
- assert.match(dossier,/dossier\.reportFinished/,'only a completed evidence-backed report shows formal judgment');
  assert.match(css,/max-width:640px/);
- assert.match(css,/\.hhba-job-dossier-milestones/);
 });
