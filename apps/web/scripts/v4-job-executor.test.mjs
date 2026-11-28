@@ -173,3 +173,40 @@ test('independent JD sidecar enforces current lease, account generation and encr
  const model=readFileSync(new URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
  assert.match(model,/await provider\.phaseReplay\.persist\?\.\(\)/);
 });
+
+
+test('completed JD model calls are encrypted-checkpoint candidates, replayed only on the next invocation',async()=>{
+ const {phaseModelReplay}=await import('../functions/_lib/v4-phase-budget.js');
+ const persisted=[];
+ const first=phaseModelReplay([],{onRemember:async entries=>{persisted.push(structuredClone(entries));}});
+ const answer={status:'completed',output:[{type:'reasoning',summary:[]},{type:'message',content:[{type:'output_text',text:'公开招聘依据'}]}]};
+ first.remember('exact-jd-stage-and-prompt-digest',answer);
+ await first.persist();
+ assert.equal(persisted.length,1,'a successful paid model call must be saved before the next JD step');
+ assert.equal(persisted[0].length,1);
+ assert.ok(!JSON.stringify(persisted).includes('reasoning'),'private model reasoning must not be saved in replay');
+ assert.equal(first.take('exact-jd-stage-and-prompt-digest'),null,'same-run deliberate repeat must be live');
+ const restarted=phaseModelReplay(persisted[0]);
+ const once=restarted.take('exact-jd-stage-and-prompt-digest');
+ assert.equal(once.output[0].content[0].text,'公开招聘依据');
+ assert.equal(restarted.take('exact-jd-stage-and-prompt-digest'),null,'next deliberate repeat must still research live');
+ assert.equal(restarted.take('different-prompt-digest'),null,'new evidence/prompt must never reuse a stale result');
+ const source=readFileSync(new URL('../functions/_lib/v4-job-executor.js',import.meta.url),'utf8');
+ const model=readFileSync(new URL('../functions/_lib/simple-match-v4.js',import.meta.url),'utf8');
+ assert.match(source,/phaseModelReplay\(vettedPrevious\?previous\?\.phaseReplay:/);
+ assert.match(source,/phaseReplay:replay\.snapshot\(\)/,'both finished and deferred JD checkpoints retain completed model evidence');
+ assert.match(source,/await saveMatchTask\(env,resultKey,/);
+ assert.match(model,/await provider\.phaseReplay\.persist\?\.\(\)/,'successful provider response must be saved before later verification can fail');
+});
+test('failed model answers are not reused and checkpoint write failure remains retryable',async()=>{
+ const {phaseModelReplay}=await import('../functions/_lib/v4-phase-budget.js');
+ let writes=0;
+ const replay=phaseModelReplay([],{onRemember:async()=>{writes++;throw Error('temporary encrypted storage failure')}});
+ replay.remember('failed',{status:'incomplete',output:[{type:'message'}]});
+ await replay.persist();
+ assert.equal(writes,0);
+ replay.remember('complete',{status:'completed',output:[{type:'message',content:[]}]});
+ await assert.rejects(()=>replay.persist(),/temporary encrypted storage failure/);
+ await assert.rejects(()=>replay.persist(),/temporary encrypted storage failure/);
+ assert.equal(writes,2,'failed durable writes cannot acknowledge model evidence as persisted');
+});
