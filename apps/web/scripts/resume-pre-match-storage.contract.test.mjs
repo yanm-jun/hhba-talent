@@ -15,7 +15,7 @@ test('original file retention is a separate explicit choice, not a side effect o
  assert.match(page,/checked=\{storageChoice==='save'\}/);
  assert.match(page,/checked=\{storageChoice==='once'\}/);
  assert.match(page,/name="hhba-resume-storage" value="save"[\s\S]{0,160}onChange=\{\(\)=>setStorageChoice\('save'\)\}/);
- assert.match(page,/file&&!savedId&&storageChoice==='undecided'/);
+ assert.match(page,/file&&!savedId&&\(storageChoice==='undecided'\|\|\(storageChoice==='save'&&!!duplicateCheckError\)\)/,'upload requires deliberate storage choice; failed duplicate checks forbid saving');
  assert.match(page,/checked=\{consent\}/,'AI analysis authorization remains independent');
  assert.match(page,/onChange=\{e=>setConsent\(e.target.checked\)\}/);
 });
