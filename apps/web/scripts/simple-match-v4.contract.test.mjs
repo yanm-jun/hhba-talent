@@ -820,7 +820,7 @@ test('research overview is driven by observed evidence, not animated provider-ca
  const experience=await readFile(new URL('../src/components/ReportFirstMatchExperience.tsx',import.meta.url),'utf8');
  assert.match(dialog,/<ReportFirstMatchExperience/);
  assert.match(experience,/const sourceCount=report\?\.search_source_count\|\|0/);
- assert.match(experience,/const ready=useMemo\(\(\)=>all\.filter\(fullReport\)/);
+ assert.match(experience,/const ready=useMemo\(\(\)=>all\.map\(readableReportJob\)/);
  assert.match(experience,/firstDelivered\.current=true;setView\('reports'\)/);
  assert.match(panels,/全部已收到候选岗位/);
  assert.match(css,/max-width:640px/);
