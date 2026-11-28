@@ -700,20 +700,23 @@ jobs:
           node -e "const fs=require('fs');const a=fs.readFileSync('apps/web/dist/images/hhba-people-group-hd.avif');const w=fs.readFileSync('apps/web/dist/images/hhba-people-group.webp');if(a.length<100000||a.toString('ascii',4,12)!=='ftypavif'||w.length<150000||w.toString('ascii',0,4)!=='RIFF')process.exit(1);console.log('HHBA_HIGH_DEFINITION_WORKERS_PHOTO_OK')"
           test -s apps/web/dist/images/hhba-join-team.webp
           node -e "const fs=require('fs');const p='apps/web/dist/images/hhba-join-team.webp';const x=fs.readFileSync(p);if(x.toString('ascii',0,4)!=='RIFF'||x.toString('ascii',8,12)!=='WEBP'||x.length<20000)process.exit(1);console.log('HHBA_REAL_JOIN_PHOTO',x.length)"
-      - name: Verify founder letter and the handwritten signature asset are in the public build
+      - name: Verify founder letter and the current traced handwritten signature in the public build
         run: |
-          test -s apps/web/dist/images/hhba-founder-signature.webp
+          test -s apps/web/dist/images/hhba-founder-signature-2026.svg
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
-          const photo=fs.readFileSync('apps/web/dist/images/hhba-founder-signature.webp');
-          if(photo.length<12000||photo.toString('ascii',0,4)!=='RIFF'||
-             photo.toString('ascii',8,12)!=='WEBP')throw Error('INVALID_HHBA_FOUNDER_SIGNATURE');
+          const signature=fs.readFileSync('apps/web/dist/images/hhba-founder-signature-2026.svg','utf8');
+          if(!signature.startsWith('<svg ')||
+             !signature.includes('viewBox="0 0 1301 691"')||
+             !signature.includes('Vector traced from the original signature photograph')||
+             !signature.includes('<path'))
+            throw Error('INVALID_HHBA_FOUNDER_SIGNATURE');
           const page=fs.readFileSync('apps/web/src/pages/JoinUsPage.tsx','utf8');
-          if(!page.includes('<BrandManifesto />')||!page.includes('A NOTE FROM HHBA')||
-             !page.includes('images/hhba-founder-signature.webp')||
+          if(!page.includes('<BrandManifesto />')||!page.includes("A NOTE FROM HHBA'S FOUNDER")||
+             !page.includes('images/hhba-founder-signature-2026.svg')||
              page.includes('images/hhba-brand-manifesto.webp'))
             throw Error('HHBA_FOUNDER_LETTER_NOT_CURRENT');
-          console.log('HHBA_FOUNDER_LETTER_OK',photo.length);
+          console.log('HHBA_FOUNDER_LETTER_OK',signature.length);
           NODE
       - name: Refresh official ATS index while preserving 200-company directory
         working-directory: apps/web
