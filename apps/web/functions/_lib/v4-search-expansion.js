@@ -14,7 +14,9 @@ export function nextEvidenceExpansion(visited=[]){
  return next?{...next,visited:[...seen,next.key]}:null;
 }
 export function ungroundedSearchCompletion({candidateCount=0,target=500,webSources=0,actualQueries=0,publicReads=0}={}){
- // A model may not claim a fully researched 500-job outcome solely from an
- // unsupported narrative. Keep partial results and an explicit diagnostic.
- return candidateCount<target&&webSources===0&&actualQueries===0&&publicReads===0;
+ // A source-driven task has no numeric threshold: require real web/source
+ // evidence before accepting a model's research-complete assertion. Existing
+ // numeric-target tasks retain their original compatibility behavior.
+ const notEnough=target===null?true:candidateCount<target;
+ return notEnough&&webSources===0&&actualQueries===0&&publicReads===0;
 }
