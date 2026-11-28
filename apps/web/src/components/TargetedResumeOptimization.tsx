@@ -24,7 +24,7 @@ import {ResumePrintSheet} from './ResumePrintSheet';
 import {downloadResumeDocx} from '../services/resumeDocx';
 import {reassessmentStatus,reassessResume,type ReassessmentStatus,type ReassessmentResult} from '../services/resumeReassessmentApi';
 import {officialJobVerifyStatus,verifyOfficialJob,type OfficialJobVerifyStatus,type OfficialVerifiedJob} from '../services/officialJobVerifyApi';
-import {JobJdArchiveError,jobJdArchiveStatus,ensureArchivedJobJd,getArchivedJobJdVersion,type JdAwareJob} from '../services/jobJdArchive';
+import {JobJdArchiveError,jobJdArchiveStatus,recoverMatchedJdArchive,ensureArchivedJobJd,getArchivedJobJdVersion,type JdAwareJob} from '../services/jobJdArchive';
 import {stablePostingScope} from '../services/stablePostingScope.mjs';
 import '../styles/targeted-resume-optimization.css';
 import '../styles/siri-edge.css';
@@ -381,7 +381,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    if(job.evidence_status!=='VERIFIED_FULL_JD'||!job.evidence_excerpt?.trim()||prior?.score_evidence_status!=='GROUNDED_JD_RESUME_QUOTES'||prior.official_url!==job.official_url)
     throw Error('请先完成此岗位的 JD 核验，再优化简历。');
    try{
-    const official=await ensureArchivedJobJd(job.official_url,signal);
+    const official=await recoverMatchedJdArchive(job.official_url,job.evidence_excerpt,signal)||await ensureArchivedJobJd(job.official_url,signal);
     if(official.canonical_url!==job.official_url||official.company!==job.company||official.title!==job.title||official.location!==job.location)
      throw Error('岗位 JD 版本不一致，请重新匹配后再优化。');
     if(!signal.aborted)setArchivedJdId(official.job_id);
@@ -535,7 +535,7 @@ export function TargetedResumeOptimization({profile,job,sourceText,sourceResume,
    setSuggestions(accepted);
    setActiveSuggestionId(accepted[0]?.id||null);
    setOpenSuggestionId(accepted[0]?.id||null);
-   const sourceNote=trustedJob.reference_jd_kind==='AI_GENERATED_REFERENCE'?'本次依据AI参考JD优化真实经历，不代表企业已确认任职资格。':trustedJob.jd_version_id?
+   const sourceNote=trustedJob.reference_jd_kind==='AI_GENERATED_REFERENCE'?'本次依据明确标注的岗位参考资料优化真实经历，不代表企业已确认任职资格。':trustedJob.jd_version_id?
     '本次已依据企业官网核验的完整岗位 JD 生成建议。':
     '当前尚未接入可核验的完整 JD，本次仅依据已保存的岗位信息生成建议。';
    setNotice(pending.length?('已保留本次研究成果。还有 '+pending.length+' 处待处理，再点优化可接着处理。'+(pauseMessage?' '+pauseMessage:'')):
