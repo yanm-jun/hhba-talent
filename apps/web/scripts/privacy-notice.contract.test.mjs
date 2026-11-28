@@ -15,7 +15,15 @@ test('privacy notice is public, readable in a separate tab and retains independe
  assert.match(checkbox,/BASE_URL\+'privacy'/);
  assert.match(checkbox,/target="_blank" rel="noopener noreferrer"/);
  assert.doesNotMatch(checkbox,/24小时|23小时|中间状态/);
- assert.match(checkbox,/脱敏后的简历文字发送至第三方 AI/);
+ assert.match(checkbox,/我已阅读并同意/);
+ assert.match(checkbox,/《隐私政策》/);
+ assert.match(checkbox,/授权进行 AI 简历分析与岗位匹配。/);
+ assert.doesNotMatch(checkbox,/脱敏后的简历文字|第三方中转|临时保存/,'details belong to the privacy page, not the compact checkbox');
+ assert.match(notice,/第三方服务及数据传输/);
+ assert.match(notice,/第三方中转服务/);
+ assert.doesNotMatch(match,/简历仅用于生成岗位建议，不会自动向企业投递或公开。/,'remove duplicate note below the consent checkbox');
+ const styles=read('../src/styles/resume-match.css');
+ assert.match(styles,/\.hhba-ai-consent\{[^}]*background:transparent/,'the previously oversized grey consent card is removed');
  assert.match(match,/!consent\|\|working/);
  assert.ok(main.indexOf("if(route==='/privacy')")<main.indexOf('const isCandidateWorkspaceRoute='));
  assert.match(notice,/export function PrivacyNoticePage/);
